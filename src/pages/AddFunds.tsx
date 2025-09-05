@@ -213,7 +213,7 @@ const AddFunds: React.FC = () => {
               <p className="text-3xl font-bold text-gray-900 mb-2">₹1,250.50</p>
               {amount && (
                 <p className="text-sm text-gray-600">
-                  After adding ₹{amount}, your balance will be: <strong>₹{(1250.50 + parseFloat(amount || '0')).toFixed(2)}</strong>
+                  After adding ₹{amount}, your balance will be: <strong>₹{(0 + parseFloat(amount || '0')).toFixed(2)}</strong>
                 </p>
               )}
             </div>
