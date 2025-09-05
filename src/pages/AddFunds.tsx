@@ -252,7 +252,7 @@ const AddFunds: React.FC = () => {
                     {[
                       'Open your UPI app (PhonePe, Google Pay, Paytm, etc.)',
                       'Scan the QR code or enter the UPI ID',
-                      `Enter the amount: ₹${amount || '0'}`,
+                      `Enter the amount
                       'Complete the payment',
                       'Your account will be credited within 5-10 minutes'
                     ].map((step, index) => (
