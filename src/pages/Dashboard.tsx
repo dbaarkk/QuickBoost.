@@ -13,10 +13,10 @@ import {
 
 const Dashboard: React.FC = () => {
   // Mock data - replace with real data from your API
-  const userBalance = 1250.50;
-  const totalOrders = 24;
-  const pendingOrders = 3;
-  const completedOrders = 21;
+  const userBalance = 0;
+  const totalOrders = 0;
+  const pendingOrders = 0;
+  const completedOrders = 0;
 
   const recentOrders = [
     {
