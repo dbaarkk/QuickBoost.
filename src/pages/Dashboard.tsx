@@ -106,16 +106,16 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-2">
             <Link to="/" className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">QuickBoost</span>
+              <TrendingUp className="h-6 w-6 text-indigo-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
             </Link>
-            <nav className="flex items-center space-x-6">
-              <Link to="/dashboard" className="text-indigo-600 font-medium">Dashboard</Link>
-              <Link to="/services" className="text-gray-700 hover:text-indigo-600 font-medium">Services</Link>
-              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 font-medium">Place Order</Link>
-              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 font-medium">Add Funds</Link>
+            <nav className="flex items-center space-x-4">
+              <Link to="/dashboard" className="text-indigo-600 text-sm font-medium">Dashboard</Link>
+              <Link to="/services" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Services</Link>
+              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Place Order</Link>
+              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Balance:</span>
                 <span className="text-sm font-semibold text-green-600">₹{userBalance.toFixed(2)}</span>
@@ -125,29 +125,29 @@ const Dashboard: React.FC = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back!</h1>
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back!</h1>
           <p className="text-gray-600">Here's what's happening with your account today.</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Account Balance</p>
-                <p className="text-2xl font-bold text-gray-900">₹{userBalance.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900">₹{userBalance.toFixed(2)}</p>
               </div>
-              <div className="bg-green-100 rounded-xl p-3">
-                <Wallet className="h-6 w-6 text-green-600" />
+              <div className="bg-green-100 rounded-lg p-2">
+                <Wallet className="h-5 w-5 text-green-600" />
               </div>
             </div>
-            <div className="mt-4">
+            <div className="mt-2">
               <Link
                 to="/add-funds"
-                className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                className="inline-flex items-center text-xs text-indigo-600 hover:text-indigo-500 font-medium"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Add Funds
@@ -155,62 +155,62 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="bg-white rounded-xl shadow-sm border p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <p className="text-2xl font-bold text-gray-900">{totalOrders}</p>
+                <p className="text-xl font-bold text-gray-900">{totalOrders}</p>
               </div>
-              <div className="bg-blue-100 rounded-xl p-3">
-                <ShoppingCart className="h-6 w-6 text-blue-600" />
+              <div className="bg-blue-100 rounded-lg p-2">
+                <ShoppingCart className="h-5 w-5 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="bg-white rounded-xl shadow-sm border p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Pending Orders</p>
-                <p className="text-2xl font-bold text-gray-900">{pendingOrders}</p>
+                <p className="text-xl font-bold text-gray-900">{pendingOrders}</p>
               </div>
-              <div className="bg-yellow-100 rounded-xl p-3">
-                <Clock className="h-6 w-6 text-yellow-600" />
+              <div className="bg-yellow-100 rounded-lg p-2">
+                <Clock className="h-5 w-5 text-yellow-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="bg-white rounded-xl shadow-sm border p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Completed Orders</p>
-                <p className="text-2xl font-bold text-gray-900">{completedOrders}</p>
+                <p className="text-xl font-bold text-gray-900">{completedOrders}</p>
               </div>
-              <div className="bg-green-100 rounded-xl p-3">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+              <div className="bg-green-100 rounded-lg p-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {quickActions.map((action, index) => (
               <Link
                 key={index}
                 to={action.link}
-                className={`${action.color} text-white p-6 rounded-xl transition-all hover:scale-105 hover:shadow-lg group`}
+                className={`${action.color} text-white p-4 rounded-lg transition-all hover:scale-105 hover:shadow-lg group`}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center mb-2">
                       {action.icon}
-                      <span className="ml-2 font-semibold">{action.title}</span>
+                      <span className="ml-2 text-sm font-semibold">{action.title}</span>
                     </div>
-                    <p className="text-sm opacity-90">{action.description}</p>
+                    <p className="text-xs opacity-90">{action.description}</p>
                   </div>
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             ))}
@@ -219,10 +219,10 @@ const Dashboard: React.FC = () => {
 
         {/* Recent Orders */}
         <div className="bg-white rounded-xl shadow-sm border">
-          <div className="px-6 py-4 border-b">
+          <div className="px-4 py-3 border-b">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">Recent Orders</h2>
-              <Link to="/orders" className="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
+              <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
+              <Link to="/orders" className="text-indigo-600 hover:text-indigo-500 text-xs font-medium">
                 View All
               </Link>
             </div>
@@ -233,16 +233,16 @@ const Dashboard: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Order Details
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Progress
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Amount
                     </th>
                   </tr>
@@ -250,14 +250,14 @@ const Dashboard: React.FC = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {recentOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div>
                           <div className="text-sm font-medium text-gray-900">#{order.id}</div>
                           <div className="text-sm text-gray-600">{order.service}</div>
                           <div className="text-xs text-gray-500">{order.quantity.toLocaleString()} items</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div className="flex items-center">
                           {getStatusIcon(order.status)}
                           <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
@@ -265,7 +265,7 @@ const Dashboard: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
                             className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
@@ -274,7 +274,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <span className="text-xs text-gray-500 mt-1">{order.progress}%</span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
                         ₹{order.amount}
                       </td>
                     </tr>
@@ -283,13 +283,13 @@ const Dashboard: React.FC = () => {
               </table>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
+            <div className="text-center py-8">
+              <ShoppingCart className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-base font-medium text-gray-900 mb-2">No orders yet</h3>
               <p className="text-gray-600 mb-4">Start by placing your first order</p>
               <Link
                 to="/place-order"
-                className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Place First Order
