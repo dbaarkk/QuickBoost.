@@ -157,7 +157,7 @@ const AddFunds: React.FC = () => {
                   <div className="flex items-center justify-between bg-white rounded-md p-3 border">
                     <span className="font-mono text-gray-900">aaryaveer@indianbank</span>
                     <button
-                      onClick={aaryaveer@indianbank}
+                      onClick={handleCopyUPI}
                       className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
                     >
                       {copied ? (
