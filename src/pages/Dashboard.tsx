@@ -19,7 +19,39 @@ const Dashboard: React.FC = () => {
   const completedOrders = 0;
 
   const recentOrders = [
-    
+    {
+      id: '1001',
+      service: 'Instagram Followers',
+      quantity: 1000,
+      status: 'Completed',
+      amount: 299,
+      date: '2025-01-15'
+    },
+    {
+      id: '1002',
+      service: 'YouTube Views',
+      quantity: 5000,
+      status: 'In Progress',
+      amount: 450,
+      date: '2025-01-14'
+    },
+    {
+      id: '1003',
+      service: 'Facebook Likes',
+      quantity: 500,
+      status: 'Pending',
+      amount: 150,
+      date: '2025-01-14'
+    },
+    {
+      id: '1004',
+      service: 'Twitter Followers',
+      quantity: 2000,
+      status: 'Completed',
+      amount: 380,
+      date: '2025-01-13'
+    }
+  ];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
