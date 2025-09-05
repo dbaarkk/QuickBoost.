@@ -332,7 +332,7 @@ const AddFunds: React.FC = () => {
                   <p className="text-sm text-gray-600">
                     If you face any issues with payment, contact our support team at{' '}
                     <a href="mailto:support@quickboost.com" className="text-indigo-600 hover:text-indigo-500 font-medium">
-                      support@quickboost.com
+                      quickboostbusiness@gmail.com
                     </a>
                   </p>
                 </div>
