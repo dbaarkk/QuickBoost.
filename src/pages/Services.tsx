@@ -10,7 +10,9 @@ import {
   ShoppingCart,
   Star,
   Clock,
-  Users
+  Users,
+  Filter,
+  ArrowRight
 } from 'lucide-react';
 
 interface Service {
@@ -24,6 +26,7 @@ interface Service {
   description: string;
   deliveryTime: string;
   rating: number;
+  popular?: boolean;
 }
 
 const Services: React.FC = () => {
@@ -31,7 +34,6 @@ const Services: React.FC = () => {
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Mock services data - replace with real data from your API
   const services: Service[] = [
     {
       id: 1,
@@ -41,9 +43,10 @@ const Services: React.FC = () => {
       price: 25,
       minOrder: 100,
       maxOrder: 100000,
-      description: 'Get high-quality Instagram followers from real accounts',
+      description: 'Get high-quality Instagram followers from real accounts with profile pictures',
       deliveryTime: '0-1 hours',
-      rating: 4.8
+      rating: 4.8,
+      popular: true
     },
     {
       id: 2,
@@ -53,9 +56,10 @@ const Services: React.FC = () => {
       price: 10,
       minOrder: 50,
       maxOrder: 50000,
-      description: 'Instant Instagram likes for your posts',
+      description: 'Instant Instagram likes for your posts from active users',
       deliveryTime: '0-30 minutes',
-      rating: 4.9
+      rating: 4.9,
+      popular: true
     },
     {
       id: 3,
@@ -65,7 +69,7 @@ const Services: React.FC = () => {
       price: 5,
       minOrder: 1000,
       maxOrder: 1000000,
-      description: 'Real YouTube views from active users',
+      description: 'Real YouTube views from active users worldwide',
       deliveryTime: '1-6 hours',
       rating: 4.7
     },
@@ -77,7 +81,7 @@ const Services: React.FC = () => {
       price: 50,
       minOrder: 50,
       maxOrder: 10000,
-      description: 'High-quality YouTube subscribers',
+      description: 'High-quality YouTube subscribers with profile pictures',
       deliveryTime: '0-2 hours',
       rating: 4.6
     },
@@ -89,7 +93,7 @@ const Services: React.FC = () => {
       price: 10,
       minOrder: 100,
       maxOrder: 50000,
-      description: 'Facebook page likes from real users',
+      description: 'Facebook page likes from real users with active profiles',
       deliveryTime: '1-3 hours',
       rating: 4.5
     },
@@ -101,7 +105,7 @@ const Services: React.FC = () => {
       price: 40,
       minOrder: 100,
       maxOrder: 25000,
-      description: 'High-quality Twitter followers',
+      description: 'High-quality Twitter followers from real accounts',
       deliveryTime: '0-2 hours',
       rating: 4.4
     }
@@ -152,18 +156,22 @@ const Services: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div className="flex justify-between items-center py-4">
             <Link to="/" className="flex items-center">
               <TrendingUp className="h-8 w-8 text-indigo-600" />
               <span className="ml-2 text-2xl font-bold text-gray-900">QuickBoost</span>
             </Link>
             <nav className="flex items-center space-x-6">
-              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600">Dashboard</Link>
+              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 font-medium">Dashboard</Link>
               <Link to="/services" className="text-indigo-600 font-medium">Services</Link>
-              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600">Add Funds</Link>
-              <button className="text-gray-700 hover:text-red-600">Logout</button>
+              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 font-medium">Place Order</Link>
+              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 font-medium">Add Funds</Link>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Balance:</span>
+                <span className="text-sm font-semibold text-green-600">₹0.00</span>
+              </div>
             </nav>
           </div>
         </div>
@@ -177,7 +185,11 @@ const Services: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
+          <div className="flex items-center mb-4">
+            <Filter className="h-5 w-5 text-gray-400 mr-2" />
+            <h3 className="font-medium text-gray-900">Filter Services</h3>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
@@ -187,7 +199,7 @@ const Services: React.FC = () => {
                 placeholder="Search services..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
 
@@ -195,7 +207,7 @@ const Services: React.FC = () => {
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               {platforms.map(platform => (
                 <option key={platform} value={platform}>
@@ -208,7 +220,7 @@ const Services: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -222,12 +234,18 @@ const Services: React.FC = () => {
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map((service) => (
-            <div key={service.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+            <div key={service.id} className="bg-white rounded-xl shadow-sm border hover:shadow-lg transition-all hover:scale-105 relative overflow-hidden">
+              {service.popular && (
+                <div className="absolute top-4 right-4 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                  Popular
+                </div>
+              )}
+              
               <div className="p-6">
                 {/* Service Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center">
-                    <div className={`p-2 rounded-lg ${getPlatformColor(service.platform)}`}>
+                    <div className={`p-3 rounded-xl ${getPlatformColor(service.platform)}`}>
                       {getPlatformIcon(service.platform)}
                     </div>
                     <div className="ml-3">
@@ -245,10 +263,12 @@ const Services: React.FC = () => {
                 {/* Service Details */}
                 <p className="text-gray-600 text-sm mb-4 line-clamp-2">{service.description}</p>
 
-                <div className="space-y-2 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <span>Delivery: {service.deliveryTime}</span>
+                <div className="space-y-2 text-sm text-gray-600 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-2" />
+                      <span>Delivery: {service.deliveryTime}</span>
+                    </div>
                   </div>
                   <div className="flex justify-between">
                     <span>Min: {service.minOrder.toLocaleString()}</span>
@@ -262,10 +282,13 @@ const Services: React.FC = () => {
                     <span className="text-2xl font-bold text-gray-900">₹{service.price}</span>
                     <span className="text-gray-600 text-sm ml-1">per 1000</span>
                   </div>
-                  <button className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                  <Link
+                    to="/place-order"
+                    className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Order Now
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

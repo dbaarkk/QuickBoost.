@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { TrendingUp, Mail, Lock, User, Eye, EyeOff, Phone } from 'lucide-react';
+import { TrendingUp, Mail, Lock, User, Eye, EyeOff, Phone, ArrowRight } from 'lucide-react';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ const Signup: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
-    // Clear error when user starts typing
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
@@ -79,17 +78,15 @@ const Signup: React.FC = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      // Navigate to dashboard after successful signup
       console.log('Signup attempt:', formData);
       navigate('/dashboard');
     }, 1000);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -101,12 +98,12 @@ const Signup: React.FC = () => {
             Create your account
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Join thousands of satisfied customers
+            Join thousands of satisfied customers and start growing today
           </p>
         </div>
 
         {/* Signup Form */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 border">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
@@ -125,7 +122,7 @@ const Signup: React.FC = () => {
                     required
                     value={formData.firstName}
                     onChange={handleChange}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                       errors.firstName ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="First name"
@@ -147,7 +144,7 @@ const Signup: React.FC = () => {
                   required
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`block w-full px-3 py-3 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                  className={`block w-full px-3 py-3 border rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                     errors.lastName ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Last name"
@@ -175,7 +172,7 @@ const Signup: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Enter your email"
@@ -202,7 +199,7 @@ const Signup: React.FC = () => {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                     errors.phone ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Enter your phone number"
@@ -230,7 +227,7 @@ const Signup: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                     errors.password ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Create a password"
@@ -269,7 +266,7 @@ const Signup: React.FC = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                     errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Confirm your password"
@@ -302,11 +299,11 @@ const Signup: React.FC = () => {
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
                 I agree to the{' '}
-                <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                <a href="#" className="text-indigo-600 hover:text-indigo-500 font-medium">
                   Terms and Conditions
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                <a href="#" className="text-indigo-600 hover:text-indigo-500 font-medium">
                   Privacy Policy
                 </a>
               </label>
@@ -316,7 +313,7 @@ const Signup: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? (
                 <div className="flex items-center">
@@ -324,7 +321,10 @@ const Signup: React.FC = () => {
                   Creating account...
                 </div>
               ) : (
-                'Create Account'
+                <div className="flex items-center">
+                  Create Account
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
               )}
             </button>
           </form>
