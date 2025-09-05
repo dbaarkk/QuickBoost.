@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TrendingUp, Mail, Lock, User, Eye, EyeOff, Phone } from 'lucide-react';
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -81,8 +82,9 @@ const Signup: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      // Handle signup logic here
+      // Navigate to dashboard after successful signup
       console.log('Signup attempt:', formData);
+      navigate('/dashboard');
     }, 1000);
   };
 
