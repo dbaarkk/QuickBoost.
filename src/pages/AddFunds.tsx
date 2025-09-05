@@ -155,7 +155,7 @@ const AddFunds: React.FC = () => {
                 <div className="bg-blue-50 rounded-lg p-4 mb-4">
                   <p className="text-sm text-gray-600 mb-2">Or pay directly to UPI ID:</p>
                   <div className="flex items-center justify-between bg-white rounded-md p-3 border">
-                    <span className="font-mono text-gray-900">quickboost@paytm</span>
+                    <span className="font-mono text-gray-900">aaryaveer@indianbank</span>
                     <button
                       onClick={handleCopyUPI}
                       className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
@@ -210,7 +210,7 @@ const AddFunds: React.FC = () => {
                 <Wallet className="h-6 w-6 text-green-600 mr-3" />
                 <h3 className="text-lg font-semibold text-gray-900">Current Balance</h3>
               </div>
-              <p className="text-3xl font-bold text-gray-900 mb-2">₹1,250.50</p>
+              <p className="text-3xl font-bold text-gray-900 mb-2">₹0</p>
               {amount && (
                 <p className="text-sm text-gray-600">
                   After adding ₹{amount}, your balance will be: <strong>₹{(0 + parseFloat(amount || '0')).toFixed(2)}</strong>
