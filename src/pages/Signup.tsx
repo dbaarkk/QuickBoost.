@@ -91,10 +91,10 @@ const Signup: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <Link to="/" className="inline-flex items-center">
-            <TrendingUp className="h-12 w-12 text-indigo-600" />
-            <span className="ml-2 text-3xl font-bold text-gray-900">QuickBoost</span>
+            <TrendingUp className="h-8 w-8 text-indigo-600" />
+            <span className="ml-2 text-2xl font-bold text-gray-900">QuickBoost</span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-4 text-2xl font-bold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -103,10 +103,10 @@ const Signup: React.FC = () => {
         </div>
 
         {/* Signup Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="bg-white rounded-2xl shadow-xl p-6 border">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
                   First Name

@@ -35,10 +35,10 @@ const Login: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <Link to="/" className="inline-flex items-center">
-            <TrendingUp className="h-12 w-12 text-indigo-600" />
-            <span className="ml-2 text-3xl font-bold text-gray-900">QuickBoost</span>
+            <TrendingUp className="h-8 w-8 text-indigo-600" />
+            <span className="ml-2 text-2xl font-bold text-gray-900">QuickBoost</span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-4 text-2xl font-bold text-gray-900">
             Welcome back
           </h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -47,8 +47,8 @@ const Login: React.FC = () => {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="bg-white rounded-2xl shadow-xl p-6 border">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -158,8 +158,8 @@ const Login: React.FC = () => {
         </div>
 
         {/* Features */}
-        <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+        <div className="bg-white rounded-2xl shadow-sm border p-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-3 text-center">
             Why Choose QuickBoost?
           </h3>
           <div className="space-y-3 text-sm text-gray-600">

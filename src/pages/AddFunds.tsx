@@ -41,16 +41,16 @@ const AddFunds: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-2">
             <Link to="/" className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">QuickBoost</span>
+              <TrendingUp className="h-6 w-6 text-indigo-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
             </Link>
-            <nav className="flex items-center space-x-6">
-              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 font-medium">Dashboard</Link>
-              <Link to="/services" className="text-gray-700 hover:text-indigo-600 font-medium">Services</Link>
-              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 font-medium">Place Order</Link>
-              <Link to="/add-funds" className="text-indigo-600 font-medium">Add Funds</Link>
+            <nav className="flex items-center space-x-4">
+              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Dashboard</Link>
+              <Link to="/services" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Services</Link>
+              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Place Order</Link>
+              <Link to="/add-funds" className="text-indigo-600 text-sm font-medium">Add Funds</Link>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Balance:</span>
                 <span className="text-sm font-semibold text-green-600">₹{currentBalance.toFixed(2)}</span>
@@ -60,23 +60,23 @@ const AddFunds: React.FC = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Add Funds to Your Account</h1>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Add Funds to Your Account</h1>
           <p className="text-gray-600">Add money to your account to start placing orders instantly</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Payment Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-6 border-b">
-                <h2 className="text-xl font-semibold text-gray-900">Payment Details</h2>
+              <div className="p-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
               </div>
               
-              <form onSubmit={handleSubmit} className="p-6">
+              <form onSubmit={handleSubmit} className="p-4">
                 {/* Amount Selection */}
-                <div className="mb-8">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-4">
                     Select Amount (₹)
                   </label>
@@ -114,7 +114,7 @@ const AddFunds: React.FC = () => {
                 </div>
 
                 {/* Payment Method */}
-                <div className="mb-8">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-4">
                     Choose Payment Method
                   </label>
@@ -174,9 +174,9 @@ const AddFunds: React.FC = () => {
           </div>
 
           {/* Payment Instructions & Info */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Current Balance */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
+            <div className="bg-white rounded-xl shadow-sm border p-4">
               <div className="flex items-center mb-4">
                 <div className="bg-green-100 p-3 rounded-xl mr-4">
                   <Wallet className="h-6 w-6 text-green-600" />
@@ -200,15 +200,15 @@ const AddFunds: React.FC = () => {
 
             {/* UPI Instructions */}
             {paymentMethod === 'upi' && (
-              <div className="bg-white rounded-xl shadow-sm border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="bg-white rounded-xl shadow-sm border p-4">
+                <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
                   <Smartphone className="h-5 w-5 mr-2 text-green-600" />
                   UPI Payment Instructions
                 </h3>
                 
                 {/* QR Code Section */}
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 text-center mb-6">
-                  <div className="w-48 h-48 bg-white rounded-xl mx-auto flex items-center justify-center border-2 border-dashed border-gray-300 mb-4">
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 text-center mb-4">
+                  <div className="w-32 h-32 bg-white rounded-xl mx-auto flex items-center justify-center border-2 border-dashed border-gray-300 mb-3">
                     <div className="text-center">
                       <Smartphone className="h-12 w-12 text-gray-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-500">Scan QR Code</p>
@@ -221,7 +221,7 @@ const AddFunds: React.FC = () => {
                 </div>
 
                 {/* UPI ID */}
-                <div className="bg-blue-50 rounded-xl p-4 mb-6">
+                <div className="bg-blue-50 rounded-xl p-3 mb-4">
                   <p className="text-sm text-gray-600 mb-3">Or pay directly to UPI ID:</p>
                   <div className="flex items-center justify-between bg-white rounded-lg p-4 border">
                     <span className="font-mono text-gray-900 font-medium">aaryaveer@indianbank</span>
@@ -252,7 +252,7 @@ const AddFunds: React.FC = () => {
                     {[
                       'Open your UPI app (PhonePe, Google Pay, Paytm, etc.)',
                       'Scan the QR code or enter the UPI ID',
-                      `Enter the amount
+                      `Enter the amount ₹${amount || '0'}`,
                       'Complete the payment',
                       'Your account will be credited within 5-10 minutes'
                     ].map((step, index) => (
@@ -270,8 +270,8 @@ const AddFunds: React.FC = () => {
 
             {/* Card Instructions */}
             {paymentMethod === 'card' && (
-              <div className="bg-white rounded-xl shadow-sm border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="bg-white rounded-xl shadow-sm border p-4">
+                <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
                   <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
                   Card Payment
                 </h3>
@@ -304,8 +304,8 @@ const AddFunds: React.FC = () => {
             )}
 
             {/* Security & Support */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="bg-white rounded-xl shadow-sm border p-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
                 <Shield className="h-5 w-5 mr-2 text-green-600" />
                 Security & Support
               </h3>
@@ -340,9 +340,9 @@ const AddFunds: React.FC = () => {
             </div>
 
             {/* Recent Transactions */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Transactions</h3>
-              <div className="text-center py-8">
+            <div className="bg-white rounded-xl shadow-sm border p-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-3">Recent Transactions</h3>
+              <div className="text-center py-4">
                 <Wallet className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">No transactions yet</p>
                 <p className="text-sm text-gray-400">Your recent transactions will appear here</p>
