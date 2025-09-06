@@ -209,7 +209,7 @@ const AddFunds: React.FC = () => {
                 <div className="bg-blue-50 rounded-xl p-3 mb-4">
                   <p className="text-sm text-gray-600 mb-3">Or pay directly to UPI ID:</p>
                   <div className="flex items-center justify-between bg-white rounded-lg p-4 border">
-                    <span className="font-mono text-gray-900 font-medium">6263288522@upi</span>
+                    <span className="font-mono text-gray-900 font-medium">shrinu1928@okaxis</span>
                     <button
                       type="button"
                       onClick={handleCopyUPI}
