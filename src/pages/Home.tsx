@@ -74,17 +74,20 @@ const Home: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-2">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">QuickBoost</span>
+              <TrendingUp className="h-6 w-6 text-indigo-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
             </div>
-            <div className="flex items-center space-x-6">
-              <Link to="/services" className="text-gray-700 hover:text-indigo-600 font-medium">Services</Link>
-              <Link to="/login" className="text-gray-700 hover:text-indigo-600 font-medium">Login</Link>
+            <div className="flex items-center space-x-4">
+              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Dashboard</Link>
+              <Link to="/services" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Services</Link>
+              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Place Order</Link>
+              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
+              <Link to="/login" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Login</Link>
               <Link
                 to="/signup"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
               >
                 Get Started
               </Link>
@@ -94,7 +97,7 @@ const Home: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-20">
+      <section className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="inline-flex items-center bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
@@ -105,7 +108,7 @@ const Home: React.FC = () => {
               Boost Your Social Media
               <span className="block text-indigo-600">Presence Today</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-gray-600 mb-6 max-w-3xl mx-auto leading-relaxed">
               Get real followers, likes, views, and engagement at the most competitive prices. 
               Trusted by 50,000+ customers across India.
             </p>
@@ -129,7 +132,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gray-900">
+      <section className="py-8 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -143,7 +146,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -169,7 +172,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -200,7 +203,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-indigo-600">
+      <section className="py-12 bg-indigo-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Boost Your Social Media?
@@ -219,7 +222,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-2">

@@ -158,34 +158,34 @@ const Services: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-2">
             <Link to="/" className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">QuickBoost</span>
+              <TrendingUp className="h-6 w-6 text-indigo-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
             </Link>
-            <nav className="flex items-center space-x-6">
-              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 font-medium">Dashboard</Link>
-              <Link to="/services" className="text-indigo-600 font-medium">Services</Link>
-              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 font-medium">Place Order</Link>
-              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 font-medium">Add Funds</Link>
+            <nav className="flex items-center space-x-4">
+              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Dashboard</Link>
+              <Link to="/services" className="text-indigo-600 text-sm font-medium">Services</Link>
+              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Place Order</Link>
+              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Balance:</span>
-                <span className="text-sm font-semibold text-green-600">₹0.00</span>
+                <span className="text-sm font-semibold text-green-600">₹{0}</span>
               </div>
             </nav>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Our Services</h1>
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Our Services</h1>
           <p className="text-gray-600">Choose from our wide range of social media marketing services</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border p-4 mb-4">
           <div className="flex items-center mb-4">
             <Filter className="h-5 w-5 text-gray-400 mr-2" />
             <h3 className="font-medium text-gray-900">Filter Services</h3>
