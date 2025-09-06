@@ -199,19 +199,17 @@ const AddFunds: React.FC = () => {
                   <div className="w-32 h-32 bg-white rounded-xl mx-auto flex items-center justify-center border-2 border-dashed border-gray-300 mb-3">
                     <div className="text-center">
                       <img src="/IMG_20250906_102052.jpg" alt="UPI QR Code" className="h-32 w-32 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Scan QR Code</p>
-                      <p className="text-xs text-gray-400">with any UPI app</p>
                     </div>
                   </div>
                   <p className="text-sm text-gray-600">
-                    Scan this QR code with your UPI app to pay ₹{amount || '0'}
+                    Scan this QR code with your UPI app to pay {amount || ''}
                   </p>
                 </div>
                 {/* UPI ID */}
                 <div className="bg-blue-50 rounded-xl p-3 mb-4">
                   <p className="text-sm text-gray-600 mb-3">Or pay directly to UPI ID:</p>
                   <div className="flex items-center justify-between bg-white rounded-lg p-4 border">
-                    <span className="font-mono text-gray-900 font-medium">aaryaveer@indianbank</span>
+                    <span className="font-mono text-gray-900 font-medium">6263288522@upi</span>
                     <button
                       type="button"
                       onClick={handleCopyUPI}
