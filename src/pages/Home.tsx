@@ -80,17 +80,7 @@ const Home: React.FC = () => {
               <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Dashboard</Link>
-              <Link to="/services" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Services</Link>
-              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Place Order</Link>
-              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
               <Link to="/login" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Login</Link>
-              <Link
-                to="/signup"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-              >
-                Get Started
-              </Link>
             </div>
           </div>
         </div>
