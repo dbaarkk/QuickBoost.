@@ -72,6 +72,16 @@ const AddFunds: React.FC = () => {
                     <CheckCircle className="h-5 w-5 mr-2" />
                     Verify UPI Payment
                   </button>
+                  
+                  {/* Success Message for UPI */}
+                  {showSuccess && paymentMethod === 'upi' && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                      <span className="text-green-800 font-medium">
+                        ✅ Transaction is being verified, please wait 1-2 minutes
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -109,6 +119,16 @@ const AddFunds: React.FC = () => {
                     <CheckCircle className="h-5 w-5 mr-2" />
                     Verify Crypto Payment
                   </button>
+                  
+                  {/* Success Message for Crypto */}
+                  {showSuccess && paymentMethod === 'crypto' && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                      <span className="text-green-800 font-medium">
+                        ✅ Transaction is being verified, please wait 1-2 minutes
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </nav>
