@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  TrendingUp, 
-  Wallet, 
-  Smartphone, 
-  Copy, 
+import {
+  TrendingUp,
+  Wallet,
+  Smartphone,
+  Copy,
   CheckCircle,
   Shield,
-  Clock
+  Clock,
 } from 'lucide-react';
 
 const wallets = [
@@ -38,6 +38,8 @@ const AddFunds: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 4000);
     console.log('Payment submitted:', { amount, paymentMethod });
   };
 
@@ -63,7 +65,7 @@ const AddFunds: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Payment Form */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-xl shadow-sm border">
               <div className="p-4 border-b">
                 <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
@@ -161,6 +163,28 @@ const AddFunds: React.FC = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       required
                     />
+
+                    {/* UPI QR and ID */}
+                    <div className="bg-gray-50 rounded-xl p-4 text-center">
+                      <img
+                        src="/IMG_20250906_102052.jpg"
+                        alt="UPI QR"
+                        className="h-32 w-32 mx-auto mb-3"
+                      />
+                      <p className="text-sm text-gray-600 mb-2">
+                        Scan this QR code with your UPI app
+                      </p>
+                      <div className="flex justify-center items-center bg-white p-2 rounded-lg border">
+                        <span className="font-mono text-gray-900 mr-3">aaryaveer@upi</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy('aaryaveer@upi')}
+                          className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                        >
+                          {copied === 'aaryaveer@upi' ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -180,6 +204,7 @@ const AddFunds: React.FC = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       required
                     />
+                    {/* Wallets */}
                     <div className="space-y-2">
                       {wallets.map((wallet) => (
                         <div
@@ -209,12 +234,22 @@ const AddFunds: React.FC = () => {
                   <CheckCircle className="h-5 w-5 mr-2" />
                   {paymentMethod === 'upi' ? 'Verify UPI Payment' : 'Verify Crypto Payment'}
                 </button>
+
+                {showSuccess && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center mt-2">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                    <span className="text-green-800 font-medium">
+                      ✅ Transaction is being verified, please wait 1-2 minutes
+                    </span>
+                  </div>
+                )}
               </form>
             </div>
           </div>
 
-          {/* Current Balance & Other Info */}
+          {/* Right Side Info */}
           <div className="space-y-4">
+            {/* Current Balance */}
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <div className="flex items-center mb-4">
                 <div className="bg-green-100 p-3 rounded-xl mr-4">
@@ -228,7 +263,7 @@ const AddFunds: React.FC = () => {
               {amount && (
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600">
-                    After adding ₹{amount}, your balance will be: 
+                    After adding ₹{amount}, your balance will be:{' '}
                     <span className="font-semibold text-gray-900 ml-1">
                       ₹{(currentBalance + parseFloat(amount || '0')).toFixed(2)}
                     </span>
@@ -256,6 +291,13 @@ const AddFunds: React.FC = () => {
                   <div>
                     <div className="font-medium text-gray-900">Instant Credit</div>
                     <div className="text-sm text-gray-600">Funds are credited within 5-10 minutes</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <Smartphone className="h-5 w-5 text-indigo-600 mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-gray-900">Contact Us</div>
+                    <div className="text-sm text-gray-600">Email: aaryaveer@gmail.com</div>
                   </div>
                 </div>
               </div>
