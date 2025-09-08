@@ -22,7 +22,7 @@ const AddFunds: React.FC = () => {
     setAmount(value.toString());
   };
   const handleCopyUPI = () => {
-    navigator.clipboard.writeText('aaryaveer@upi');
+    navigator.clipboard.writeText('6263288522@upi');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

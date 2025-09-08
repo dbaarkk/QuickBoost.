@@ -192,6 +192,8 @@ const PlaceOrder: React.FC = () => {
         return 'text-sky-600 bg-sky-100';
       case 'Telegram':
         return 'text-cyan-600 bg-cyan-100';
+      case 'LinkedIn':
+        return 'text-blue-800 bg-blue-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }
