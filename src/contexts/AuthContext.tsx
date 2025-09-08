@@ -20,9 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
@@ -34,31 +32,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshProfile = async () => {
     if (user) {
       const { data, error } = await getUserProfile(user.id);
-      if (!error && data) {
-        setProfile(data);
-      }
+      if (!error && data) setProfile(data);
     }
   };
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      if (session?.user) {
-        refreshProfile();
-      }
+      if (session?.user) await refreshProfile();
       setLoading(false);
-    });
+    };
+    init();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_, session) => {
         setUser(session?.user ?? null);
-        if (session?.user) {
-          await refreshProfile();
-        } else {
-          setProfile(null);
-        }
+        if (session?.user) await refreshProfile();
+        else setProfile(null);
         setLoading(false);
       }
     );
@@ -71,50 +64,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     last_name: string;
     phone: string;
   }) => {
-    // Create the user
+    // Sign up
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: userData
-      }
+      options: { data: userData }
     });
 
     if (signUpError) return { error: signUpError };
 
-    // Immediately sign in the user to skip email confirmation
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    // Immediately sign in the new user
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password
     });
+
+    if (!signInError && signInData.user) {
+      setUser(signInData.user); // <-- This is key to skip "please log in"
+      await refreshProfile();
+    }
 
     return { error: signInError };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!error && data.user) {
+      setUser(data.user); // <-- ensures user state is set immediately
+      await refreshProfile();
+    }
     return { error };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-  };
-
-  const value = {
-    user,
-    profile,
-    loading,
-    signUp,
-    signIn,
-    signOut,
-    refreshProfile
+    setUser(null);
+    setProfile(null);
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
