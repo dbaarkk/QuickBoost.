@@ -4,7 +4,6 @@ import {
   TrendingUp,
   Wallet,
   Smartphone,
-  Copy,
   CheckCircle,
   Shield,
   Clock,
@@ -22,9 +21,9 @@ const wallets = [
 ];
 
 const AddFunds: React.FC = () => {
-  const { profile, refreshProfile } = useAuth();
+  const { profile } = useAuth();
   const [amount, setAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'crypto'>('upi');
   const [utrNumber, setUtrNumber] = useState('');
   const [txid, setTxid] = useState('');
   const [copied, setCopied] = useState('');
@@ -44,7 +43,7 @@ const AddFunds: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!amount || parseFloat(amount) <= 0) {
       setSubmitError('Please enter a valid amount');
       return;
@@ -65,8 +64,8 @@ const AddFunds: React.FC = () => {
 
     const depositData = {
       amount: parseFloat(amount),
-      payment_method: paymentMethod as 'upi' | 'crypto',
-      ...(paymentMethod === 'upi' ? { utr_number: utrNumber } : { txid })
+      payment_method: paymentMethod,
+      ...(paymentMethod === 'upi' ? { utr_number: utrNumber } : { txid }),
     };
 
     createDeposit(depositData).then(({ data, error }) => {
@@ -111,7 +110,6 @@ const AddFunds: React.FC = () => {
                 <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
               </div>
               <form onSubmit={handleSubmit} className="p-4 space-y-4">
-                {/* Success Message */}
                 {showSuccess && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
                     <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
@@ -121,7 +119,6 @@ const AddFunds: React.FC = () => {
                   </div>
                 )}
 
-                {/* Error Message */}
                 {submitError && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                     <p className="text-red-800 text-sm">{submitError}</p>
@@ -153,7 +150,7 @@ const AddFunds: React.FC = () => {
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="Enter custom amount"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
-                    min="10"
+                    min={10}
                     required
                   />
                 </div>
@@ -168,7 +165,7 @@ const AddFunds: React.FC = () => {
                         name="paymentMethod"
                         value="upi"
                         checked={paymentMethod === 'upi'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        onChange={(e) => setPaymentMethod(e.target.value as 'upi' | 'crypto')}
                         className="text-indigo-600 focus:ring-indigo-500"
                       />
                       <div className="ml-4 flex items-center">
@@ -188,7 +185,7 @@ const AddFunds: React.FC = () => {
                         name="paymentMethod"
                         value="crypto"
                         checked={paymentMethod === 'crypto'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        onChange={(e) => setPaymentMethod(e.target.value as 'upi' | 'crypto')}
                         className="text-indigo-600 focus:ring-indigo-500"
                       />
                       <div className="ml-4 flex items-center">
@@ -216,7 +213,6 @@ const AddFunds: React.FC = () => {
                       required
                     />
 
-                    {/* UPI QR and ID */}
                     <div className="bg-gray-50 rounded-xl p-4 text-center">
                       <img
                         src="/IMG_20250906_102052.jpg"
@@ -250,7 +246,7 @@ const AddFunds: React.FC = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       required
                     />
-                    {/* Wallets */}
+
                     <div className="space-y-2">
                       {wallets.map((wallet) => (
                         <div
@@ -296,7 +292,6 @@ const AddFunds: React.FC = () => {
 
           {/* Right Side Info */}
           <div className="space-y-4">
-            {/* Current Balance */}
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <div className="flex items-center mb-4">
                 <div className="bg-green-100 p-3 rounded-xl mr-4">
@@ -319,176 +314,6 @@ const AddFunds: React.FC = () => {
               )}
             </div>
 
-            {/* Security & Support */}
-            <div className="bg-white rounded-xl shadow-sm border p-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
-                <Shield className="h-5 w-5 mr-2 text-green-600" />
-                Security & Support
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <Shield className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
-                  <div>
-                    <div className="font-medium text-gray-900">100% Secure</div>
-                    <div className="text-sm text-gray-600">All transactions are encrypted and secure</div>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <Clock className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
-                  <div>
-                    <div className="font-medium text-gray-900">Instant Credit</div>
-                    <div className="text-sm text-gray-600">Funds are credited within 5-10 minutes</div>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <Smartphone className="h-5 w-5 text-indigo-600 mr-3 mt-0.5" />
-                  <div>
-                    <div className="font-medium text-gray-900">Contact Us</div>
-                    <div className="text-sm text-gray-600">Email: quickboostbusiness@gmail.com</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default AddFunds;
-                      placeholder="Enter amount paid"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      min="10"
-                      required
-                    />
-                    <input
-  type="number"
-  placeholder="Enter amount paid"
-  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-  min={10}
-  required
-  value={amount}
-  onChange={(e) => setAmount(Number(e.target.value))}
-/>
-
-<input
-  type="text"
-  placeholder="Enter 12-digit UTR number"
-  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-  required
-  value={utr}
-  onChange={(e) => setUtr(e.target.value)}
-/>
-{/* UPI QR and ID */}
-                    <div className="bg-gray-50 rounded-xl p-4 text-center">
-                      <img
-                        src="/IMG_20250906_102052.jpg"
-                        alt="UPI QR"
-                        className="h-32 w-32 mx-auto mb-3"
-                      />
-                      <p className="text-sm text-gray-600 mb-2">
-                        Scan this QR code with your UPI app
-                      </p>
-                      <div className="flex justify-center items-center bg-white p-2 rounded-lg border">
-                        <span className="font-mono text-gray-900 mr-3">aaryaveer@upi</span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopy('aaryaveer@upi')}
-                          className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                        >
-                          {copied === 'aaryaveer@upi' ? 'Copied!' : 'Copy'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {paymentMethod === 'crypto' && (
-                  <div className="space-y-4">
-                    <input
-                      type="number"
-                      placeholder="Enter amount paid in USD"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      min="1"
-                      step="0.01"
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Enter transaction hash/ID"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      required
-                    />
-                    {/* Wallets */}
-                    <div className="space-y-2">
-                      {wallets.map((wallet) => (
-                        <div
-                          key={wallet.name}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 rounded-lg p-3 border break-words"
-                        >
-                          <span className="font-mono text-gray-900 break-all">
-                            {wallet.name}: {wallet.address}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopy(wallet.address)}
-                            className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium mt-2 sm:mt-0"
-                          >
-                            {copied === wallet.address ? 'Copied!' : 'Copy'}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors flex items-center justify-center"
-                >
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  {paymentMethod === 'upi' ? 'Verify UPI Payment' : 'Verify Crypto Payment'}
-                </button>
-
-                {showSuccess && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center mt-2">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
-                    <span className="text-green-800 font-medium">
-                      ✅ Transaction is being verified, please wait 1-2 minutes
-                    </span>
-                  </div>
-                )}
-              </form>
-            </div>
-          </div>
-
-          {/* Right Side Info */}
-          <div className="space-y-4">
-            {/* Current Balance */}
-            <div className="bg-white rounded-xl shadow-sm border p-4">
-              <div className="flex items-center mb-4">
-                <div className="bg-green-100 p-3 rounded-xl mr-4">
-                  <Wallet className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Current Balance</h3>
-                  <p className="text-3xl font-bold text-green-600">₹{currentBalance.toFixed(2)}</p>
-                </div>
-              </div>
-              {amount && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600">
-                    After adding ₹{amount}, your balance will be:{' '}
-                    <span className="font-semibold text-gray-900 ml-1">
-                      ₹{(currentBalance + parseFloat(amount || '0')).toFixed(2)}
-                    </span>
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Security & Support */}
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
                 <Shield className="h-5 w-5 mr-2 text-green-600" />
