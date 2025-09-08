@@ -297,7 +297,7 @@ const AddFunds: React.FC = () => {
                   <Smartphone className="h-5 w-5 text-indigo-600 mr-3 mt-0.5" />
                   <div>
                     <div className="font-medium text-gray-900">Contact Us</div>
-                    <div className="text-sm text-gray-600">Email: aaryaveer@gmail.com</div>
+                    <div className="text-sm text-gray-600">Email: quickboostbusiness@gmail.com</div>
                   </div>
                 </div>
               </div>
