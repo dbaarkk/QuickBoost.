@@ -195,7 +195,7 @@ const AddFunds: React.FC = () => {
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 text-center mb-4">
                   <div className="w-32 h-32 bg-white rounded-xl mx-auto flex items-center justify-center border-2 border-dashed border-gray-300 mb-3">
                     <div className="text-center">
-                      <img src="/IMG_20250906_102052.jpg" alt="UPI QR Code" className="h-32 w-32 mx-auto mb-2" />
+                      <img Public="/IMG_20250906_102052.jpg" alt="UPI QR Code" className="h-32 w-32 mx-auto mb-2" />
                     </div>
                   </div>
                   <p className="text-sm text-gray-600">
@@ -206,7 +206,7 @@ const AddFunds: React.FC = () => {
                 <div className="bg-blue-50 rounded-xl p-3 mb-4">
                   <p className="text-sm text-gray-600 mb-3">Or pay directly to UPI ID:</p>
                   <div className="flex items-center justify-between bg-white rounded-lg p-4 border">
-                    <span className="font-mono text-gray-900 font-medium">shrinu1928@okaxis</span>
+                    <span className="font-mono text-gray-900 font-medium">aaryaveer@upi</span>
                     <button
                       type="button"
                       onClick={handleCopyUPI}
