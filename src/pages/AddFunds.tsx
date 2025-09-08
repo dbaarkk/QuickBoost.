@@ -12,24 +12,31 @@ import {
   Shield,
   Clock
 } from 'lucide-react';
+
 const AddFunds: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [copied, setCopied] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
   const currentBalance = 0;
+
   const handleAmountSelect = (value: number) => {
     setAmount(value.toString());
   };
+
   const handleCopyUPI = () => {
     navigator.clipboard.writeText('6263288522@upi');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Payment submitted:', { amount, paymentMethod });
   };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -74,6 +81,16 @@ const AddFunds: React.FC = () => {
                     <CheckCircle className="h-5 w-5 mr-2" />
                     Verify UPI Payment
                   </button>
+                  
+                  {/* Success Message for UPI */}
+                  {showSuccess && paymentMethod === 'upi' && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                      <span className="text-green-800 font-medium">
+                        ✅ Transaction is being verified, please wait 1-2 minutes
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -111,17 +128,29 @@ const AddFunds: React.FC = () => {
                     <CheckCircle className="h-5 w-5 mr-2" />
                     Verify Crypto Payment
                   </button>
+                  
+                  {/* Success Message for Crypto */}
+                  {showSuccess && paymentMethod === 'crypto' && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                      <span className="text-green-800 font-medium">
+                        ✅ Transaction is being verified, please wait 1-2 minutes
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </nav>
           </div>
         </div>
       </header>
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Add Funds to Your Account</h1>
           <p className="text-gray-600">Add money to your account to start placing orders instantly</p>
         </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Payment Form */}
           <div className="lg:col-span-2">
@@ -168,6 +197,7 @@ const AddFunds: React.FC = () => {
                   </div>
                   <p className="text-sm text-gray-500 mt-2">Minimum amount: ₹10</p>
                 </div>
+
                 {/* Payment Method */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-4">
@@ -235,6 +265,7 @@ const AddFunds: React.FC = () => {
                     </label>
                   </div>
                 </div>
+
                 <button
                   type="submit"
                   disabled={!amount}
@@ -245,6 +276,7 @@ const AddFunds: React.FC = () => {
               </form>
             </div>
           </div>
+
           {/* Payment Instructions & Info */}
           <div className="space-y-4">
             {/* Current Balance */}
@@ -269,6 +301,7 @@ const AddFunds: React.FC = () => {
                 </div>
               )}
             </div>
+
             {/* UPI Instructions */}
             {paymentMethod === 'upi' && (
               <div className="bg-white rounded-xl shadow-sm border p-4">
@@ -288,6 +321,7 @@ const AddFunds: React.FC = () => {
                     Scan this QR code with your UPI app to pay {amount || ''}
                   </p>
                 </div>
+
                 {/* UPI ID */}
                 <div className="bg-blue-50 rounded-xl p-3 mb-4">
                   <p className="text-sm text-gray-600 mb-3">Or pay directly to UPI ID:</p>
@@ -312,6 +346,7 @@ const AddFunds: React.FC = () => {
                     </button>
                   </div>
                 </div>
+
                 {/* Steps */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900">Payment Steps:</h4>
@@ -334,6 +369,7 @@ const AddFunds: React.FC = () => {
                 </div>
               </div>
             )}
+
             {/* Card Instructions */}
             {paymentMethod === 'card' && (
               <div className="bg-white rounded-xl shadow-sm border p-4">
@@ -368,6 +404,7 @@ const AddFunds: React.FC = () => {
                 </div>
               </div>
             )}
+
             {/* Security & Support */}
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
@@ -403,6 +440,7 @@ const AddFunds: React.FC = () => {
                 </div>
               </div>
             </div>
+
             {/* Recent Transactions */}
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <h3 className="text-base font-semibold text-gray-900 mb-3">Recent Transactions</h3>
@@ -417,4 +455,5 @@ const AddFunds: React.FC = () => {
     </div>
   );
 };
+
 export default AddFunds;
