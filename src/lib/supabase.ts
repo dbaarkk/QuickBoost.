@@ -65,27 +65,20 @@ export interface Deposit {
 }
 
 // Auth functions
-export const signUp = async (email: string, password: string, userData: {
-  first_name: string;
-  last_name: string;
-  phone: string;
-}) => {
-  const { data, error } = await supabase.auth.signUp({
+export const signUp = async (
+  email: string,
+  password: string,
+  userData: { first_name: string; last_name: string; phone?: string }
+) => {
+  return supabase.auth.signUp({
     email,
     password,
-    options: {
-      data: userData
-    }
+    options: { data: userData }
   });
-  return { data, error };
 };
 
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-  return { data, error };
+  return supabase.auth.signInWithPassword({ email, password });
 };
 
 export const signOut = async () => {
@@ -98,128 +91,100 @@ export const getCurrentUser = async () => {
   return { user, error };
 };
 
-// User profile functions
-export const getUserProfile = async (userId: string): Promise<{ data: UserProfile | null, error: any }> => {
+// User profile
+export const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
-    .from('user_profiles')
+    .from<UserProfile>('user_profiles')
     .select('*')
     .eq('id', userId)
     .single();
-  
   return { data, error };
 };
 
 export const updateUserProfile = async (userId: string, updates: Partial<UserProfile>) => {
   const { data, error } = await supabase
-    .from('user_profiles')
+    .from<UserProfile>('user_profiles')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', userId)
     .select()
     .single();
-  
   return { data, error };
 };
 
-// Services functions
-export const getServices = async (): Promise<{ data: Service[] | null, error: any }> => {
+// Services
+export const getServices = async () => {
   const { data, error } = await supabase
-    .from('services')
+    .from<Service>('services')
     .select('*')
     .eq('is_active', true)
     .order('platform', { ascending: true });
-  
   return { data, error };
 };
 
-export const getServiceById = async (id: number): Promise<{ data: Service | null, error: any }> => {
+export const getServiceById = async (id: number) => {
   const { data, error } = await supabase
-    .from('services')
+    .from<Service>('services')
     .select('*')
     .eq('id', id)
     .single();
-  
   return { data, error };
 };
 
-// Orders functions
+// Orders
 export const createOrder = async (orderData: {
   service_id: number;
   quantity: number;
   link: string;
   amount: number;
-}): Promise<{ data: Order | null, error: any }> => {
+}) => {
   const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) {
-    return { data: null, error: { message: 'User not authenticated' } };
-  }
+  if (!user) return { data: null, error: { message: 'User not authenticated' } };
 
-  // Check user balance first
+  // Check balance
   const { data: profile, error: profileError } = await getUserProfile(user.id);
-  if (profileError || !profile) {
-    return { data: null, error: profileError || { message: 'Profile not found' } };
-  }
-
-  if (profile.balance < orderData.amount) {
-    return { data: null, error: { message: 'Insufficient balance' } };
-  }
+  if (profileError || !profile) return { data: null, error: profileError || { message: 'Profile not found' } };
+  if (profile.balance < orderData.amount) return { data: null, error: { message: 'Insufficient balance' } };
 
   const { data, error } = await supabase
-    .from('orders')
-    .insert({
-      user_id: user.id,
-      ...orderData
-    })
+    .from<Order>('orders')
+    .insert({ user_id: user.id, ...orderData })
     .select()
     .single();
-  
   return { data, error };
 };
 
-export const getUserOrders = async (userId: string): Promise<{ data: Order[] | null, error: any }> => {
+export const getUserOrders = async (userId: string) => {
   const { data, error } = await supabase
-    .from('orders')
-    .select(`
-      *,
-      service:services(*)
-    `)
+    .from<Order>('orders')
+    .select(`*, service:services(*)`)
     .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-  
+    .order('created_at', { ascending: false }); // newest first
   return { data, error };
 };
 
-// Deposits functions
+// Deposits
 export const createDeposit = async (depositData: {
   amount: number;
   payment_method: 'upi' | 'crypto';
   utr_number?: string;
   txid?: string;
-}): Promise<{ data: Deposit | null, error: any }> => {
+}) => {
   const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) {
-    return { data: null, error: { message: 'User not authenticated' } };
-  }
+  if (!user) return { data: null, error: { message: 'User not authenticated' } };
 
   const { data, error } = await supabase
-    .from('deposits')
-    .insert({
-      user_id: user.id,
-      ...depositData
-    })
+    .from<Deposit>('deposits')
+    .insert({ user_id: user.id, ...depositData })
     .select()
     .single();
-  
   return { data, error };
 };
 
-export const getUserDeposits = async (userId: string): Promise<{ data: Deposit[] | null, error: any }> => {
+export const getUserDeposits = async (userId: string) => {
   const { data, error } = await supabase
-    .from('deposits')
+    .from<Deposit>('deposits')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
-  
   return { data, error };
 };
