@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   TrendingUp, 
@@ -8,12 +7,10 @@ import {
   Plus, 
   Eye, 
   Clock, 
-  CheckCircle,
-  XCircle,
-  ArrowRight,
-  BarChart3,
-  Users,
-  Star
+  CheckCircle, 
+  XCircle, 
+  ArrowRight, 
+  BarChart3 
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserOrders, Order } from '../lib/supabase';
@@ -23,31 +20,31 @@ const Dashboard: React.FC = () => {
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
 
+  // Fetch recent orders
   useEffect(() => {
-  const fetchOrders = async () => {
-    if (!user) return;
+    const fetchOrders = async () => {
+      if (!user) return;
 
-    setOrdersLoading(true);
+      setOrdersLoading(true);
 
-    const { data, error } = await getUserOrders(user.id);
-    if (error) {
-      console.error("Error fetching orders:", error);
-      setRecentOrders([]);
-    } else if (data) {
-      // Sort descending by created_at to show newest orders
-      const sorted = data.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-      setRecentOrders(sorted.slice(0, 5));
-    } else {
-      setRecentOrders([]);
-    }
+      const { data, error } = await getUserOrders(user.id);
+      if (error) {
+        console.error("Error fetching orders:", error);
+        setRecentOrders([]);
+      } else if (data) {
+        const sorted = data.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setRecentOrders(sorted.slice(0, 5));
+      } else {
+        setRecentOrders([]);
+      }
 
-    setOrdersLoading(false);
-  };
+      setOrdersLoading(false);
+    };
 
-  fetchOrders();
-}, [user]);
+    fetchOrders();
+  }, [user]);
 
   const quickActions = [
     {
@@ -75,42 +72,29 @@ const Dashboard: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'in_progress':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'pending':
-        return <Eye className="h-5 w-5 text-blue-500" />;
-      default:
-        return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'completed': return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'in_progress': return <Clock className="h-5 w-5 text-yellow-500" />;
+      case 'pending': return <Eye className="h-5 w-5 text-blue-500" />;
+      default: return <XCircle className="h-5 w-5 text-red-500" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return 'text-green-700 bg-green-100';
-      case 'in_progress':
-        return 'text-yellow-700 bg-yellow-100';
-      case 'pending':
-        return 'text-blue-700 bg-blue-100';
-      default:
-        return 'text-red-700 bg-red-100';
+      case 'completed': return 'text-green-700 bg-green-100';
+      case 'in_progress': return 'text-yellow-700 bg-yellow-100';
+      case 'pending': return 'text-blue-700 bg-blue-100';
+      default: return 'text-red-700 bg-red-100';
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'completed':
-        return 'Completed';
-      case 'in_progress':
-        return 'In Progress';
-      case 'pending':
-        return 'Pending';
-      case 'cancelled':
-        return 'Cancelled';
-      default:
-        return status;
+      case 'completed': return 'Completed';
+      case 'in_progress': return 'In Progress';
+      case 'pending': return 'Pending';
+      case 'cancelled': return 'Cancelled';
+      default: return status;
     }
   };
 
@@ -169,7 +153,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Account Balance</p>
-                <p className="text-xl font-bold text-gray-900">₹{userBalance.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900">₹{profile.balance.toFixed(2)}</p>
               </div>
               <div className="bg-green-100 rounded-lg p-2">
                 <Wallet className="h-5 w-5 text-green-600" />
@@ -238,16 +222,16 @@ const Dashboard: React.FC = () => {
 
         {/* Recent Orders */}
         <div className="bg-white rounded-xl shadow-sm border">
-          <div className="px-4 py-3 border-b">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
-              <Link to="/orders" className="text-indigo-600 hover:text-indigo-500 text-xs font-medium">
-                View All
-              </Link>
-            </div>
+          <div className="px-4 py-3 border-b flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
+            <Link to="/orders" className="text-indigo-600 hover:text-indigo-500 text-xs font-medium">
+              View All
+            </Link>
           </div>
-          
-          {recentOrders.length > 0 ? (
+
+          {ordersLoading ? (
+            <div className="p-4 text-center">Loading orders...</div>
+          ) : recentOrders.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -286,7 +270,7 @@ const Dashboard: React.FC = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
+                          <div
                             className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${order.progress}%` }}
                           ></div>
