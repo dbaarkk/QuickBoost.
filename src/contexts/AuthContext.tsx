@@ -6,11 +6,11 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData: {
-    first_name: string;
-    last_name: string;
-    phone: string;
-  }) => Promise<{ error: any }>;
+  signUp: (
+    email: string,
+    password: string,
+    userData: { first_name: string; last_name: string; phone?: string }
+  ) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -37,7 +37,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Get initial session
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
@@ -46,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     init();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_, session) => {
         setUser(session?.user ?? null);
@@ -59,28 +57,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, userData: {
-    first_name: string;
-    last_name: string;
-    phone: string;
-  }) => {
-    // Sign up
+  const signUp = async (
+    email: string,
+    password: string,
+    userData: { first_name: string; last_name: string; phone?: string }
+  ) => {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: userData }
+      options: { data: userData },
     });
 
     if (signUpError) return { error: signUpError };
 
-    // Immediately sign in the new user
+    // Automatically log in after signup
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
 
     if (!signInError && signInData.user) {
-      setUser(signInData.user); // <-- This is key to skip "please log in"
+      setUser(signInData.user);
       await refreshProfile();
     }
 
@@ -90,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (!error && data.user) {
-      setUser(data.user); // <-- ensures user state is set immediately
+      setUser(data.user);
       await refreshProfile();
     }
     return { error };
@@ -103,7 +100,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, refreshProfile }}>
+    <AuthContext.Provider
+      value={{ user, profile, loading, signUp, signIn, signOut, refreshProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );
