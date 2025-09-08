@@ -10,6 +10,15 @@ import {
   Clock
 } from 'lucide-react';
 
+const wallets = [
+  { name: 'Solana', address: '99q2VEJtZjt56UjJuSLb45mkdrAnA4Lsb7q33uKUQo1P' },
+  { name: 'Ethereum', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
+  { name: 'Base', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
+  { name: 'Sui', address: '0xed8bb93f61609b27a2d586c658c17715f6fc6cfa8166b41aea6cad7f57f35d10' },
+  { name: 'Polygon', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
+  { name: 'Bitcoin', address: 'bc1qt3vl6de9j7q7lrmmwx2g3fnaf0m0cmmk9ct4f9' },
+];
+
 const AddFunds: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('upi');
@@ -19,18 +28,7 @@ const AddFunds: React.FC = () => {
   const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
   const currentBalance = 0;
 
-  const wallets = [
-    { name: 'Solana', address: '99q2VEJtZjt56UjJuSLb45mkdrAnA4Lsb7q33uKUQo1P' },
-    { name: 'Ethereum', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
-    { name: 'Base', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
-    { name: 'Sui', address: '0xed8bb93f61609b27a2d586c658c17715f6fc6cfa8166b41aea6cad7f57f35d10' },
-    { name: 'Polygon', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
-    { name: 'Bitcoin', address: 'bc1qt3vl6de9j7q7lrmmwx2g3fnaf0m0cmmk9ct4f9' },
-  ];
-
-  const handleAmountSelect = (value: number) => {
-    setAmount(value.toString());
-  };
+  const handleAmountSelect = (value: number) => setAmount(value.toString());
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -70,13 +68,10 @@ const AddFunds: React.FC = () => {
               <div className="p-4 border-b">
                 <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
               </div>
-              
-              <form onSubmit={handleSubmit} className="p-4">
+              <form onSubmit={handleSubmit} className="p-4 space-y-4">
                 {/* Amount Selection */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-4">
-                    Select Amount (₹)
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Amount (₹)</label>
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {predefinedAmounts.map((value) => (
                       <button
@@ -93,28 +88,20 @@ const AddFunds: React.FC = () => {
                       </button>
                     ))}
                   </div>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      placeholder="Enter custom amount"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
-                      min="10"
-                      required
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <span className="text-gray-500">₹</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">Minimum amount: ₹10</p>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter custom amount"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+                    min="10"
+                    required
+                  />
                 </div>
 
                 {/* Payment Method */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-4">
-                    Choose Payment Method
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Choose Payment Method</label>
                   <div className="space-y-3">
                     <label className="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
                       <input
@@ -135,7 +122,7 @@ const AddFunds: React.FC = () => {
                         </div>
                       </div>
                     </label>
-                    
+
                     <label className="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
                       <input
                         type="radio"
@@ -158,99 +145,76 @@ const AddFunds: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Verification Section (Amount + UTR/TXID) */}
+                {/* Verification Fields */}
                 {paymentMethod === 'upi' && (
-                  <div className="mb-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Amount (₹) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="Enter amount paid"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        min="10"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        UTR Number <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter 12-digit UTR number"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors flex items-center justify-center"
-                    >
-                      <CheckCircle className="h-5 w-5 mr-2" />
-                      Verify UPI Payment
-                    </button>
+                  <div className="space-y-4">
+                    <input
+                      type="number"
+                      placeholder="Enter amount paid"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      min="10"
+                      required
+                    />
+                    <input
+                      type="text"
+                      placeholder="Enter 12-digit UTR number"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      required
+                    />
                   </div>
                 )}
 
                 {paymentMethod === 'crypto' && (
-                  <div className="mb-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Amount (USD) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="Enter amount paid in USD"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        min="1"
-                        step="0.01"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Transaction ID (TXID) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter transaction hash/ID"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        required
-                      />
-                    </div>
+                  <div className="space-y-4">
+                    <input
+                      type="number"
+                      placeholder="Enter amount paid in USD"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      min="1"
+                      step="0.01"
+                      required
+                    />
+                    <input
+                      type="text"
+                      placeholder="Enter transaction hash/ID"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      required
+                    />
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">Wallet Addresses:</h4>
                       {wallets.map((wallet) => (
-                        <div key={wallet.name} className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border">
-                          <span className="font-mono text-gray-900">{wallet.name}: {wallet.address}</span>
+                        <div
+                          key={wallet.name}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 rounded-lg p-3 border break-words"
+                        >
+                          <span className="font-mono text-gray-900 break-all">
+                            {wallet.name}: {wallet.address}
+                          </span>
                           <button
                             type="button"
                             onClick={() => handleCopy(wallet.address)}
-                            className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors"
+                            className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium mt-2 sm:mt-0"
                           >
                             {copied === wallet.address ? 'Copied!' : 'Copy'}
                           </button>
                         </div>
                       ))}
                     </div>
-                    <button
-                      type="submit"
-                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors flex items-center justify-center mt-3"
-                    >
-                      <CheckCircle className="h-5 w-5 mr-2" />
-                      Verify Crypto Payment
-                    </button>
                   </div>
                 )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors flex items-center justify-center"
+                >
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  {paymentMethod === 'upi' ? 'Verify UPI Payment' : 'Verify Crypto Payment'}
+                </button>
               </form>
             </div>
           </div>
 
-          {/* Current Balance & Other Panels */}
+          {/* Current Balance & Other Info */}
           <div className="space-y-4">
-            {/* Current Balance */}
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <div className="flex items-center mb-4">
                 <div className="bg-green-100 p-3 rounded-xl mr-4">
@@ -264,7 +228,7 @@ const AddFunds: React.FC = () => {
               {amount && (
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600">
-                    After adding ₹{amount}, your balance will be: 
+                    After adding ₹{amount}, your balance will be: 
                     <span className="font-semibold text-gray-900 ml-1">
                       ₹{(currentBalance + parseFloat(amount || '0')).toFixed(2)}
                     </span>
@@ -279,7 +243,6 @@ const AddFunds: React.FC = () => {
                 <Shield className="h-5 w-5 mr-2 text-green-600" />
                 Security & Support
               </h3>
-              
               <div className="space-y-4">
                 <div className="flex items-start">
                   <Shield className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
@@ -288,7 +251,6 @@ const AddFunds: React.FC = () => {
                     <div className="text-sm text-gray-600">All transactions are encrypted and secure</div>
                   </div>
                 </div>
-                
                 <div className="flex items-start">
                   <Clock className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
                   <div>
