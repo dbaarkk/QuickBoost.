@@ -96,7 +96,7 @@ const Home: React.FC = () => {
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Boost Your Social Media
-              <span className="block text-indigo-600">Presence Today</span>
+              <span className="block">with <span className="text-indigo-600">QuickBoost</span> <span className="text-indigo-600">Today</span></span>
             </h1>
             <p className="text-lg text-gray-600 mb-6 max-w-3xl mx-auto leading-relaxed">
               Get real followers, likes, views, and engagement at the most competitive prices. 

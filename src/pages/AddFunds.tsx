@@ -151,10 +151,9 @@ const AddFunds: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!amount}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white py-4 px-6 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center"
+                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-xl font-semibold transition-colors flex items-center justify-center"
                 >
-                  <ArrowRight className="h-5 w-5 mr-2" />
-                  Proceed to Payment
+                  {paymentMethod === 'upi' ? 'Verify UPI Payment' : 'Verify Crypto Payment'}
                 </button>
               </form>
             </div>
