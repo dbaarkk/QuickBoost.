@@ -24,18 +24,30 @@ const Dashboard: React.FC = () => {
   const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (user) {
-        const { data, error } = await getUserOrders(user.id);
-        if (!error && data) {
-          setRecentOrders(data.slice(0, 5)); // Get last 5 orders
-        }
-        setOrdersLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    if (!user) return;
 
-    fetchOrders();
-  }, [user]);
+    setOrdersLoading(true);
+
+    const { data, error } = await getUserOrders(user.id);
+    if (error) {
+      console.error("Error fetching orders:", error);
+      setRecentOrders([]);
+    } else if (data) {
+      // Sort descending by created_at to show newest orders
+      const sorted = data.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setRecentOrders(sorted.slice(0, 5));
+    } else {
+      setRecentOrders([]);
+    }
+
+    setOrdersLoading(false);
+  };
+
+  fetchOrders();
+}, [user]);
 
   const quickActions = [
     {
