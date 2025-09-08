@@ -363,13 +363,24 @@ export default AddFunds;
                       required
                     />
                     <input
-                      type="text"
-                      placeholder="Enter 12-digit UTR number"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      required
-                    />
+  type="number"
+  placeholder="Enter amount paid"
+  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+  min={10}
+  required
+  value={amount}
+  onChange={(e) => setAmount(Number(e.target.value))}
+/>
 
-                    {/* UPI QR and ID */}
+<input
+  type="text"
+  placeholder="Enter 12-digit UTR number"
+  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+  required
+  value={utr}
+  onChange={(e) => setUtr(e.target.value)}
+/>
+{/* UPI QR and ID */}
                     <div className="bg-gray-50 rounded-xl p-4 text-center">
                       <img
                         src="/IMG_20250906_102052.jpg"
