@@ -63,6 +63,30 @@ const Services: React.FC = () => {
     },
     {
       id: 3,
+      name: 'Instagram Views - Real',
+      platform: 'Instagram',
+      category: 'Views',
+      price: 5,
+      minOrder: 1000,
+      maxOrder: 1000000,
+      description: 'Real Instagram story/reel views from active users',
+      deliveryTime: '0-1 hours',
+      rating: 4.8
+    },
+    {
+      id: 4,
+      name: 'Instagram Comments - Custom',
+      platform: 'Instagram',
+      category: 'Comments',
+      price: 80,
+      minOrder: 10,
+      maxOrder: 1000,
+      description: 'Custom Instagram comments from real users',
+      deliveryTime: '1-6 hours',
+      rating: 4.6
+    },
+    {
+      id: 5,
       name: 'YouTube Views - Real',
       platform: 'YouTube',
       category: 'Views',
@@ -74,7 +98,7 @@ const Services: React.FC = () => {
       rating: 4.7
     },
     {
-      id: 4,
+      id: 6,
       name: 'YouTube Subscribers',
       platform: 'YouTube',
       category: 'Subscribers',
@@ -86,7 +110,31 @@ const Services: React.FC = () => {
       rating: 4.6
     },
     {
-      id: 5,
+      id: 7,
+      name: 'YouTube Likes',
+      platform: 'YouTube',
+      category: 'Likes',
+      price: 15,
+      minOrder: 100,
+      maxOrder: 50000,
+      description: 'YouTube video likes from real users',
+      deliveryTime: '0-2 hours',
+      rating: 4.5
+    },
+    {
+      id: 8,
+      name: 'YouTube Comments',
+      platform: 'YouTube',
+      category: 'Comments',
+      price: 100,
+      minOrder: 5,
+      maxOrder: 500,
+      description: 'Custom YouTube comments from real users',
+      deliveryTime: '2-12 hours',
+      rating: 4.4
+    },
+    {
+      id: 9,
       name: 'Facebook Page Likes',
       platform: 'Facebook',
       category: 'Likes',
@@ -98,7 +146,19 @@ const Services: React.FC = () => {
       rating: 4.5
     },
     {
-      id: 6,
+      id: 10,
+      name: 'Facebook Followers',
+      platform: 'Facebook',
+      category: 'Followers',
+      price: 30,
+      minOrder: 100,
+      maxOrder: 25000,
+      description: 'Facebook profile/page followers from real accounts',
+      deliveryTime: '1-4 hours',
+      rating: 4.3
+    },
+    {
+      id: 11,
       name: 'Twitter Followers',
       platform: 'Twitter',
       category: 'Followers',
@@ -108,11 +168,71 @@ const Services: React.FC = () => {
       description: 'High-quality Twitter followers from real accounts',
       deliveryTime: '0-2 hours',
       rating: 4.4
+    },
+    {
+      id: 12,
+      name: 'Twitter Likes',
+      platform: 'Twitter',
+      category: 'Likes',
+      price: 20,
+      minOrder: 50,
+      maxOrder: 10000,
+      description: 'Twitter post likes from active users',
+      deliveryTime: '0-1 hours',
+      rating: 4.5
+    },
+    {
+      id: 13,
+      name: 'Twitter Retweets',
+      platform: 'Twitter',
+      category: 'Retweets',
+      price: 35,
+      minOrder: 25,
+      maxOrder: 5000,
+      description: 'Twitter retweets from real active accounts',
+      deliveryTime: '0-2 hours',
+      rating: 4.3
+    },
+    {
+      id: 14,
+      name: 'Telegram Members',
+      platform: 'Telegram',
+      category: 'Members',
+      price: 60,
+      minOrder: 100,
+      maxOrder: 50000,
+      description: 'Real Telegram channel/group members',
+      deliveryTime: '1-6 hours',
+      rating: 4.6
+    },
+    {
+      id: 15,
+      name: 'Telegram Views',
+      platform: 'Telegram',
+      category: 'Views',
+      price: 8,
+      minOrder: 500,
+      maxOrder: 100000,
+      description: 'Telegram post views from real users',
+      deliveryTime: '0-2 hours',
+      rating: 4.7
+    },
+    {
+      id: 16,
+      name: 'Telegram Reactions',
+      platform: 'Telegram',
+      category: 'Reactions',
+      price: 25,
+      minOrder: 50,
+      maxOrder: 10000,
+      description: 'Telegram post reactions from active users',
+      deliveryTime: '0-1 hours',
+      rating: 4.5
     }
   ];
 
-  const platforms = ['all', 'Instagram', 'YouTube', 'Facebook', 'Twitter'];
-  const categories = ['all', 'Followers', 'Likes', 'Views', 'Subscribers'];
+  const platforms = ['all', 'Instagram', 'YouTube', 'Facebook', 'Twitter', 'Telegram'];
+  const categories = ['all', 'Followers', 'Likes', 'Views', 'Subscribers', 'Comments', 'Members', 'Retweets', 'Reactions'];
 
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,6 +268,8 @@ const Services: React.FC = () => {
         return 'text-blue-600 bg-blue-100';
       case 'Twitter':
         return 'text-sky-600 bg-sky-100';
+      case 'Telegram':
+        return 'text-cyan-600 bg-cyan-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }

@@ -65,6 +65,18 @@ const PlaceOrder: React.FC = () => {
     },
     {
       id: 3,
+      name: 'Instagram Views - Real',
+      platform: 'Instagram',
+      category: 'Views',
+      price: 5,
+      minOrder: 1000,
+      maxOrder: 1000000,
+      description: 'Real Instagram story/reel views from active users',
+      deliveryTime: '0-1 hours',
+      rating: 4.8
+    },
+    {
+      id: 4,
       name: 'YouTube Views - Real',
       platform: 'YouTube',
       category: 'Views',
@@ -76,7 +88,7 @@ const PlaceOrder: React.FC = () => {
       rating: 4.7
     },
     {
-      id: 4,
+      id: 5,
       name: 'YouTube Subscribers',
       platform: 'YouTube',
       category: 'Subscribers',
@@ -88,7 +100,7 @@ const PlaceOrder: React.FC = () => {
       rating: 4.6
     },
     {
-      id: 5,
+      id: 6,
       name: 'Facebook Page Likes',
       platform: 'Facebook',
       category: 'Likes',
@@ -100,7 +112,7 @@ const PlaceOrder: React.FC = () => {
       rating: 4.5
     },
     {
-      id: 6,
+      id: 7,
       name: 'Twitter Followers',
       platform: 'Twitter',
       category: 'Followers',
@@ -110,6 +122,30 @@ const PlaceOrder: React.FC = () => {
       description: 'High-quality Twitter followers from real accounts',
       deliveryTime: '0-2 hours',
       rating: 4.4
+    },
+    {
+      id: 8,
+      name: 'Telegram Members',
+      platform: 'Telegram',
+      category: 'Members',
+      price: 60,
+      minOrder: 100,
+      maxOrder: 50000,
+      description: 'Real Telegram channel/group members',
+      deliveryTime: '1-6 hours',
+      rating: 4.6
+    },
+    {
+      id: 9,
+      name: 'Telegram Views',
+      platform: 'Telegram',
+      category: 'Views',
+      price: 8,
+      minOrder: 500,
+      maxOrder: 100000,
+      description: 'Telegram post views from real users',
+      deliveryTime: '0-2 hours',
+      rating: 4.7
     }
   ];
 
@@ -137,6 +173,8 @@ const PlaceOrder: React.FC = () => {
         return <Facebook className="h-5 w-5" />;
       case 'Twitter':
         return <Twitter className="h-5 w-5" />;
+      case 'Telegram':
+        return <Users className="h-5 w-5" />;
       default:
         return <Users className="h-5 w-5" />;
     }
@@ -152,6 +190,8 @@ const PlaceOrder: React.FC = () => {
         return 'text-blue-600 bg-blue-100';
       case 'Twitter':
         return 'text-sky-600 bg-sky-100';
+      case 'Telegram':
+        return 'text-cyan-600 bg-cyan-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }

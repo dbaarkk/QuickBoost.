@@ -18,8 +18,8 @@ import {
 const Dashboard: React.FC = () => {
   const userBalance = 0;
   const totalOrders = 0;
-  const pendingOrders = 0;
-  const completedOrders = 0;
+  const totalSpent = 0;
+  const userName = "John Doe"; // This would come from user authentication
 
   const recentOrders = [
     {
@@ -130,7 +130,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-xl shadow-sm border p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -167,23 +167,11 @@ const Dashboard: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm border p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Pending Orders</p>
-                <p className="text-xl font-bold text-gray-900">{pendingOrders}</p>
+                <p className="text-sm font-medium text-gray-600">Total Spent</p>
+                <p className="text-xl font-bold text-gray-900">₹{totalSpent.toFixed(2)}</p>
               </div>
-              <div className="bg-yellow-100 rounded-lg p-2">
-                <Clock className="h-5 w-5 text-yellow-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Completed Orders</p>
-                <p className="text-xl font-bold text-gray-900">{completedOrders}</p>
-              </div>
-              <div className="bg-green-100 rounded-lg p-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="bg-purple-100 rounded-lg p-2">
+                <BarChart3 className="h-5 w-5 text-purple-600" />
               </div>
             </div>
           </div>

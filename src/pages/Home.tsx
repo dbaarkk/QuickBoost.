@@ -110,12 +110,6 @@ const Home: React.FC = () => {
                 Start Now - It's Free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <Link
-                to="/services"
-                className="inline-flex items-center bg-white hover:bg-gray-50 text-gray-900 px-8 py-4 rounded-lg text-lg font-semibold transition-colors border border-gray-300"
-              >
-                View Services
-              </Link>
             </div>
           </div>
         </div>
