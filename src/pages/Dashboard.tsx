@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   TrendingUp, 
@@ -14,42 +15,27 @@ import {
   Users,
   Star
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { getUserOrders, Order } from '../lib/supabase';
 
 const Dashboard: React.FC = () => {
-  const userBalance = 0;
-  const totalOrders = 0;
-  const totalSpent = 0;
-  const userName = "John Doe"; // This would come from user authentication
+  const { user, profile, loading } = useAuth();
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
-  const recentOrders = [
-    {
-      id: '1001',
-      service: 'Instagram Followers',
-      quantity: 1000,
-      status: 'Completed',
-      amount: 299,
-      date: '2025-01-15',
-      progress: 100
-    },
-    {
-      id: '1002',
-      service: 'YouTube Views',
-      quantity: 5000,
-      status: 'In Progress',
-      amount: 450,
-      date: '2025-01-14',
-      progress: 65
-    },
-    {
-      id: '1003',
-      service: 'Facebook Likes',
-      quantity: 500,
-      status: 'Pending',
-      amount: 150,
-      date: '2025-01-14',
-      progress: 0
-    }
-  ];
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (user) {
+        const { data, error } = await getUserOrders(user.id);
+        if (!error && data) {
+          setRecentOrders(data.slice(0, 5)); // Get last 5 orders
+        }
+        setOrdersLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user]);
 
   const quickActions = [
     {
@@ -77,11 +63,11 @@ const Dashboard: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Completed':
+      case 'completed':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'In Progress':
+      case 'in_progress':
         return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'Pending':
+      case 'pending':
         return <Eye className="h-5 w-5 text-blue-500" />;
       default:
         return <XCircle className="h-5 w-5 text-red-500" />;
@@ -90,16 +76,52 @@ const Dashboard: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Completed':
+      case 'completed':
         return 'text-green-700 bg-green-100';
-      case 'In Progress':
+      case 'in_progress':
         return 'text-yellow-700 bg-yellow-100';
-      case 'Pending':
+      case 'pending':
         return 'text-blue-700 bg-blue-100';
       default:
         return 'text-red-700 bg-red-100';
     }
   };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'Completed';
+      case 'in_progress':
+        return 'In Progress';
+      case 'pending':
+        return 'Pending';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Please log in</h2>
+          <Link to="/login" className="text-indigo-600 hover:text-indigo-500">
+            Go to login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -115,7 +137,7 @@ const Dashboard: React.FC = () => {
               <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Balance:</span>
-                <span className="text-sm font-semibold text-green-600">₹{userBalance.toFixed(2)}</span>
+                <span className="text-sm font-semibold text-green-600">₹{profile.balance.toFixed(2)}</span>
               </div>
             </nav>
           </div>
@@ -125,7 +147,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Welcome Section */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back, {profile.first_name}!</h1>
           <p className="text-gray-600">Here's what's happening with your account today.</p>
         </div>
 
@@ -156,7 +178,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <p className="text-xl font-bold text-gray-900">{totalOrders}</p>
+                <p className="text-xl font-bold text-gray-900">{profile.total_orders}</p>
               </div>
               <div className="bg-blue-100 rounded-lg p-2">
                 <ShoppingCart className="h-5 w-5 text-blue-600" />
@@ -168,7 +190,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Spent</p>
-                <p className="text-xl font-bold text-gray-900">₹{totalSpent.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900">₹{profile.total_spent.toFixed(2)}</p>
               </div>
               <div className="bg-purple-100 rounded-lg p-2">
                 <BarChart3 className="h-5 w-5 text-purple-600" />
@@ -237,8 +259,8 @@ const Dashboard: React.FC = () => {
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">#{order.id}</div>
-                          <div className="text-sm text-gray-600">{order.service}</div>
+                          <div className="text-sm font-medium text-gray-900">#{order.id.slice(0, 8)}</div>
+                          <div className="text-sm text-gray-600">{order.service?.name || 'Unknown Service'}</div>
                           <div className="text-xs text-gray-500">{order.quantity.toLocaleString()} items</div>
                         </div>
                       </td>
@@ -246,7 +268,7 @@ const Dashboard: React.FC = () => {
                         <div className="flex items-center">
                           {getStatusIcon(order.status)}
                           <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                            {order.status}
+                            {getStatusLabel(order.status)}
                           </span>
                         </div>
                       </td>
@@ -260,7 +282,7 @@ const Dashboard: React.FC = () => {
                         <span className="text-xs text-gray-500 mt-1">{order.progress}%</span>
                       </td>
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                        ₹{order.amount}
+                        ₹{order.amount.toFixed(2)}
                       </td>
                     </tr>
                   ))}

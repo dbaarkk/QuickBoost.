@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Import all pages
 import Home from './pages/Home';
@@ -12,19 +13,21 @@ import Signup from './pages/Signup';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-funds" element={<AddFunds />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/place-order" element={<PlaceOrder />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/add-funds" element={<AddFunds />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/place-order" element={<PlaceOrder />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

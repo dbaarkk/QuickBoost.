@@ -9,6 +9,8 @@ import {
   Shield,
   Clock,
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { createDeposit } from '../lib/supabase';
 
 const wallets = [
   { name: 'Solana', address: '99q2VEJtZjt56UjJuSLb45mkdrAnA4Lsb7q33uKUQo1P' },
@@ -20,13 +22,17 @@ const wallets = [
 ];
 
 const AddFunds: React.FC = () => {
+  const { profile, refreshProfile } = useAuth();
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [utrNumber, setUtrNumber] = useState('');
+  const [txid, setTxid] = useState('');
   const [copied, setCopied] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
-  const currentBalance = 0;
 
   const handleAmountSelect = (value: number) => setAmount(value.toString());
 
@@ -38,9 +44,43 @@ const AddFunds: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 4000);
-    console.log('Payment submitted:', { amount, paymentMethod });
+    
+    if (!amount || parseFloat(amount) <= 0) {
+      setSubmitError('Please enter a valid amount');
+      return;
+    }
+
+    if (paymentMethod === 'upi' && !utrNumber) {
+      setSubmitError('Please enter UTR number');
+      return;
+    }
+
+    if (paymentMethod === 'crypto' && !txid) {
+      setSubmitError('Please enter transaction ID');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    const depositData = {
+      amount: parseFloat(amount),
+      payment_method: paymentMethod as 'upi' | 'crypto',
+      ...(paymentMethod === 'upi' ? { utr_number: utrNumber } : { txid })
+    };
+
+    createDeposit(depositData).then(({ data, error }) => {
+      if (error) {
+        setSubmitError(error.message);
+      } else {
+        setShowSuccess(true);
+        setAmount('');
+        setUtrNumber('');
+        setTxid('');
+        setTimeout(() => setShowSuccess(false), 5000);
+      }
+      setIsSubmitting(false);
+    });
   };
 
   return (
@@ -71,6 +111,23 @@ const AddFunds: React.FC = () => {
                 <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
               </div>
               <form onSubmit={handleSubmit} className="p-4 space-y-4">
+                {/* Success Message */}
+                {showSuccess && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                    <span className="text-green-800 font-medium">
+                      ✅ Transaction is being verified, please wait 1-2 minutes
+                    </span>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {submitError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-red-800 text-sm">{submitError}</p>
+                  </div>
+                )}
+
                 {/* Amount Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Select Amount (₹)</label>
@@ -151,7 +208,155 @@ const AddFunds: React.FC = () => {
                 {paymentMethod === 'upi' && (
                   <div className="space-y-4">
                     <input
-                      type="number"
+                      type="text"
+                      value={utrNumber}
+                      onChange={(e) => setUtrNumber(e.target.value)}
+                      placeholder="Enter 12-digit UTR number"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      required
+                    />
+
+                    {/* UPI QR and ID */}
+                    <div className="bg-gray-50 rounded-xl p-4 text-center">
+                      <img
+                        src="/IMG_20250906_102052.jpg"
+                        alt="UPI QR"
+                        className="h-32 w-32 mx-auto mb-3"
+                      />
+                      <p className="text-sm text-gray-600 mb-2">
+                        Scan this QR code with your UPI app
+                      </p>
+                      <div className="flex justify-center items-center bg-white p-2 rounded-lg border">
+                        <span className="font-mono text-gray-900 mr-3">6263288522@upi</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy('6263288522@upi')}
+                          className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                        >
+                          {copied === '6263288522@upi' ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === 'crypto' && (
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={txid}
+                      onChange={(e) => setTxid(e.target.value)}
+                      placeholder="Enter transaction hash/ID"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      required
+                    />
+                    {/* Wallets */}
+                    <div className="space-y-2">
+                      {wallets.map((wallet) => (
+                        <div
+                          key={wallet.name}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 rounded-lg p-3 border break-words"
+                        >
+                          <span className="font-mono text-gray-900 break-all">
+                            {wallet.name}: {wallet.address}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(wallet.address)}
+                            className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium mt-2 sm:mt-0"
+                          >
+                            {copied === wallet.address ? 'Copied!' : 'Copy'}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-xl font-semibold transition-colors flex items-center justify-center"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      {paymentMethod === 'upi' ? 'Verify UPI Payment' : 'Verify Crypto Payment'}
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Right Side Info */}
+          <div className="space-y-4">
+            {/* Current Balance */}
+            <div className="bg-white rounded-xl shadow-sm border p-4">
+              <div className="flex items-center mb-4">
+                <div className="bg-green-100 p-3 rounded-xl mr-4">
+                  <Wallet className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Current Balance</h3>
+                  <p className="text-3xl font-bold text-green-600">₹{profile?.balance.toFixed(2) || '0.00'}</p>
+                </div>
+              </div>
+              {amount && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-600">
+                    After adding ₹{amount}, your balance will be:{' '}
+                    <span className="font-semibold text-gray-900 ml-1">
+                      ₹{((profile?.balance || 0) + parseFloat(amount || '0')).toFixed(2)}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Security & Support */}
+            <div className="bg-white rounded-xl shadow-sm border p-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                <Shield className="h-5 w-5 mr-2 text-green-600" />
+                Security & Support
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <Shield className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-gray-900">100% Secure</div>
+                    <div className="text-sm text-gray-600">All transactions are encrypted and secure</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <Clock className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-gray-900">Instant Credit</div>
+                    <div className="text-sm text-gray-600">Funds are credited within 5-10 minutes</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <Smartphone className="h-5 w-5 text-indigo-600 mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-gray-900">Contact Us</div>
+                    <div className="text-sm text-gray-600">Email: quickboostbusiness@gmail.com</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AddFunds;
                       placeholder="Enter amount paid"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       min="10"

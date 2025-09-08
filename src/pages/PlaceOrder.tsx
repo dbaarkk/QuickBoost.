@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   TrendingUp, 
@@ -16,140 +17,35 @@ import {
   ArrowRight,
   CheckCircle
 } from 'lucide-react';
-
-interface Service {
-  id: number;
-  name: string;
-  platform: string;
-  category: string;
-  price: number;
-  minOrder: number;
-  maxOrder: number;
-  description: string;
-  deliveryTime: string;
-  rating: number;
-}
+import { useAuth } from '../contexts/AuthContext';
+import { getServices, createOrder, Service } from '../lib/supabase';
 
 const PlaceOrder: React.FC = () => {
+  const { profile, refreshProfile } = useAuth();
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [quantity, setQuantity] = useState('');
   const [link, setLink] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Mock services data
-  const services: Service[] = [
-    {
-      id: 1,
-      name: 'Instagram Followers - High Quality',
-      platform: 'Instagram',
-      category: 'Followers',
-      price: 25,
-      minOrder: 100,
-      maxOrder: 100000,
-      description: 'Get high-quality Instagram followers from real accounts with profile pictures',
-      deliveryTime: '0-1 hours',
-      rating: 4.8
-    },
-    {
-      id: 2,
-      name: 'Instagram Likes - Instant',
-      platform: 'Instagram',
-      category: 'Likes',
-      price: 10,
-      minOrder: 50,
-      maxOrder: 50000,
-      description: 'Instant Instagram likes for your posts from active users',
-      deliveryTime: '0-30 minutes',
-      rating: 4.9
-    },
-    {
-      id: 3,
-      name: 'Instagram Views - Real',
-      platform: 'Instagram',
-      category: 'Views',
-      price: 5,
-      minOrder: 1000,
-      maxOrder: 1000000,
-      description: 'Real Instagram story/reel views from active users',
-      deliveryTime: '0-1 hours',
-      rating: 4.8
-    },
-    {
-      id: 4,
-      name: 'YouTube Views - Real',
-      platform: 'YouTube',
-      category: 'Views',
-      price: 5,
-      minOrder: 1000,
-      maxOrder: 1000000,
-      description: 'Real YouTube views from active users worldwide',
-      deliveryTime: '1-6 hours',
-      rating: 4.7
-    },
-    {
-      id: 5,
-      name: 'YouTube Subscribers',
-      platform: 'YouTube',
-      category: 'Subscribers',
-      price: 50,
-      minOrder: 50,
-      maxOrder: 10000,
-      description: 'High-quality YouTube subscribers with profile pictures',
-      deliveryTime: '0-2 hours',
-      rating: 4.6
-    },
-    {
-      id: 6,
-      name: 'Facebook Page Likes',
-      platform: 'Facebook',
-      category: 'Likes',
-      price: 10,
-      minOrder: 100,
-      maxOrder: 50000,
-      description: 'Facebook page likes from real users with active profiles',
-      deliveryTime: '1-3 hours',
-      rating: 4.5
-    },
-    {
-      id: 7,
-      name: 'Twitter Followers',
-      platform: 'Twitter',
-      category: 'Followers',
-      price: 40,
-      minOrder: 100,
-      maxOrder: 25000,
-      description: 'High-quality Twitter followers from real accounts',
-      deliveryTime: '0-2 hours',
-      rating: 4.4
-    },
-    {
-      id: 8,
-      name: 'Telegram Members',
-      platform: 'Telegram',
-      category: 'Members',
-      price: 60,
-      minOrder: 100,
-      maxOrder: 50000,
-      description: 'Real Telegram channel/group members',
-      deliveryTime: '1-6 hours',
-      rating: 4.6
-    },
-    {
-      id: 9,
-      name: 'Telegram Views',
-      platform: 'Telegram',
-      category: 'Views',
-      price: 8,
-      minOrder: 500,
-      maxOrder: 100000,
-      description: 'Telegram post views from real users',
-      deliveryTime: '0-2 hours',
-      rating: 4.7
-    }
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      const { data, error } = await getServices();
+      if (!error && data) {
+        setServices(data);
+      }
+      setLoading(false);
+    };
 
-  const platforms = ['all', 'Instagram', 'YouTube', 'Facebook', 'Twitter'];
+    fetchServices();
+  }, []);
+
+  const platforms = ['all', ...Array.from(new Set(services.map(s => s.platform)))];
 
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -201,17 +97,44 @@ const PlaceOrder: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedService || !quantity || !link) return;
+    if (!selectedService || !quantity || !link || !profile) return;
+
+    const orderAmount = calculateTotal();
     
-    console.log('Order submitted:', {
-      service: selectedService,
-      quantity: parseInt(quantity),
+    // Validate balance
+    if (profile.balance < orderAmount) {
+      setSubmitError('Insufficient balance. Please add funds to your account.');
+      return;
+    }
+
+    // Validate quantity
+    const qty = parseInt(quantity);
+    if (qty < selectedService.min_order || qty > selectedService.max_order) {
+      setSubmitError(`Quantity must be between ${selectedService.min_order} and ${selectedService.max_order}`);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    createOrder({
+      service_id: selectedService.id,
+      quantity: qty,
       link,
-      total: calculateTotal()
+      amount: orderAmount
+    }).then(({ data, error }) => {
+      if (error) {
+        setSubmitError(error.message);
+      } else {
+        setSubmitSuccess(true);
+        setQuantity('');
+        setLink('');
+        setSelectedService(null);
+        refreshProfile(); // Refresh user profile to update balance
+        setTimeout(() => setSubmitSuccess(false), 5000);
+      }
+      setIsSubmitting(false);
     });
-    
-    // Here you would typically send the order to your backend
-    alert('Order placed successfully!');
   };
 
   return (
@@ -228,7 +151,7 @@ const PlaceOrder: React.FC = () => {
               <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Balance:</span>
-                <span className="text-sm font-semibold text-green-600">₹{0}</span>
+                <span className="text-sm font-semibold text-green-600">₹{profile?.balance.toFixed(2) || '0.00'}</span>
               </div>
             </nav>
           </div>
@@ -277,47 +200,53 @@ const PlaceOrder: React.FC = () => {
 
               {/* Services Grid */}
               <div className="p-4">
-                <div className="space-y-3">
-                  {filteredServices.map((service) => (
-                    <div
-                      key={service.id}
-                      onClick={() => setSelectedService(service)}
-                      className={`p-3 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                        selectedService?.id === service.id
-                          ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-3">
-                          <div className={`p-2 rounded-lg ${getPlatformColor(service.platform)}`}>
-                            {getPlatformIcon(service.platform)}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 mb-1">{service.name}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{service.description}</p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
-                              <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-1" />
-                                <span>{service.deliveryTime}</span>
+                {loading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {filteredServices.map((service) => (
+                      <div
+                        key={service.id}
+                        onClick={() => setSelectedService(service)}
+                        className={`p-3 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                          selectedService?.id === service.id
+                            ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start space-x-3">
+                            <div className={`p-2 rounded-lg ${getPlatformColor(service.platform)}`}>
+                              {getPlatformIcon(service.platform)}
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900 mb-1">{service.name}</h3>
+                              <p className="text-sm text-gray-600 mb-2">{service.description}</p>
+                              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <div className="flex items-center">
+                                  <Clock className="h-4 w-4 mr-1" />
+                                  <span>{service.delivery_time}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <Star className="h-4 w-4 mr-1 text-yellow-400 fill-current" />
+                                  <span>{service.rating}</span>
+                                </div>
+                                <span>Min: {service.min_order.toLocaleString()}</span>
+                                <span>Max: {service.max_order.toLocaleString()}</span>
                               </div>
-                              <div className="flex items-center">
-                                <Star className="h-4 w-4 mr-1 text-yellow-400 fill-current" />
-                                <span>{service.rating}</span>
-                              </div>
-                              <span>Min: {service.minOrder.toLocaleString()}</span>
-                              <span>Max: {service.maxOrder.toLocaleString()}</span>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold text-gray-900">₹{service.price}</div>
-                          <div className="text-sm text-gray-500">per 1000</div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-gray-900">₹{service.price}</div>
+                            <div className="text-sm text-gray-500">per 1000</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -333,6 +262,21 @@ const PlaceOrder: React.FC = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="p-4">
+                {/* Success Message */}
+                {submitSuccess && (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                    <span className="text-green-800 font-medium">Order placed successfully!</span>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {submitError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">{submitError}</p>
+                  </div>
+                )}
+
                 {/* Selected Service */}
                 {selectedService ? (
                   <div className="mb-4 p-3 bg-gray-50 rounded-lg">
@@ -344,7 +288,7 @@ const PlaceOrder: React.FC = () => {
                     </div>
                     <div className="text-sm text-gray-600">
                       <div>Price: ₹{selectedService.price} per 1000</div>
-                      <div>Min: {selectedService.minOrder.toLocaleString()} | Max: {selectedService.maxOrder.toLocaleString()}</div>
+                      <div>Min: {selectedService.min_order.toLocaleString()} | Max: {selectedService.max_order.toLocaleString()}</div>
                     </div>
                   </div>
                 ) : (
@@ -383,8 +327,8 @@ const PlaceOrder: React.FC = () => {
                       value={quantity}
                       onChange={(e) => setQuantity(e.target.value)}
                       placeholder="Enter quantity"
-                      min={selectedService?.minOrder || 1}
-                      max={selectedService?.maxOrder || 999999}
+                      min={selectedService?.min_order || 1}
+                      max={selectedService?.max_order || 999999}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       required
                     />
@@ -392,7 +336,7 @@ const PlaceOrder: React.FC = () => {
                   </div>
                   {selectedService && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Min: {selectedService.minOrder.toLocaleString()} | Max: {selectedService.maxOrder.toLocaleString()}
+                      Min: {selectedService.min_order.toLocaleString()} | Max: {selectedService.max_order.toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -420,11 +364,20 @@ const PlaceOrder: React.FC = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={!selectedService || !quantity || !link}
+                  disabled={!selectedService || !quantity || !link || isSubmitting}
                   className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
                 >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Place Order
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Placing Order...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="h-5 w-5 mr-2" />
+                      Place Order
+                    </>
+                  )}
                 </button>
 
                 {/* Order Info */}

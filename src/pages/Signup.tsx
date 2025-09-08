@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { TrendingUp, Mail, Lock, User, Eye, EyeOff, Phone, ArrowRight } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -16,6 +18,7 @@ const Signup: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -71,18 +74,31 @@ const Signup: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setSubmitError('');
+
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    
-    setTimeout(() => {
+
+    try {
+      const { error } = await signUp(formData.email, formData.password, {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone: formData.phone
+      });
+      
+      if (error) {
+        setSubmitError(error.message);
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setSubmitError('An unexpected error occurred');
+    } finally {
       setIsLoading(false);
-      console.log('Signup attempt:', formData);
-      navigate('/dashboard');
-    }, 1000);
+    }
   };
 
   return (
@@ -105,6 +121,13 @@ const Signup: React.FC = () => {
         {/* Signup Form */}
         <div className="bg-white rounded-2xl shadow-xl p-6 border">
           <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Error Message */}
+            {submitError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-800 text-sm">{submitError}</p>
+              </div>
+            )}
+
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-3">
               <div>
