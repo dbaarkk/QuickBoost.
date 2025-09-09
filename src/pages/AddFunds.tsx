@@ -204,6 +204,18 @@ const AddFunds: React.FC = () => {
                 {/* Verification Fields */}
                 {paymentMethod === 'upi' && (
                   <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Amount (₹)</label>
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="Enter amount in ₹"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        min={10}
+                        required
+                      />
+                    </div>
                     <input
                       type="text"
                       value={utrNumber}
@@ -238,6 +250,18 @@ const AddFunds: React.FC = () => {
 
                 {paymentMethod === 'crypto' && (
                   <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Amount (USD)</label>
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="Enter amount in USD"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        min={1}
+                        required
+                      />
+                    </div>
                     <input
                       type="text"
                       value={txid}

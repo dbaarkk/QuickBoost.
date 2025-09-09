@@ -48,16 +48,67 @@ const PlaceOrder: React.FC = () => {
 
   // initial hardcoded services (kept as defaults)
   const defaultServices: LocalService[] = [
-    { id: 1, name: 'Instagram Followers', platform: 'Instagram', price: 0.5, minOrder: 100, maxOrder: 10000, description: 'High-quality Instagram followers', icon: 'Users', delivery_time: 'Instant', rating: 4.6 },
-    { id: 2, name: 'Instagram Likes', platform: 'Instagram', price: 0.3, minOrder: 50, maxOrder: 5000, description: 'Real Instagram likes for your posts', icon: 'Heart', delivery_time: 'Minutes', rating: 4.4 },
-    { id: 3, name: 'Instagram Comments', platform: 'Instagram', price: 1.2, minOrder: 10, maxOrder: 1000, description: 'Engaging comments on your posts', icon: 'MessageCircle', delivery_time: 'Minutes', rating: 4.5 },
-    { id: 4, name: 'Instagram Views', platform: 'Instagram', price: 0.2, minOrder: 100, maxOrder: 50000, description: 'Boost your Instagram video views', icon: 'Eye', delivery_time: 'Minutes', rating: 4.2 },
-    // ... (trimmed for brevity) keep the rest or add back as needed (use your original list)
-    { id: 7, name: 'YouTube Subscribers', platform: 'YouTube', price: 2.5, minOrder: 50, maxOrder: 5000, description: 'Grow your YouTube channel', icon: 'UserPlus', delivery_time: 'Hours', rating: 4.5 },
-    { id: 8, name: 'YouTube Views', platform: 'YouTube', price: 0.8, minOrder: 100, maxOrder: 100000, description: 'Increase video watch time', icon: 'Play', delivery_time: 'Minutes', rating: 4.1 },
-    { id: 31, name: 'Spotify Followers', platform: 'Spotify', price: 2.8, minOrder: 100, maxOrder: 10000, description: 'Grow your music audience', icon: 'Users', delivery_time: 'Hours', rating: 4.3 },
-    { id: 38, name: 'Website Traffic', platform: 'Website', price: 1.5, minOrder: 1000, maxOrder: 100000, description: 'Drive traffic to your website', icon: 'Eye', delivery_time: 'Hours', rating: 4.0 },
-    { id: 40, name: 'Google Reviews', platform: 'Website', price: 8.0, minOrder: 5, maxOrder: 100, description: 'Positive Google reviews', icon: 'Star', delivery_time: 'Hours', rating: 4.7 },
+    // Instagram Services
+    { id: 1, name: 'Instagram Followers', platform: 'Instagram', price: 0.50, minOrder: 100, maxOrder: 10000, description: 'High-quality Instagram followers', icon: 'Users', delivery_time: 'Instant', rating: 4.8 },
+    { id: 2, name: 'Instagram Likes', platform: 'Instagram', price: 0.30, minOrder: 50, maxOrder: 5000, description: 'Real Instagram likes for your posts', icon: 'Heart', delivery_time: 'Minutes', rating: 4.9 },
+    { id: 3, name: 'Instagram Comments', platform: 'Instagram', price: 1.20, minOrder: 10, maxOrder: 1000, description: 'Engaging comments on your posts', icon: 'MessageCircle', delivery_time: 'Minutes', rating: 4.5 },
+    { id: 4, name: 'Instagram Views', platform: 'Instagram', price: 0.20, minOrder: 100, maxOrder: 50000, description: 'Boost your Instagram video views', icon: 'Eye', delivery_time: 'Minutes', rating: 4.2 },
+    { id: 5, name: 'Instagram Story Views', platform: 'Instagram', price: 0.40, minOrder: 50, maxOrder: 10000, description: 'Increase your story visibility', icon: 'Eye', delivery_time: 'Minutes', rating: 4.3 },
+    { id: 6, name: 'Instagram Shares', platform: 'Instagram', price: 0.80, minOrder: 25, maxOrder: 2000, description: 'Share your content widely', icon: 'Share2', delivery_time: 'Minutes', rating: 4.1 },
+    
+    // YouTube Services
+    { id: 7, name: 'YouTube Subscribers', platform: 'YouTube', price: 2.50, minOrder: 50, maxOrder: 5000, description: 'Grow your YouTube channel', icon: 'UserPlus', delivery_time: 'Hours', rating: 4.5 },
+    { id: 8, name: 'YouTube Views', platform: 'YouTube', price: 0.80, minOrder: 100, maxOrder: 100000, description: 'Increase video watch time', icon: 'Play', delivery_time: 'Minutes', rating: 4.1 },
+    { id: 9, name: 'YouTube Likes', platform: 'YouTube', price: 1.50, minOrder: 25, maxOrder: 2000, description: 'Get more likes on videos', icon: 'Heart', delivery_time: 'Minutes', rating: 4.4 },
+    { id: 10, name: 'YouTube Comments', platform: 'YouTube', price: 3.00, minOrder: 5, maxOrder: 500, description: 'Engaging video comments', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.2 },
+    { id: 11, name: 'YouTube Watch Time', platform: 'YouTube', price: 5.00, minOrder: 100, maxOrder: 10000, description: 'Boost your watch hours', icon: 'Play', delivery_time: 'Hours', rating: 4.0 },
+    
+    // TikTok Services
+    { id: 12, name: 'TikTok Followers', platform: 'TikTok', price: 1.80, minOrder: 100, maxOrder: 10000, description: 'Grow your TikTok audience', icon: 'Users', delivery_time: 'Hours', rating: 4.6 },
+    { id: 13, name: 'TikTok Likes', platform: 'TikTok', price: 0.60, minOrder: 50, maxOrder: 10000, description: 'Get more likes on TikTok', icon: 'Heart', delivery_time: 'Minutes', rating: 4.7 },
+    { id: 14, name: 'TikTok Views', platform: 'TikTok', price: 0.40, minOrder: 100, maxOrder: 100000, description: 'Increase video visibility', icon: 'Eye', delivery_time: 'Minutes', rating: 4.5 },
+    { id: 15, name: 'TikTok Shares', platform: 'TikTok', price: 1.20, minOrder: 25, maxOrder: 5000, description: 'Viral content sharing', icon: 'Share2', delivery_time: 'Minutes', rating: 4.3 },
+    { id: 16, name: 'TikTok Comments', platform: 'TikTok', price: 2.50, minOrder: 10, maxOrder: 1000, description: 'Engaging TikTok comments', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.4 },
+    
+    // Facebook Services
+    { id: 17, name: 'Facebook Page Likes', platform: 'Facebook', price: 1.20, minOrder: 100, maxOrder: 10000, description: 'Grow your Facebook page', icon: 'Heart', delivery_time: 'Hours', rating: 4.5 },
+    { id: 18, name: 'Facebook Post Likes', platform: 'Facebook', price: 0.80, minOrder: 50, maxOrder: 5000, description: 'Boost post engagement', icon: 'Heart', delivery_time: 'Minutes', rating: 4.6 },
+    { id: 19, name: 'Facebook Followers', platform: 'Facebook', price: 1.50, minOrder: 100, maxOrder: 10000, description: 'Increase page followers', icon: 'Users', delivery_time: 'Hours', rating: 4.3 },
+    { id: 20, name: 'Facebook Comments', platform: 'Facebook', price: 2.00, minOrder: 10, maxOrder: 1000, description: 'Quality post comments', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.4 },
+    { id: 21, name: 'Facebook Shares', platform: 'Facebook', price: 1.80, minOrder: 25, maxOrder: 2000, description: 'Expand your reach', icon: 'Share2', delivery_time: 'Hours', rating: 4.2 },
+    
+    // Twitter Services
+    { id: 22, name: 'Twitter Followers', platform: 'Twitter', price: 2.20, minOrder: 100, maxOrder: 10000, description: 'Build your Twitter audience', icon: 'Users', delivery_time: 'Hours', rating: 4.4 },
+    { id: 23, name: 'Twitter Likes', platform: 'Twitter', price: 1.00, minOrder: 50, maxOrder: 5000, description: 'Get more tweet likes', icon: 'Heart', delivery_time: 'Minutes', rating: 4.5 },
+    { id: 24, name: 'Twitter Retweets', platform: 'Twitter', price: 1.50, minOrder: 25, maxOrder: 2000, description: 'Amplify your tweets', icon: 'Share2', delivery_time: 'Minutes', rating: 4.3 },
+    { id: 25, name: 'Twitter Comments', platform: 'Twitter', price: 3.50, minOrder: 10, maxOrder: 500, description: 'Engaging tweet replies', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.2 },
+    
+    // LinkedIn Services
+    { id: 26, name: 'LinkedIn Followers', platform: 'LinkedIn', price: 3.00, minOrder: 50, maxOrder: 5000, description: 'Professional network growth', icon: 'Users', delivery_time: 'Hours', rating: 4.4 },
+    { id: 27, name: 'LinkedIn Post Likes', platform: 'LinkedIn', price: 2.50, minOrder: 25, maxOrder: 1000, description: 'Professional engagement', icon: 'Heart', delivery_time: 'Hours', rating: 4.3 },
+    { id: 28, name: 'LinkedIn Connections', platform: 'LinkedIn', price: 4.00, minOrder: 25, maxOrder: 2000, description: 'Expand your network', icon: 'UserPlus', delivery_time: 'Hours', rating: 4.2 },
+    
+    // Telegram Services
+    { id: 29, name: 'Telegram Members', platform: 'Telegram', price: 1.80, minOrder: 100, maxOrder: 10000, description: 'Grow your Telegram channel', icon: 'Users', delivery_time: 'Hours', rating: 4.6 },
+    { id: 30, name: 'Telegram Views', platform: 'Telegram', price: 0.60, minOrder: 100, maxOrder: 50000, description: 'Increase post visibility', icon: 'Eye', delivery_time: 'Minutes', rating: 4.7 },
+    
+    // Spotify Services
+    { id: 31, name: 'Spotify Followers', platform: 'Spotify', price: 2.80, minOrder: 100, maxOrder: 10000, description: 'Grow your music audience', icon: 'Users', delivery_time: 'Hours', rating: 4.3 },
+    { id: 32, name: 'Spotify Plays', platform: 'Spotify', price: 1.20, minOrder: 100, maxOrder: 100000, description: 'Boost your track plays', icon: 'Play', delivery_time: 'Hours', rating: 4.5 },
+    { id: 33, name: 'Spotify Monthly Listeners', platform: 'Spotify', price: 4.50, minOrder: 50, maxOrder: 5000, description: 'Increase monthly listeners', icon: 'Users', delivery_time: 'Hours', rating: 4.1 },
+    
+    // Discord Services
+    { id: 34, name: 'Discord Members', platform: 'Discord', price: 2.00, minOrder: 50, maxOrder: 5000, description: 'Grow your Discord server', icon: 'Users', delivery_time: 'Hours', rating: 4.4 },
+    { id: 35, name: 'Discord Online Members', platform: 'Discord', price: 3.50, minOrder: 25, maxOrder: 1000, description: 'Active server members', icon: 'Zap', delivery_time: 'Hours', rating: 4.2 },
+    
+    // Twitch Services
+    { id: 36, name: 'Twitch Followers', platform: 'Twitch', price: 3.20, minOrder: 50, maxOrder: 5000, description: 'Build your streaming audience', icon: 'Users', delivery_time: 'Hours', rating: 4.3 },
+    { id: 37, name: 'Twitch Views', platform: 'Twitch', price: 2.50, minOrder: 100, maxOrder: 10000, description: 'Boost stream viewership', icon: 'Eye', delivery_time: 'Hours', rating: 4.1 },
+    
+    // Website Services
+    { id: 38, name: 'Website Traffic', platform: 'Website', price: 1.50, minOrder: 1000, maxOrder: 100000, description: 'Drive traffic to your website', icon: 'Eye', delivery_time: 'Hours', rating: 4.0 },
+    { id: 39, name: 'SEO Backlinks', platform: 'Website', price: 5.00, minOrder: 10, maxOrder: 1000, description: 'High-quality backlinks', icon: 'Zap', delivery_time: 'Days', rating: 4.2 },
+    { id: 40, name: 'Google Reviews', platform: 'Website', price: 8.00, minOrder: 5, maxOrder: 100, description: 'Positive Google reviews', icon: 'Star', delivery_time: 'Days', rating: 4.7 }
   ];
 
   const [services, setServices] = useState<LocalService[]>(defaultServices);
