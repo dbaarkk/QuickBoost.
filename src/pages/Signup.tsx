@@ -91,13 +91,17 @@ const Signup: React.FC = () => {
       
       if (error) {
         setSubmitError(error.message);
+        setIsLoading(false);
       } else {
-        navigate('/dashboard');
+        // Don't manually navigate - the auth context will handle this
+        // The user will be automatically redirected to dashboard
       }
     } catch (err) {
       setSubmitError('An unexpected error occurred');
-    } finally {
       setIsLoading(false);
+    } finally {
+      // Don't set loading to false here if signup was successful
+      // Let the auth context handle it
     }
   };
 

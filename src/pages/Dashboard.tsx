@@ -106,19 +106,6 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  if (!user || !profile) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Please log in</h2>
-          <Link to="/login" className="text-indigo-600 hover:text-indigo-500">
-            Go to login
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
