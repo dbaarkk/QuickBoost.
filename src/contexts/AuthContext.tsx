@@ -6,11 +6,7 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData: {
-    first_name: string;
-    last_name: string;
-    phone?: string;
-  }) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: { first_name: string; last_name: string; phone: string }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -39,42 +35,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        await refreshProfile();
-      }
+      setUser(session?.user ?? null);
+      if (session?.user) await refreshProfile();
       setLoading(false);
     };
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        await refreshProfile();
-      } else {
-        setUser(null);
-        setProfile(null);
-      }
+      setUser(session?.user ?? null);
+      if (session?.user) await refreshProfile();
+      else setProfile(null);
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, userData: {
-    first_name: string;
-    last_name: string;
-    phone?: string;
-  }) => {
-    const { data, error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone: string }) => {
+    // Attempt to sign up
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: { data: userData }
     });
 
-    if (error) return { error };
+    if (signUpError && signUpError.message !== 'User already registered') {
+      return { error: signUpError };
+    }
 
-    // Automatically sign in after signup
+    // If user already exists, attempt to sign in
+    if (signUpError && signUpError.message === 'User already registered') {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      if (!signInError && signInData.user) {
+        setUser(signInData.user);
+        await refreshProfile();
+        return { error: null };
+      }
+      return { error: signInError };
+    }
+
+    // If signup successful, sign in the user immediately
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -89,16 +92,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (!error && data.user) {
       setUser(data.user);
       await refreshProfile();
     }
-
     return { error };
   };
 
@@ -107,11 +105,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setProfile(null);
   };
-
-  // Render children only after loading completes
-  if (loading) {
-    return <div>Loading...</div>; // Or nothing at all if you prefer
-  }
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, refreshProfile }}>
