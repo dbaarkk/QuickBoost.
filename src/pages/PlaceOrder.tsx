@@ -15,8 +15,16 @@ import {
   Facebook,
   Twitter,
   ArrowRight,
-  CheckCircle
-import { ShoppingCart, AlertCircle, CheckCircle, Users, Heart, MessageCircle, Share2, Eye, Play, UserPlus, Zap, Star, Instagram, Youtube, Twitter, Facebook } from 'lucide-react';
+  CheckCircle,
+  AlertCircle,
+  Heart,
+  MessageCircle,
+  Share2,
+  Eye,
+  Play,
+  UserPlus,
+  Zap
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getServices, createOrder, Service } from '../lib/supabase';
 

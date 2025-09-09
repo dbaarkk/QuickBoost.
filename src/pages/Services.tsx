@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, Star, Users, Heart, MessageCircle, Share2, Eye, Play, UserPlus, Zap, Instagram, Youtube, Twitter, Facebook } from 'lucide-react';
+import { 
   TrendingUp, 
   Instagram, 
   Youtube, 
@@ -13,7 +13,14 @@ import { Search, Filter, Star, Users, Heart, MessageCircle, Share2, Eye, Play, U
   Clock,
   Users,
   Filter,
-  ArrowRight
+  ArrowRight,
+  Heart,
+  MessageCircle,
+  Share2,
+  Eye,
+  Play,
+  UserPlus,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getServices, Service } from '../lib/supabase';
