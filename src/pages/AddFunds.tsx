@@ -292,6 +292,37 @@ const AddFunds: React.FC = () => {
 
           {/* Right Side Info */}
           <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount (USD)
+              </label>
+              <input
+                type="number"
+                value={cryptoForm.amount}
+                onChange={(e) => setCryptoForm({...cryptoForm, amount: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter amount in USD"
+                min="1"
+                step="0.01"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount (₹)
+              </label>
+              <input
+                type="number"
+                value={upiForm.amount}
+                onChange={(e) => setUpiForm({...upiForm, amount: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter amount in ₹"
+                min="1"
+                required
+              />
+            </div>
+
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <div className="flex items-center mb-4">
                 <div className="bg-green-100 p-3 rounded-xl mr-4">

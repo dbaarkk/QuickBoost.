@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
+import { Search, Filter, Star, Users, Heart, MessageCircle, Share2, Eye, Play, UserPlus, Zap, Instagram, Youtube, Twitter, Facebook } from 'lucide-react';
   TrendingUp, 
   Instagram, 
   Youtube, 
@@ -20,7 +20,69 @@ import { getServices, Service } from '../lib/supabase';
 
 const Services: React.FC = () => {
   const { profile } = useAuth();
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<Service[]>([
+    // Instagram Services
+    { id: 1, name: 'Instagram Followers', category: 'Instagram', price: 0.50, minOrder: 100, maxOrder: 10000, description: 'High-quality Instagram followers', icon: 'Users' },
+    { id: 2, name: 'Instagram Likes', category: 'Instagram', price: 0.30, minOrder: 50, maxOrder: 5000, description: 'Real Instagram likes for your posts', icon: 'Heart' },
+    { id: 3, name: 'Instagram Comments', category: 'Instagram', price: 1.20, minOrder: 10, maxOrder: 1000, description: 'Engaging comments on your posts', icon: 'MessageCircle' },
+    { id: 4, name: 'Instagram Views', category: 'Instagram', price: 0.20, minOrder: 100, maxOrder: 50000, description: 'Boost your Instagram video views', icon: 'Eye' },
+    { id: 5, name: 'Instagram Story Views', category: 'Instagram', price: 0.40, minOrder: 50, maxOrder: 10000, description: 'Increase your story visibility', icon: 'Eye' },
+    { id: 6, name: 'Instagram Shares', category: 'Instagram', price: 0.80, minOrder: 25, maxOrder: 2000, description: 'Share your content widely', icon: 'Share2' },
+    
+    // YouTube Services
+    { id: 7, name: 'YouTube Subscribers', category: 'YouTube', price: 2.50, minOrder: 50, maxOrder: 5000, description: 'Grow your YouTube channel', icon: 'UserPlus' },
+    { id: 8, name: 'YouTube Views', category: 'YouTube', price: 0.80, minOrder: 100, maxOrder: 100000, description: 'Increase video watch time', icon: 'Play' },
+    { id: 9, name: 'YouTube Likes', category: 'YouTube', price: 1.50, minOrder: 25, maxOrder: 2000, description: 'Get more likes on videos', icon: 'Heart' },
+    { id: 10, name: 'YouTube Comments', category: 'YouTube', price: 3.00, minOrder: 5, maxOrder: 500, description: 'Engaging video comments', icon: 'MessageCircle' },
+    { id: 11, name: 'YouTube Watch Time', category: 'YouTube', price: 5.00, minOrder: 100, maxOrder: 10000, description: 'Boost your watch hours', icon: 'Play' },
+    
+    // TikTok Services
+    { id: 12, name: 'TikTok Followers', category: 'TikTok', price: 1.80, minOrder: 100, maxOrder: 10000, description: 'Grow your TikTok audience', icon: 'Users' },
+    { id: 13, name: 'TikTok Likes', category: 'TikTok', price: 0.60, minOrder: 50, maxOrder: 10000, description: 'Get more likes on TikTok', icon: 'Heart' },
+    { id: 14, name: 'TikTok Views', category: 'TikTok', price: 0.40, minOrder: 100, maxOrder: 100000, description: 'Increase video visibility', icon: 'Eye' },
+    { id: 15, name: 'TikTok Shares', category: 'TikTok', price: 1.20, minOrder: 25, maxOrder: 5000, description: 'Viral content sharing', icon: 'Share2' },
+    { id: 16, name: 'TikTok Comments', category: 'TikTok', price: 2.50, minOrder: 10, maxOrder: 1000, description: 'Engaging TikTok comments', icon: 'MessageCircle' },
+    
+    // Facebook Services
+    { id: 17, name: 'Facebook Page Likes', category: 'Facebook', price: 1.20, minOrder: 100, maxOrder: 10000, description: 'Grow your Facebook page', icon: 'Heart' },
+    { id: 18, name: 'Facebook Post Likes', category: 'Facebook', price: 0.80, minOrder: 50, maxOrder: 5000, description: 'Boost post engagement', icon: 'Heart' },
+    { id: 19, name: 'Facebook Followers', category: 'Facebook', price: 1.50, minOrder: 100, maxOrder: 10000, description: 'Increase page followers', icon: 'Users' },
+    { id: 20, name: 'Facebook Comments', category: 'Facebook', price: 2.00, minOrder: 10, maxOrder: 1000, description: 'Quality post comments', icon: 'MessageCircle' },
+    { id: 21, name: 'Facebook Shares', category: 'Facebook', price: 1.80, minOrder: 25, maxOrder: 2000, description: 'Expand your reach', icon: 'Share2' },
+    
+    // Twitter Services
+    { id: 22, name: 'Twitter Followers', category: 'Twitter', price: 2.20, minOrder: 100, maxOrder: 10000, description: 'Build your Twitter audience', icon: 'Users' },
+    { id: 23, name: 'Twitter Likes', category: 'Twitter', price: 1.00, minOrder: 50, maxOrder: 5000, description: 'Get more tweet likes', icon: 'Heart' },
+    { id: 24, name: 'Twitter Retweets', category: 'Twitter', price: 1.50, minOrder: 25, maxOrder: 2000, description: 'Amplify your tweets', icon: 'Share2' },
+    { id: 25, name: 'Twitter Comments', category: 'Twitter', price: 3.50, minOrder: 10, maxOrder: 500, description: 'Engaging tweet replies', icon: 'MessageCircle' },
+    
+    // LinkedIn Services
+    { id: 26, name: 'LinkedIn Followers', category: 'LinkedIn', price: 3.00, minOrder: 50, maxOrder: 5000, description: 'Professional network growth', icon: 'Users' },
+    { id: 27, name: 'LinkedIn Post Likes', category: 'LinkedIn', price: 2.50, minOrder: 25, maxOrder: 1000, description: 'Professional engagement', icon: 'Heart' },
+    { id: 28, name: 'LinkedIn Connections', category: 'LinkedIn', price: 4.00, minOrder: 25, maxOrder: 2000, description: 'Expand your network', icon: 'UserPlus' },
+    
+    // Telegram Services
+    { id: 29, name: 'Telegram Members', category: 'Telegram', price: 1.80, minOrder: 100, maxOrder: 10000, description: 'Grow your Telegram channel', icon: 'Users' },
+    { id: 30, name: 'Telegram Views', category: 'Telegram', price: 0.60, minOrder: 100, maxOrder: 50000, description: 'Increase post visibility', icon: 'Eye' },
+    
+    // Spotify Services
+    { id: 31, name: 'Spotify Followers', category: 'Spotify', price: 2.80, minOrder: 100, maxOrder: 10000, description: 'Grow your music audience', icon: 'Users' },
+    { id: 32, name: 'Spotify Plays', category: 'Spotify', price: 1.20, minOrder: 100, maxOrder: 100000, description: 'Boost your track plays', icon: 'Play' },
+    { id: 33, name: 'Spotify Monthly Listeners', category: 'Spotify', price: 4.50, minOrder: 50, maxOrder: 5000, description: 'Increase monthly listeners', icon: 'Users' },
+    
+    // Discord Services
+    { id: 34, name: 'Discord Members', category: 'Discord', price: 2.00, minOrder: 50, maxOrder: 5000, description: 'Grow your Discord server', icon: 'Users' },
+    { id: 35, name: 'Discord Online Members', category: 'Discord', price: 3.50, minOrder: 25, maxOrder: 1000, description: 'Active server members', icon: 'Zap' },
+    
+    // Twitch Services
+    { id: 36, name: 'Twitch Followers', category: 'Twitch', price: 3.20, minOrder: 50, maxOrder: 5000, description: 'Build your streaming audience', icon: 'Users' },
+    { id: 37, name: 'Twitch Views', category: 'Twitch', price: 2.50, minOrder: 100, maxOrder: 10000, description: 'Boost stream viewership', icon: 'Eye' },
+    
+    // Website Traffic
+    { id: 38, name: 'Website Traffic', category: 'Website', price: 1.50, minOrder: 1000, maxOrder: 100000, description: 'Drive traffic to your website', icon: 'Eye' },
+    { id: 39, name: 'SEO Backlinks', category: 'Website', price: 5.00, minOrder: 10, maxOrder: 1000, description: 'High-quality backlinks', icon: 'Zap' },
+    { id: 40, name: 'Google Reviews', category: 'Website', price: 8.00, minOrder: 5, maxOrder: 100, description: 'Positive Google reviews', icon: 'Star' }
+  ]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
@@ -35,25 +97,9 @@ const Services: React.FC = () => {
       setLoading(false);
     };
 
-    fetchServices();
+    setLoading(false);
   }, []);
 
-  const platforms = ['all', ...Array.from(new Set(services.map(s => s.platform)))];
-  const categories = ['all', ...Array.from(new Set(services.map(s => s.category)))];
-
-  const filteredServices = services.filter(service => {
-    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPlatform = selectedPlatform === 'all' || service.platform === selectedPlatform;
-    const matchesCategory = selectedCategory === 'all' || service.category === selectedCategory;
-    
-    return matchesSearch && matchesPlatform && matchesCategory;
-  });
-
-  const getPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case 'Instagram':
-        return <Instagram className="h-5 w-5" />;
       case 'YouTube':
         return <Youtube className="h-5 w-5" />;
       case 'Facebook':

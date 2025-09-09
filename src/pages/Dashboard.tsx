@@ -203,9 +203,6 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="px-4 py-3 border-b flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
-            <Link to="/orders" className="text-indigo-600 hover:text-indigo-500 text-xs font-medium">
-              View All
-            </Link>
           </div>
 
           {ordersLoading ? (
