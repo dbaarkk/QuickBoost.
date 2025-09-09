@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
+// UserProfile interface
 export interface UserProfile {
   id: string;
   email: string;
@@ -15,6 +16,7 @@ export interface UserProfile {
   updated_at: string;
 }
 
+// Auth context types
 interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
@@ -25,6 +27,7 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
 }
 
+// Create context with default values
 const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
@@ -35,11 +38,12 @@ const AuthContext = createContext<AuthContextType>({
   refreshProfile: async () => {}
 });
 
+// Custom hook to use the context
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  return context;
+  return useContext(AuthContext);
 };
 
+// Function to fetch user profile
 const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('user_profiles')
@@ -49,6 +53,7 @@ const getUserProfile = async (userId: string) => {
   return { data, error };
 };
 
+// AuthProvider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -56,12 +61,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshProfile = async () => {
     try {
-    if (user) {
-      const { data, error } = await getUserProfile(user.id);
+      if (user) {
+        const { data, error } = await getUserProfile(user.id);
         if (!error && data) {
           setProfile(data);
         }
-    }
+      }
     } catch (error) {
       console.error('Error refreshing profile:', error);
     }
@@ -70,7 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
 
-    // Get initial session
     const getInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -91,7 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     getInitialSession();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (mounted) {
@@ -101,9 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } else {
             setProfile(null);
           }
-          if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-            setLoading(false);
-          }
+          setLoading(false);
         }
       }
     );
@@ -112,36 +113,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [user]);
+  }, []); // ✅ Run only once on mount
 
   const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone: string }) => {
     try {
       setLoading(true);
-      
-      // First try to sign up
+
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: { data: userData }
       });
 
-      // If user already exists or signup failed, try to sign in
       if (signUpError) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password
         });
-        
+
         if (signInError) {
           setLoading(false);
           return { error: signInError };
         }
-        
-        // Sign in successful, auth state change will handle the rest
+
         return { error: null };
       }
 
-      // If signup was successful, sign them in immediately
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -152,7 +149,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: signInError };
       }
 
-      // Sign in successful, auth state change will handle the rest
       return { error: null };
     } catch (error) {
       setLoading(false);
@@ -164,12 +160,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      
       if (error) {
         setLoading(false);
       }
-      // If successful, auth state change will handle the rest
-      
       return { error };
     } catch (error) {
       setLoading(false);
