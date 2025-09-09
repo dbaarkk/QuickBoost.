@@ -33,70 +33,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) await refreshProfile();
-      setLoading(false);
-    };
-    init();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) await refreshProfile();
-      else setProfile(null);
+      if (session?.user) {
+        refreshProfile();
+      }
       setLoading(false);
     });
 
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        await refreshProfile();
+      } else {
+        setProfile(null);
+      }
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        setLoading(false);
+      }
+    });
+
     return () => subscription.unsubscribe();
-  }, []);
+  }, [user]);
 
   const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone: string }) => {
-    // Attempt to sign up
-    const { data, error: signUpError } = await supabase.auth.signUp({
+    setLoading(true);
+    
+    // First try to sign up
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: { data: userData }
     });
 
-    if (signUpError && signUpError.message !== 'User already registered') {
-      return { error: signUpError };
-    }
-
-    // If user already exists, attempt to sign in
-    if (signUpError && signUpError.message === 'User already registered') {
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    // If user already exists or signup failed, try to sign in
+    if (signUpError) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
-      if (!signInError && signInData.user) {
-        setUser(signInData.user);
-        await refreshProfile();
-        return { error: null };
+      
+      if (signInError) {
+        setLoading(false);
+        return { error: signInError };
       }
-      return { error: signInError };
+      
+      // Sign in successful, auth state change will handle the rest
+      return { error: null };
     }
 
-    // If signup successful, sign in the user immediately
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    // If signup was successful, sign them in immediately
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
-    if (!signInError && signInData.user) {
-      setUser(signInData.user);
-      await refreshProfile();
+    if (signInError) {
+      setLoading(false);
+      return { error: signInError };
     }
 
-    return { error: signInError };
+    // Sign in successful, auth state change will handle the rest
+    return { error: null };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error && data.user) {
-      setUser(data.user);
-      await refreshProfile();
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      setLoading(false);
     }
+    // If successful, auth state change will handle the rest
+    
     return { error };
   };
 
