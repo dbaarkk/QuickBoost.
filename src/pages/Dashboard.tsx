@@ -16,7 +16,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getUserOrders, Order } from '../lib/supabase';
 
 const Dashboard: React.FC = () => {
-  const { user, profile, loading } = useAuth();
+  const { user, profile } = useAuth();
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
 
@@ -97,15 +97,6 @@ const Dashboard: React.FC = () => {
       default: return status;
     }
   };
-
-  // Show loading if auth or profile is still loading
-  if (loading || !profile) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
