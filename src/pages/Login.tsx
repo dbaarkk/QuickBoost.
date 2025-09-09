@@ -9,23 +9,27 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const { signIn, user } = useAuth();
+  const { signIn, user, initialized } = useAuth();
   const navigate = useNavigate();
 
+  // Redirect immediately if user exists and auth is initialized
   useEffect(() => {
-    if (user) navigate('/dashboard', { replace: true });
-  }, [user, navigate]);
+    if (initialized && user) navigate('/dashboard', { replace: true });
+  }, [user, initialized, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     try {
       await signIn(email, password);
-      // Redirect happens automatically
+      // Redirect happens automatically after auth state update
     } catch (err: any) {
       setError(err.message || 'Failed to login');
     }
   };
+
+  // Render nothing until auth finishes initializing
+  if (!initialized) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
