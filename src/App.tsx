@@ -65,11 +65,6 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
   }
 
-  // Only redirect logged-in users away from login/signup
-  const currentPath = window.location.pathname;
-  if (user && (currentPath === '/login' || currentPath === '/signup')) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   return <>{children}</>;
 };
