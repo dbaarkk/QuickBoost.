@@ -1,7 +1,6 @@
 import React, { ErrorInfo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import { useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // Import all pages
 import Home from './pages/Home';
@@ -66,69 +65,32 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
   }
 
-  return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
+  // Only redirect logged-in users away from login/signup
+  const currentPath = window.location.pathname;
+  if (user && (currentPath === '/login' || currentPath === '/signup')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 /* ------------------- App Routes ------------------- */
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <PublicRoute>
-            <Home />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <Signup />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/add-funds"
-        element={
-          <ProtectedRoute>
-            <AddFunds />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/services"
-        element={
-          <ProtectedRoute>
-            <Services />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/place-order"
-        element={
-          <ProtectedRoute>
-            <PlaceOrder />
-          </ProtectedRoute>
-        }
-      />
+      {/* Home page always shows */}
+      <Route path="/" element={<Home />} />
+
+      {/* Login & Signup redirect only if logged in */}
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+      <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+
+      {/* Protected routes */}
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/add-funds" element={<ProtectedRoute><AddFunds /></ProtectedRoute>} />
+      <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+      <Route path="/place-order" element={<ProtectedRoute><PlaceOrder /></ProtectedRoute>} />
+
       {/* Redirect any unknown routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
