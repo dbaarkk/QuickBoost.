@@ -13,7 +13,7 @@ const Login = () => {
   const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // Redirect if user is logged in and not loading
   useEffect(() => {
     if (!loading && user) {
       navigate('/dashboard', { replace: true });
@@ -27,27 +27,22 @@ const Login = () => {
 
     try {
       await signIn(email, password);
-      // Navigation handled by useEffect when user state updates
+      // Navigation handled in useEffect when user updates
     } catch (error: any) {
-      setError(error.message || 'Failed to log in');
+      setError(error.message || 'Failed to sign in');
       setIsSubmitting(false);
     }
   };
 
-  // Show nothing if loading and user is undefined (auth still initializing)
+  // If loading is true and user is not yet set, show nothing to prevent flickering
   if (loading && !user) {
     return null;
   }
 
-  // If user is already logged in, don't show the form (will redirect via useEffect)
-  if (!loading && user) {
-    return null;
-  }
-
-  // Otherwise, show the login form
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+        {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="flex items-center justify-center mb-4">
             <TrendingUp className="h-8 w-8 text-indigo-600" />
@@ -65,9 +60,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -83,9 +76,7 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
