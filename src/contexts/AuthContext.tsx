@@ -126,6 +126,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (signUpError) {
+        // If user already exists, try to sign them in
+        if (signUpError.message.includes('already registered')) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password
@@ -137,6 +139,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         return { error: null };
+        }
+        
+        setLoading(false);
+        return { error: signUpError };
       }
 
       const { error: signInError } = await supabase.auth.signInWithPassword({
