@@ -9,11 +9,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  
+
   const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in (but wait for loading to complete)
+  // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
       navigate('/dashboard', { replace: true });
@@ -27,29 +27,27 @@ const Login = () => {
 
     try {
       await signIn(email, password);
-      // Navigation will happen automatically via useEffect when user state updates
+      // Navigation handled by useEffect when user state updates
     } catch (error: any) {
       setError(error.message || 'Failed to log in');
       setIsSubmitting(false);
     }
   };
 
-  // Show loading spinner while auth is initializing
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+  // Show nothing if loading and user is undefined (auth still initializing)
+  if (loading && !user) {
+    return null;
   }
 
+  // If user is already logged in, don't show the form (will redirect via useEffect)
+  if (!loading && user) {
+    return null;
+  }
+
+  // Otherwise, show the login form
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="flex items-center justify-center mb-4">
             <TrendingUp className="h-8 w-8 text-indigo-600" />
