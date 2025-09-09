@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  TrendingUp, 
-  Wallet, 
-  ShoppingCart, 
-  Plus, 
-  Eye, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  ArrowRight, 
-  BarChart3 
+import { 
+  TrendingUp, 
+  Wallet, 
+  ShoppingCart, 
+  Plus, 
+  Eye, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  ArrowRight, 
+  BarChart3 
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserOrders, Order } from '../lib/supabase';
@@ -98,7 +98,8 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  if (loading) {
+  // Show loading if auth or profile is still loading
+  if (loading || !profile) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -120,7 +121,7 @@ const Dashboard: React.FC = () => {
               <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Balance:</span>
-                <span className="text-sm font-semibold text-green-600">₹{profile.balance.toFixed(2)}</span>
+                <span className="text-sm font-semibold text-green-600">₹{profile?.balance?.toFixed(2) ?? 0}</span>
               </div>
             </nav>
           </div>
@@ -130,7 +131,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Welcome Section */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back, {profile.first_name}!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back, {profile?.first_name ?? 'User'}!</h1>
           <p className="text-gray-600">Here's what's happening with your account today.</p>
         </div>
 
@@ -140,7 +141,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Account Balance</p>
-                <p className="text-xl font-bold text-gray-900">₹{profile.balance.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900">₹{profile?.balance?.toFixed(2) ?? 0}</p>
               </div>
               <div className="bg-green-100 rounded-lg p-2">
                 <Wallet className="h-5 w-5 text-green-600" />
@@ -161,7 +162,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <p className="text-xl font-bold text-gray-900">{profile.total_orders}</p>
+                <p className="text-xl font-bold text-gray-900">{profile?.total_orders ?? 0}</p>
               </div>
               <div className="bg-blue-100 rounded-lg p-2">
                 <ShoppingCart className="h-5 w-5 text-blue-600" />
@@ -173,7 +174,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Spent</p>
-                <p className="text-xl font-bold text-gray-900">₹{profile.total_spent.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900">₹{profile?.total_spent?.toFixed(2) ?? 0}</p>
               </div>
               <div className="bg-purple-100 rounded-lg p-2">
                 <BarChart3 className="h-5 w-5 text-purple-600" />
