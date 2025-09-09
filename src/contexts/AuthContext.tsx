@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 // UserProfile interface
@@ -96,12 +95,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(session.user);
             const profileData = await getUserProfile(session.user.id);
             setProfile(profileData);
+          } else {
+            setUser(null);
+            setProfile(null);
           }
           setLoading(false);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
         if (mounted) {
+          setUser(null);
+          setProfile(null);
           setLoading(false);
         }
       }
@@ -156,13 +160,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
 
           if (signInError) {
+            setLoading(false);
             throw new Error(signInError.message);
           }
 
-          // User signed in successfully
+          // User signed in successfully - auth state change will handle the rest
           return;
         }
         
+        setLoading(false);
         throw new Error(signUpError.message);
       }
 
@@ -174,10 +180,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         if (signInError) {
+          setLoading(false);
           throw new Error(signInError.message);
         }
       }
 
+      // Auth state change will handle setting loading to false
     } catch (error: any) {
       setLoading(false);
       throw new Error(error.message || 'Failed to create account');
@@ -194,14 +202,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
+        setLoading(false);
         throw new Error(error.message);
       }
 
       if (!data.user) {
+        setLoading(false);
         throw new Error('Login failed - no user data received');
       }
 
-      // Auth state change will be handled by the listener
+      // Auth state change will handle setting user and loading to false
     } catch (error: any) {
       setLoading(false);
       throw new Error(error.message || 'Failed to sign in');
@@ -210,6 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
@@ -217,8 +228,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(null);
       setProfile(null);
+      setLoading(false);
     } catch (error) {
       console.error('Error in signOut:', error);
+      setLoading(false);
     }
   };
 

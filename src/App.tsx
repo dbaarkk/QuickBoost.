@@ -43,6 +43,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
+  // Show loading spinner while determining auth state
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -54,12 +55,14 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
 
+  // Only redirect after loading is complete
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
+  // Show loading spinner while determining auth state
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -71,6 +74,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
   }
 
+  // Allow access to public routes regardless of auth state
   return <>{children}</>;
 };
 
@@ -81,7 +85,7 @@ const AppRoutes: React.FC = () => {
       {/* Home page always shows */}
       <Route path="/" element={<Home />} />
 
-      {/* Login & Signup redirect only if logged in */}
+      {/* Login & Signup are public routes */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
 
