@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ErrorInfo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
@@ -12,10 +12,38 @@ import PlaceOrder from './pages/PlaceOrder';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 
-// Protected Route Component
+/* ------------------- Error Boundary ------------------- */
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error?: Error }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center text-red-600 p-4">
+          <h1 className="text-2xl font-bold mb-4">Something went wrong!</h1>
+          <pre className="whitespace-pre-wrap">{this.state.error?.message}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+/* ------------------- Protected & Public Routes ------------------- */
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -23,14 +51,13 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
       </div>
     );
   }
-  
+
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-// Public Route Component (redirect to dashboard if already logged in)
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -38,60 +65,85 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </div>
     );
   }
-  
+
   return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
 };
 
+/* ------------------- App Routes ------------------- */
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={
-        <PublicRoute>
-          <Home />
-        </PublicRoute>
-      } />
-      <Route path="/login" element={
-        <PublicRoute>
-          <Login />
-        </PublicRoute>
-      } />
-      <Route path="/signup" element={
-        <PublicRoute>
-          <Signup />
-        </PublicRoute>
-      } />
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/add-funds" element={
-        <ProtectedRoute>
-          <AddFunds />
-        </ProtectedRoute>
-      } />
-      <Route path="/services" element={
-        <ProtectedRoute>
-          <Services />
-        </ProtectedRoute>
-      } />
-      <Route path="/place-order" element={
-        <ProtectedRoute>
-          <PlaceOrder />
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <Home />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-funds"
+        element={
+          <ProtectedRoute>
+            <AddFunds />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services"
+        element={
+          <ProtectedRoute>
+            <Services />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/place-order"
+        element={
+          <ProtectedRoute>
+            <PlaceOrder />
+          </ProtectedRoute>
+        }
+      />
       {/* Redirect any unknown routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
 
+/* ------------------- Main App ------------------- */
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <ErrorBoundary>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </ErrorBoundary>
     </AuthProvider>
   );
 }
