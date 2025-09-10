@@ -102,55 +102,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        setUser(data.user);
-        const profileData = await getUserProfile(data.user.id);
-        setProfile(profileData);
-        setLoading(false);
-      }
-
-      if (data.user && !data.session) {
-        await signIn(email, password);
-      }
-    } catch (error: any) {
-      setLoading(false);
-      throw new Error(error.message || 'Failed to sign up');
-    }
-  };
-
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+    if (!data.user) throw new Error('No user data received');
+
+    setUser(data.user);
+    const profileData = await getUserProfile(data.user.id);
+    setProfile(profileData);
+
+    return data.user; // Return user immediately
+  } catch (error: any) {
+    console.error('Sign in error:', error);
+    throw new Error(error.message || 'Invalid credentials');
+  }
+};
+
+const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: userData
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.user) {
+      const { error: signInError, data: signInData } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      if (error) throw error;
-      if (!data.user) throw new Error('No user data received');
+      if (signInError) throw signInError;
 
-      setUser(data.user);
-      const profileData = await getUserProfile(data.user.id);
+      setUser(signInData.user);
+      const profileData = await getUserProfile(signInData.user.id);
       setProfile(profileData);
-      setLoading(false);
-    } catch (error: any) {
-      setLoading(false);
-      throw new Error(error.message || 'Failed to sign in');
+
+      return signInData.user; // Return user immediately
     }
-  };
+
+    throw new Error('Signup failed');
+  } catch (error: any) {
+    console.error('Signup error:', error);
+    throw new Error(error.message || 'Failed to create account');
+  }
+};
 
   const signOut = async () => {
     setLoading(true);
