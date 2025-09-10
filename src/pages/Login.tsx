@@ -12,13 +12,6 @@ const Login = () => {
   const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect immediately when user is authenticated
-  useEffect(() => {
-    if (user && !loading) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, loading, navigate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
