@@ -27,7 +27,7 @@ const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
       .select('*')
       .eq('id', userId)
       .single();
-    
+
     if (error) {
       console.error('Error fetching profile:', error);
       return null;
@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (mounted) {
           if (session?.user) {
             setUser(session.user);
@@ -103,50 +103,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: userData
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        setUser(data.user);
+        const profileData = await getUserProfile(data.user.id);
+        setProfile(profileData);
+        setLoading(false);
       }
-    });
 
-    if (error) throw error;
-
-    // Immediately update state for instant redirect
-    if (data.user) {
-      setUser(data.user);
-      const profileData = await getUserProfile(data.user.id);
-      setProfile(profileData);
-    }
-
-    // If user already exists but no session, sign them in
-    if (data.user && !data.session) {
-      await signIn(email, password);
+      if (data.user && !data.session) {
+        await signIn(email, password);
+      }
+    } catch (error: any) {
+      setLoading(false);
+      throw new Error(error.message || 'Failed to sign up');
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-    if (error) throw error;
-    if (!data.user) throw new Error('No user data received');
-    
-    // Update state immediately for instant redirect
-    setUser(data.user);
-    const profileData = await getUserProfile(data.user.id);
-    setProfile(profileData);
+      if (error) throw error;
+      if (!data.user) throw new Error('No user data received');
+
+      setUser(data.user);
+      const profileData = await getUserProfile(data.user.id);
+      setProfile(profileData);
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      throw new Error(error.message || 'Failed to sign in');
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    
-    setUser(null);
-    setProfile(null);
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      setUser(null);
+      setProfile(null);
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      throw new Error(error.message || 'Failed to sign out');
+    }
   };
 
   return (
