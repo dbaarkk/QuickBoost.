@@ -3,21 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
-const Login = () => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  
-  const { signIn, user, loading } = useAuth();
+
+  const { signIn, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect immediately when user is authenticated
+  // Redirect immediately after user logs in
   useEffect(() => {
-    if (user && !loading) {
+    if (user) {
       navigate('/dashboard', { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,16 +25,11 @@ const Login = () => {
 
     try {
       await signIn(email, password);
-      // Redirect happens via useEffect when user state updates
+      // Navigation happens automatically in useEffect after user is set
     } catch (error: any) {
       setError(error.message || 'Invalid credentials');
     }
   };
-
-  // Don't render if user is already authenticated
-  if (user && !loading) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
