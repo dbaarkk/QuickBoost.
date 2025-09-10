@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing environment variables: VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -12,6 +14,19 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true
   }
 });
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone?: string;
+  balance: number;
+  total_orders: number;
+  total_spent: number;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface Service {
   id: number;
@@ -54,102 +69,99 @@ export interface Deposit {
   updated_at: string;
 }
 
-// Auth functions
-export const signUp = async (
-  email: string,
-  password: string,
-  userData: { first_name: string; last_name: string; phone?: string }
-) => {
-  return supabase.auth.signUp({
-    email,
-    password,
-    options: { data: userData }
-  });
-};
-
-export const signIn = async (email: string, password: string) => {
-  return supabase.auth.signInWithPassword({ email, password });
-};
-
-export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  return { error };
-};
-
-export const getCurrentUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  return { user, error };
-};
-
-// User profile
-export const getUserProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from<UserProfile>('user_profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-  return { data, error };
-};
-
-export const updateUserProfile = async (userId: string, updates: Partial<UserProfile>) => {
-  const { data, error } = await supabase
-    .from<UserProfile>('user_profiles')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('id', userId)
-    .select()
-    .single();
-  return { data, error };
-};
-
 // Services
 export const getServices = async () => {
-  const { data, error } = await supabase
-    .from<Service>('services')
-    .select('*')
-    .eq('is_active', true)
-    .order('platform', { ascending: true });
-  return { data, error };
+  try {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('is_active', true)
+      .order('platform', { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    return [];
+  }
 };
 
 export const getServiceById = async (id: number) => {
-  const { data, error } = await supabase
-    .from<Service>('services')
-    .select('*')
-    .eq('id', id)
-    .single();
-  return { data, error };
+  try {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching service:', error);
+    return null;
+  }
 };
 
 // Orders
 export const createOrder = async (orderData: {
-  service_id: number;
+  service_id: number | string;
   quantity: number;
   link: string;
   amount: number;
 }) => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: null, error: { message: 'User not authenticated' } };
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
 
-  // Check balance
-  const { data: profile, error: profileError } = await getUserProfile(user.id);
-  if (profileError || !profile) return { data: null, error: profileError || { message: 'Profile not found' } };
-  if (profile.balance < orderData.amount) return { data: null, error: { message: 'Insufficient balance' } };
+    // Check balance
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('balance')
+      .eq('id', user.id)
+      .single();
+    
+    if (profileError) throw profileError;
+    if (!profile || profile.balance < orderData.amount) {
+      throw new Error('Insufficient balance');
+    }
 
-  const { data, error } = await supabase
-    .from<Order>('orders')
-    .insert({ user_id: user.id, ...orderData })
-    .select()
-    .single();
-  return { data, error };
+    const { data, error } = await supabase
+      .from('orders')
+      .insert({
+        user_id: user.id,
+        service_id: Number(orderData.service_id),
+        quantity: orderData.quantity,
+        link: orderData.link,
+        amount: orderData.amount
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Error creating order:', error);
+    return { data: null, error };
+  }
 };
 
 export const getUserOrders = async (userId: string) => {
-  const { data, error } = await supabase
-    .from<Order>('orders')
-    .select(`*, service:services(*)`)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false }); // newest first
-  return { data, error };
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        service:services(*)
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return { data: data || [], error: null };
+  } catch (error: any) {
+    console.error('Error fetching orders:', error);
+    return { data: [], error };
+  }
 };
 
 // Deposits
@@ -159,22 +171,39 @@ export const createDeposit = async (depositData: {
   utr_number?: string;
   txid?: string;
 }) => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: null, error: { message: 'User not authenticated' } };
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
 
-  const { data, error } = await supabase
-    .from<Deposit>('deposits')
-    .insert({ user_id: user.id, ...depositData })
-    .select()
-    .single();
-  return { data, error };
+    const { data, error } = await supabase
+      .from('deposits')
+      .insert({
+        user_id: user.id,
+        ...depositData
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error: any) {
+    console.error('Error creating deposit:', error);
+    return { data: null, error };
+  }
 };
 
 export const getUserDeposits = async (userId: string) => {
-  const { data, error } = await supabase
-    .from<Deposit>('deposits')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-  return { data, error };
+  try {
+    const { data, error } = await supabase
+      .from('deposits')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return { data: data || [], error: null };
+  } catch (error: any) {
+    console.error('Error fetching deposits:', error);
+    return { data: [], error };
+  }
 };

@@ -18,7 +18,7 @@ const Signup = () => {
   const { signUp, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in (but wait for loading to complete)
+  // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
       navigate('/dashboard', { replace: true });
@@ -47,8 +47,8 @@ const Signup = () => {
       return;
     }
 
-    if (!formData.email.includes('@gmail.com')) {
-      setError('Please use a Gmail address');
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -74,6 +74,7 @@ const Signup = () => {
       // Navigation will happen automatically via useEffect when user state updates
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -131,7 +132,7 @@ const Signup = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Gmail Address
+              Email Address
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -141,7 +142,7 @@ const Signup = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="Enter your Gmail address"
+                placeholder="Enter your email address"
                 required
                 disabled={isSubmitting}
               />
@@ -221,7 +222,7 @@ const Signup = () => {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have an account?{' '}
-            <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium">
+            <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
               Sign in
             </Link>
           </p>

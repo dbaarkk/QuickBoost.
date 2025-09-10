@@ -1,24 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
-
-export interface UserProfile {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  phone?: string;
-  balance: number;
-  total_orders: number;
-  total_spent: number;
-  created_at: string;
-  updated_at: string;
-}
+import { supabase, UserProfile } from '../lib/supabase';
 
 interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
-  initialized: boolean; // NEW
+  loading: boolean;
   signUp: (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -35,10 +22,19 @@ export const useAuth = () => {
 
 const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
-    const { data, error } = await supabase.from('user_profiles').select('*').eq('id', userId).single();
-    if (error) return null;
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return null;
+    }
     return data;
-  } catch {
+  } catch (error) {
+    console.error('Error fetching profile:', error);
     return null;
   }
 };
@@ -46,48 +42,58 @@ const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [initialized, setInitialized] = useState(false); // NEW
+  const [loading, setLoading] = useState(true);
 
   const refreshProfile = async () => {
     if (!user) return;
-    const profileData = await getUserProfile(user.id);
-    setProfile(profileData);
+    try {
+      const profileData = await getUserProfile(user.id);
+      setProfile(profileData);
+    } catch (error) {
+      console.error('Error refreshing profile:', error);
+    }
   };
 
   useEffect(() => {
     let mounted = true;
 
     const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!mounted) return;
-
-      if (session?.user) {
-        setUser(session.user);
-        const profileData = await getUserProfile(session.user.id);
-        setProfile(profileData);
-      } else {
-        setUser(null);
-        setProfile(null);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (mounted) {
+          if (session?.user) {
+            setUser(session.user);
+            const profileData = await getUserProfile(session.user.id);
+            setProfile(profileData);
+          }
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setLoading(false);
+        }
       }
-
-      setInitialized(true); // signal auth finished initializing
     };
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
 
-      if (session?.user) {
-        setUser(session.user);
-        const profileData = await getUserProfile(session.user.id);
-        setProfile(profileData);
-      } else {
-        setUser(null);
-        setProfile(null);
+      try {
+        if (session?.user) {
+          setUser(session.user);
+          const profileData = await getUserProfile(session.user.id);
+          setProfile(profileData);
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error handling auth state change:', error);
       }
-
-      setInitialized(true);
     });
 
     return () => {
@@ -97,26 +103,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: userData } });
-    if (error) throw new Error(error.message);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData
+        }
+      });
 
-    if (data.user) await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+
+      // If user already exists, try to sign them in
+      if (data.user && !data.session) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (signInError) throw signInError;
+      }
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      throw new Error(error.message || 'Failed to create account');
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw new Error(error.message);
-    if (!data.user) throw new Error('No user data received');
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      if (!data.user) throw new Error('No user data received');
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      throw new Error(error.message || 'Invalid credentials');
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      setProfile(null);
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+      throw new Error(error.message || 'Failed to sign out');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, initialized, signUp, signIn, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{
+      user,
+      profile,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      refreshProfile
+    }}>
       {children}
     </AuthContext.Provider>
   );

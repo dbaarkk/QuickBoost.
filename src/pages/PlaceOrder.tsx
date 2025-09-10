@@ -8,112 +8,23 @@ import {
   Info,
   Star,
   Clock,
-  Users,
   Instagram,
   Youtube,
   Facebook,
   Twitter,
-  ArrowRight,
+  Users,
   CheckCircle,
-  AlertCircle,
-  Heart,
-  MessageCircle,
-  Share2,
-  Eye,
-  Play,
-  UserPlus,
-  Zap
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { getServices, createOrder } from '../lib/supabase';
-
-/**
- * Local service shape used by this component (normalized)
- */
-type LocalService = {
-  id: number | string;
-  name: string;
-  platform: string;
-  price: number; // price is "per 1000"
-  minOrder: number;
-  maxOrder: number;
-  description?: string;
-  delivery_time?: string;
-  rating?: number;
-  icon?: string;
-};
+import { getServices, createOrder, Service } from '../lib/supabase';
 
 const PlaceOrder: React.FC = () => {
   const { profile, refreshProfile } = useAuth();
 
-  // initial hardcoded services (kept as defaults)
-  const defaultServices: LocalService[] = [
-    // Instagram Services
-    { id: 1, name: 'Instagram Followers', platform: 'Instagram', price: 0.50, minOrder: 100, maxOrder: 10000, description: 'High-quality Instagram followers', icon: 'Users', delivery_time: 'Instant', rating: 4.8 },
-    { id: 2, name: 'Instagram Likes', platform: 'Instagram', price: 0.30, minOrder: 50, maxOrder: 5000, description: 'Real Instagram likes for your posts', icon: 'Heart', delivery_time: 'Minutes', rating: 4.9 },
-    { id: 3, name: 'Instagram Comments', platform: 'Instagram', price: 1.20, minOrder: 10, maxOrder: 1000, description: 'Engaging comments on your posts', icon: 'MessageCircle', delivery_time: 'Minutes', rating: 4.5 },
-    { id: 4, name: 'Instagram Views', platform: 'Instagram', price: 0.20, minOrder: 100, maxOrder: 50000, description: 'Boost your Instagram video views', icon: 'Eye', delivery_time: 'Minutes', rating: 4.2 },
-    { id: 5, name: 'Instagram Story Views', platform: 'Instagram', price: 0.40, minOrder: 50, maxOrder: 10000, description: 'Increase your story visibility', icon: 'Eye', delivery_time: 'Minutes', rating: 4.3 },
-    { id: 6, name: 'Instagram Shares', platform: 'Instagram', price: 0.80, minOrder: 25, maxOrder: 2000, description: 'Share your content widely', icon: 'Share2', delivery_time: 'Minutes', rating: 4.1 },
-    
-    // YouTube Services
-    { id: 7, name: 'YouTube Subscribers', platform: 'YouTube', price: 2.50, minOrder: 50, maxOrder: 5000, description: 'Grow your YouTube channel', icon: 'UserPlus', delivery_time: 'Hours', rating: 4.5 },
-    { id: 8, name: 'YouTube Views', platform: 'YouTube', price: 0.80, minOrder: 100, maxOrder: 100000, description: 'Increase video watch time', icon: 'Play', delivery_time: 'Minutes', rating: 4.1 },
-    { id: 9, name: 'YouTube Likes', platform: 'YouTube', price: 1.50, minOrder: 25, maxOrder: 2000, description: 'Get more likes on videos', icon: 'Heart', delivery_time: 'Minutes', rating: 4.4 },
-    { id: 10, name: 'YouTube Comments', platform: 'YouTube', price: 3.00, minOrder: 5, maxOrder: 500, description: 'Engaging video comments', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.2 },
-    { id: 11, name: 'YouTube Watch Time', platform: 'YouTube', price: 5.00, minOrder: 100, maxOrder: 10000, description: 'Boost your watch hours', icon: 'Play', delivery_time: 'Hours', rating: 4.0 },
-    
-    // TikTok Services
-    { id: 12, name: 'TikTok Followers', platform: 'TikTok', price: 1.80, minOrder: 100, maxOrder: 10000, description: 'Grow your TikTok audience', icon: 'Users', delivery_time: 'Hours', rating: 4.6 },
-    { id: 13, name: 'TikTok Likes', platform: 'TikTok', price: 0.60, minOrder: 50, maxOrder: 10000, description: 'Get more likes on TikTok', icon: 'Heart', delivery_time: 'Minutes', rating: 4.7 },
-    { id: 14, name: 'TikTok Views', platform: 'TikTok', price: 0.40, minOrder: 100, maxOrder: 100000, description: 'Increase video visibility', icon: 'Eye', delivery_time: 'Minutes', rating: 4.5 },
-    { id: 15, name: 'TikTok Shares', platform: 'TikTok', price: 1.20, minOrder: 25, maxOrder: 5000, description: 'Viral content sharing', icon: 'Share2', delivery_time: 'Minutes', rating: 4.3 },
-    { id: 16, name: 'TikTok Comments', platform: 'TikTok', price: 2.50, minOrder: 10, maxOrder: 1000, description: 'Engaging TikTok comments', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.4 },
-    
-    // Facebook Services
-    { id: 17, name: 'Facebook Page Likes', platform: 'Facebook', price: 1.20, minOrder: 100, maxOrder: 10000, description: 'Grow your Facebook page', icon: 'Heart', delivery_time: 'Hours', rating: 4.5 },
-    { id: 18, name: 'Facebook Post Likes', platform: 'Facebook', price: 0.80, minOrder: 50, maxOrder: 5000, description: 'Boost post engagement', icon: 'Heart', delivery_time: 'Minutes', rating: 4.6 },
-    { id: 19, name: 'Facebook Followers', platform: 'Facebook', price: 1.50, minOrder: 100, maxOrder: 10000, description: 'Increase page followers', icon: 'Users', delivery_time: 'Hours', rating: 4.3 },
-    { id: 20, name: 'Facebook Comments', platform: 'Facebook', price: 2.00, minOrder: 10, maxOrder: 1000, description: 'Quality post comments', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.4 },
-    { id: 21, name: 'Facebook Shares', platform: 'Facebook', price: 1.80, minOrder: 25, maxOrder: 2000, description: 'Expand your reach', icon: 'Share2', delivery_time: 'Hours', rating: 4.2 },
-    
-    // Twitter Services
-    { id: 22, name: 'Twitter Followers', platform: 'Twitter', price: 2.20, minOrder: 100, maxOrder: 10000, description: 'Build your Twitter audience', icon: 'Users', delivery_time: 'Hours', rating: 4.4 },
-    { id: 23, name: 'Twitter Likes', platform: 'Twitter', price: 1.00, minOrder: 50, maxOrder: 5000, description: 'Get more tweet likes', icon: 'Heart', delivery_time: 'Minutes', rating: 4.5 },
-    { id: 24, name: 'Twitter Retweets', platform: 'Twitter', price: 1.50, minOrder: 25, maxOrder: 2000, description: 'Amplify your tweets', icon: 'Share2', delivery_time: 'Minutes', rating: 4.3 },
-    { id: 25, name: 'Twitter Comments', platform: 'Twitter', price: 3.50, minOrder: 10, maxOrder: 500, description: 'Engaging tweet replies', icon: 'MessageCircle', delivery_time: 'Hours', rating: 4.2 },
-    
-    // LinkedIn Services
-    { id: 26, name: 'LinkedIn Followers', platform: 'LinkedIn', price: 3.00, minOrder: 50, maxOrder: 5000, description: 'Professional network growth', icon: 'Users', delivery_time: 'Hours', rating: 4.4 },
-    { id: 27, name: 'LinkedIn Post Likes', platform: 'LinkedIn', price: 2.50, minOrder: 25, maxOrder: 1000, description: 'Professional engagement', icon: 'Heart', delivery_time: 'Hours', rating: 4.3 },
-    { id: 28, name: 'LinkedIn Connections', platform: 'LinkedIn', price: 4.00, minOrder: 25, maxOrder: 2000, description: 'Expand your network', icon: 'UserPlus', delivery_time: 'Hours', rating: 4.2 },
-    
-    // Telegram Services
-    { id: 29, name: 'Telegram Members', platform: 'Telegram', price: 1.80, minOrder: 100, maxOrder: 10000, description: 'Grow your Telegram channel', icon: 'Users', delivery_time: 'Hours', rating: 4.6 },
-    { id: 30, name: 'Telegram Views', platform: 'Telegram', price: 0.60, minOrder: 100, maxOrder: 50000, description: 'Increase post visibility', icon: 'Eye', delivery_time: 'Minutes', rating: 4.7 },
-    
-    // Spotify Services
-    { id: 31, name: 'Spotify Followers', platform: 'Spotify', price: 2.80, minOrder: 100, maxOrder: 10000, description: 'Grow your music audience', icon: 'Users', delivery_time: 'Hours', rating: 4.3 },
-    { id: 32, name: 'Spotify Plays', platform: 'Spotify', price: 1.20, minOrder: 100, maxOrder: 100000, description: 'Boost your track plays', icon: 'Play', delivery_time: 'Hours', rating: 4.5 },
-    { id: 33, name: 'Spotify Monthly Listeners', platform: 'Spotify', price: 4.50, minOrder: 50, maxOrder: 5000, description: 'Increase monthly listeners', icon: 'Users', delivery_time: 'Hours', rating: 4.1 },
-    
-    // Discord Services
-    { id: 34, name: 'Discord Members', platform: 'Discord', price: 2.00, minOrder: 50, maxOrder: 5000, description: 'Grow your Discord server', icon: 'Users', delivery_time: 'Hours', rating: 4.4 },
-    { id: 35, name: 'Discord Online Members', platform: 'Discord', price: 3.50, minOrder: 25, maxOrder: 1000, description: 'Active server members', icon: 'Zap', delivery_time: 'Hours', rating: 4.2 },
-    
-    // Twitch Services
-    { id: 36, name: 'Twitch Followers', platform: 'Twitch', price: 3.20, minOrder: 50, maxOrder: 5000, description: 'Build your streaming audience', icon: 'Users', delivery_time: 'Hours', rating: 4.3 },
-    { id: 37, name: 'Twitch Views', platform: 'Twitch', price: 2.50, minOrder: 100, maxOrder: 10000, description: 'Boost stream viewership', icon: 'Eye', delivery_time: 'Hours', rating: 4.1 },
-    
-    // Website Services
-    { id: 38, name: 'Website Traffic', platform: 'Website', price: 1.50, minOrder: 1000, maxOrder: 100000, description: 'Drive traffic to your website', icon: 'Eye', delivery_time: 'Hours', rating: 4.0 },
-    { id: 39, name: 'SEO Backlinks', platform: 'Website', price: 5.00, minOrder: 10, maxOrder: 1000, description: 'High-quality backlinks', icon: 'Zap', delivery_time: 'Days', rating: 4.2 },
-    { id: 40, name: 'Google Reviews', platform: 'Website', price: 8.00, minOrder: 5, maxOrder: 100, description: 'Positive Google reviews', icon: 'Star', delivery_time: 'Days', rating: 4.7 }
-  ];
-
-  const [services, setServices] = useState<LocalService[]>(defaultServices);
-  const [loading, setLoading] = useState<boolean>(false); // not blocking on mount
-  const [selectedService, setSelectedService] = useState<LocalService | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [quantity, setQuantity] = useState<string>('');
   const [link, setLink] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -122,33 +33,16 @@ const PlaceOrder: React.FC = () => {
   const [submitError, setSubmitError] = useState<string>('');
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
 
-  // Fetch services from backend if available and normalize structure
+  // Fetch services from backend
   useEffect(() => {
     const fetchServices = async () => {
-      setLoading(true);
       try {
-        const { data, error } = await getServices();
-        if (!error && Array.isArray(data) && data.length > 0) {
-          // normalize whatever shape the backend returns to LocalService
-          const normalized: LocalService[] = data.map((s: any) => ({
-            id: s.id ?? s.service_id ?? Math.random(),
-            name: s.name ?? s.title ?? 'Unnamed service',
-            platform: s.platform ?? s.category ?? s.service_category ?? 'Other',
-            price: Number(s.price ?? s.rate ?? 0),
-            minOrder: Number(s.min_order ?? s.minOrder ?? s.min ?? 1),
-            maxOrder: Number(s.max_order ?? s.maxOrder ?? s.max ?? 999999),
-            description: s.description ?? '',
-            delivery_time: s.delivery_time ?? s.delivery ?? 'Instant',
-            rating: Number(s.rating ?? 4.5),
-            icon: s.icon ?? 'Users'
-          }));
-          setServices(normalized);
-        } else {
-          // keep defaults (already set)
-        }
-      } catch (err) {
-        // keep defaults and log
-        // console.error('Failed to load services', err);
+        setLoading(true);
+        const servicesData = await getServices();
+        setServices(Array.isArray(servicesData) ? servicesData : []);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        setServices([]);
       } finally {
         setLoading(false);
       }
@@ -182,16 +76,11 @@ const PlaceOrder: React.FC = () => {
       case 'Instagram':
         return <Instagram className="h-5 w-5" />;
       case 'YouTube':
-      case 'YouTube ':
         return <Youtube className="h-5 w-5" />;
       case 'Facebook':
         return <Facebook className="h-5 w-5" />;
       case 'Twitter':
         return <Twitter className="h-5 w-5" />;
-      case 'Telegram':
-        return <Users className="h-5 w-5" />;
-      case 'Spotify':
-        return <Zap className="h-5 w-5" />;
       default:
         return <Users className="h-5 w-5" />;
     }
@@ -240,8 +129,8 @@ const PlaceOrder: React.FC = () => {
     }
 
     // Validate quantity range
-    if (qty < selectedService.minOrder || qty > selectedService.maxOrder) {
-      setSubmitError(`Quantity must be between ${selectedService.minOrder.toLocaleString()} and ${selectedService.maxOrder.toLocaleString()}`);
+    if (qty < selectedService.min_order || qty > selectedService.max_order) {
+      setSubmitError(`Quantity must be between ${selectedService.min_order.toLocaleString()} and ${selectedService.max_order.toLocaleString()}`);
       return;
     }
 
@@ -380,14 +269,14 @@ const PlaceOrder: React.FC = () => {
                                 <div className="flex items-center space-x-4 text-sm text-gray-500">
                                   <div className="flex items-center">
                                     <Clock className="h-4 w-4 mr-1" />
-                                    <span>{service.delivery_time ?? 'Instant'}</span>
+                                    <span>{service.delivery_time}</span>
                                   </div>
                                   <div className="flex items-center">
                                     <Star className="h-4 w-4 mr-1 text-yellow-400" />
-                                    <span>{service.rating ?? 4.5}</span>
+                                    <span>{service.rating}</span>
                                   </div>
-                                  <span>Min: {service.minOrder.toLocaleString()}</span>
-                                  <span>Max: {service.maxOrder.toLocaleString()}</span>
+                                  <span>Min: {service.min_order.toLocaleString()}</span>
+                                  <span>Max: {service.max_order.toLocaleString()}</span>
                                 </div>
                               </div>
                             </div>
@@ -439,7 +328,7 @@ const PlaceOrder: React.FC = () => {
                     </div>
                     <div className="text-sm text-gray-600">
                       <div>Price: ₹{selectedService.price} per 1000</div>
-                      <div>Min: {selectedService.minOrder.toLocaleString()} | Max: {selectedService.maxOrder.toLocaleString()}</div>
+                      <div>Min: {selectedService.min_order.toLocaleString()} | Max: {selectedService.max_order.toLocaleString()}</div>
                     </div>
                   </div>
                 ) : (
@@ -476,8 +365,8 @@ const PlaceOrder: React.FC = () => {
                       value={quantity}
                       onChange={(e) => setQuantity(e.target.value)}
                       placeholder="Enter quantity"
-                      min={selectedService?.minOrder ?? 1}
-                      max={selectedService?.maxOrder ?? 999999}
+                      min={selectedService?.min_order ?? 1}
+                      max={selectedService?.max_order ?? 999999}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       required
                     />
@@ -485,7 +374,7 @@ const PlaceOrder: React.FC = () => {
                   </div>
                   {selectedService && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Min: {selectedService.minOrder.toLocaleString()} | Max: {selectedService.maxOrder.toLocaleString()}
+                      Min: {selectedService.min_order.toLocaleString()} | Max: {selectedService.max_order.toLocaleString()}
                     </p>
                   )}
                 </div>

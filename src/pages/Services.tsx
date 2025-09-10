@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Filter,
   ArrowRight,
   ShoppingCart,
   AlertCircle,
-  CheckCircle,
-  Users,
-  Heart,
-  MessageCircle,
-  Share2,
-  Eye,
-  Play,
-  UserPlus,
-  Zap,
   Star,
+  TrendingUp,
   Instagram,
   Youtube,
   Twitter,
-  Facebook
+  Facebook,
+  Users,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getServices, Service } from '../lib/supabase';
@@ -32,10 +27,12 @@ const Services: React.FC = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
+        setLoading(true);
         const servicesData = await getServices();
-        setServices(servicesData);
+        setServices(Array.isArray(servicesData) ? servicesData : []);
       } catch (error) {
         console.error('Error fetching services:', error);
+        setServices([]);
       } finally {
         setLoading(false);
       }
@@ -44,8 +41,8 @@ const Services: React.FC = () => {
     fetchServices();
   }, []);
 
-  const getServiceIcon = (serviceName: string) => {
-    switch(serviceName) {
+  const getServiceIcon = (platform: string) => {
+    switch (platform) {
       case 'YouTube':
         return <Youtube className="h-5 w-5" />;
       case 'Facebook':
@@ -55,12 +52,32 @@ const Services: React.FC = () => {
       case 'Twitter':
         return <Twitter className="h-5 w-5" />;
       default:
-        return <Star className="h-5 w-5" />;
+        return <Users className="h-5 w-5" />;
     }
   };
 
-  const platforms = ['all', 'Instagram', 'YouTube', 'TikTok', 'Facebook', 'Twitter', 'LinkedIn', 'Telegram', 'Spotify', 'Discord', 'Twitch', 'Website'];
-  const categories = ['all', 'Followers', 'Likes', 'Views', 'Comments', 'Shares', 'Subscribers', 'Members'];
+  const getPlatformColor = (platform: string) => {
+    switch (platform) {
+      case 'Instagram':
+        return 'text-pink-600 bg-pink-100';
+      case 'YouTube':
+        return 'text-red-600 bg-red-100';
+      case 'Facebook':
+        return 'text-blue-600 bg-blue-100';
+      case 'Twitter':
+        return 'text-sky-600 bg-sky-100';
+      case 'Telegram':
+        return 'text-cyan-600 bg-cyan-100';
+      case 'LinkedIn':
+        return 'text-blue-800 bg-blue-100';
+      default:
+        return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  // Get unique platforms and categories from services
+  const platforms = ['all', ...Array.from(new Set(services.map(service => service.platform)))];
+  const categories = ['all', ...Array.from(new Set(services.map(service => service.category)))];
 
   const filteredServices = services.filter(service => {
     const platformMatch = selectedPlatform === 'all' || service.platform === selectedPlatform;
@@ -70,10 +87,24 @@ const Services: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading services...</p>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-2">
+              <Link to="/" className="flex items-center">
+                <TrendingUp className="h-6 w-6 text-indigo-600" />
+                <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading services...</p>
+          </div>
         </div>
       </div>
     );
@@ -81,6 +112,22 @@ const Services: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-2">
+            <Link to="/" className="flex items-center">
+              <TrendingUp className="h-6 w-6 text-indigo-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
+            </Link>
+            <nav className="flex items-center space-x-4">
+              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Dashboard</Link>
+              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Place Order</Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Services</h1>
@@ -135,7 +182,9 @@ const Services: React.FC = () => {
             <div key={service.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  {getServiceIcon(service.platform)}
+                  <div className={`p-2 rounded-lg ${getPlatformColor(service.platform)}`}>
+                    {getServiceIcon(service.platform)}
+                  </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{service.name}</h3>
                     <p className="text-sm text-gray-500">{service.platform}</p>
@@ -152,32 +201,38 @@ const Services: React.FC = () => {
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Price per 1000:</span>
-                  <span className="font-medium">₹{service.price_per_1000}</span>
+                  <span className="font-medium">₹{service.price}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Min Order:</span>
-                  <span className="font-medium">{service.min_order}</span>
+                  <span className="font-medium">{service.min_order.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Max Order:</span>
-                  <span className="font-medium">{service.max_order}</span>
+                  <span className="font-medium">{service.max_order.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Delivery:</span>
-                  <span className="font-medium">{service.delivery_time}</span>
+                  <div className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1 text-gray-400" />
+                    <span className="font-medium">{service.delivery_time}</span>
+                  </div>
                 </div>
               </div>
               
-              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+              <Link
+                to="/place-order"
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              >
                 <ShoppingCart className="h-4 w-4" />
                 Order Now
                 <ArrowRight className="h-4 w-4" />
-              </button>
+              </Link>
             </div>
           ))}
         </div>
 
-        {filteredServices.length === 0 && (
+        {filteredServices.length === 0 && !loading && (
           <div className="text-center py-12">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
