@@ -114,13 +114,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
-      // If user already exists, try to sign them in
+      // If user already exists but no session, sign them in
       if (data.user && !data.session) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        if (signInError) throw signInError;
+        await signIn(email, password);
       }
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -137,6 +133,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
       if (!data.user) throw new Error('No user data received');
+      
+      // Update state immediately
+      setUser(data.user);
+      const profileData = await getUserProfile(data.user.id);
+      setProfile(profileData);
     } catch (error: any) {
       console.error('Sign in error:', error);
       throw new Error(error.message || 'Invalid credentials');

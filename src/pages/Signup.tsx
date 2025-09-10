@@ -18,7 +18,7 @@ const Signup = () => {
   const { signUp, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // Redirect immediately when user is authenticated
   useEffect(() => {
     if (!loading && user) {
       navigate('/dashboard', { replace: true });
@@ -71,7 +71,7 @@ const Signup = () => {
         phone: ''
       });
       
-      // Navigation will happen automatically via useEffect when user state updates
+      // Navigation will happen automatically via useEffect
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
     } finally {

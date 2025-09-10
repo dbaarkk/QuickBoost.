@@ -8,14 +8,14 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
 
+  // Redirect immediately when user is authenticated
   useEffect(() => {
-    console.log("Auth state changed", { user, loading });
     if (!loading && user) {
-      console.log("Navigating to dashboard");
       navigate('/dashboard', { replace: true });
     }
   }, [user, loading, navigate]);
@@ -23,14 +23,15 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    console.log("Submitting form");
+    setIsSubmitting(true);
 
     try {
       await signIn(email, password);
-      console.log("Signed in");
+      // Navigation will happen automatically via useEffect
     } catch (error: any) {
       setError(error.message || 'Invalid credentials');
-      console.error("Sign in error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -63,6 +64,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Enter your email"
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -78,12 +80,14 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Enter your password"
+                disabled={isSubmitting}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -92,9 +96,10 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+            disabled={isSubmitting}
+            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isSubmitting ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
 
