@@ -12,9 +12,10 @@ const Login = () => {
   const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
   useEffect(() => {
+    console.log("Auth state changed", { user, loading });
     if (!loading && user) {
+      console.log("Navigating to dashboard");
       navigate('/dashboard', { replace: true });
     }
   }, [user, loading, navigate]);
@@ -22,11 +23,14 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    console.log("Submitting form");
+
     try {
       await signIn(email, password);
-      // Navigation will happen automatically via useEffect
+      console.log("Signed in");
     } catch (error: any) {
       setError(error.message || 'Invalid credentials');
+      console.error("Sign in error:", error);
     }
   };
 
