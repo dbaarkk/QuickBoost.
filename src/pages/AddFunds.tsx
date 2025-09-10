@@ -235,7 +235,7 @@ const AddFunds: React.FC = () => {
                         Scan this QR code with your UPI app
                       </p>
                       <div className="flex justify-center items-center bg-white p-2 rounded-lg border">
-                        <span className="font-mono text-gray-900 mr-3">6263288522@upi</span>
+                        <span className="font-mono text-gray-900 mr-3">aaryaveer@upi</span>
                         <button
                           type="button"
                           onClick={() => handleCopy('6263288522@upi')}
