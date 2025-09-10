@@ -62,14 +62,14 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
   
-  // Don't redirect while loading
-  if (loading) {
-    return <>{children}</>;
-  }
-  
   // If user is authenticated, redirect to dashboard
   if (user) {
     return <Navigate to="/dashboard" replace />;
+  }
+  
+  // Don't redirect while loading
+  if (loading) {
+    return <>{children}</>;
   }
   
   // Allow access to public routes if not authenticated
