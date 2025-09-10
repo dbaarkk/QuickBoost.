@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   TrendingUp, 
   Users, 
@@ -8,12 +9,11 @@ import {
   Star, 
   ArrowRight,
   CheckCircle,
-  Clock,
-  Award,
-  Smartphone
+  Award
 } from 'lucide-react';
 
 const Home: React.FC = () => {
+  const { user } = useAuth();
   const features = [
     {
       icon: <Zap className="h-8 w-8" />,
@@ -80,7 +80,7 @@ const Home: React.FC = () => {
               <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/login" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Login</Link>
+              {!user && <Link to="/login" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Login</Link>}
             </div>
           </div>
         </div>
@@ -104,10 +104,10 @@ const Home: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/signup"
+                to={user ? "/dashboard" : "/signup"}
                 className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg hover:shadow-xl"
               >
-                Start Now - It's Free
+                {user ? "Continue" : "Start Now - It's Free"}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </div>
@@ -196,10 +196,10 @@ const Home: React.FC = () => {
             Join thousands of satisfied customers and start growing your social media presence today
           </p>
           <Link
-            to="/signup"
+            to={user ? "/dashboard" : "/signup"}
             className="inline-flex items-center bg-white hover:bg-gray-100 text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg"
           >
-            Get Started Today
+            {user ? "Continue" : "Get Started Today"}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
