@@ -114,6 +114,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
+      // Immediately update state for instant redirect
+      if (data.user) {
+        setUser(data.user);
+        const profileData = await getUserProfile(data.user.id);
+        setProfile(profileData);
+      }
+
       // If user already exists but no session, sign them in
       if (data.user && !data.session) {
         await signIn(email, password);
@@ -134,7 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       if (!data.user) throw new Error('No user data received');
       
-      // Update state immediately
+      // Update state immediately for instant redirect
       setUser(data.user);
       const profileData = await getUserProfile(data.user.id);
       setProfile(profileData);

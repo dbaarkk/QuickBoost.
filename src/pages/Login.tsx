@@ -23,14 +23,13 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsSubmitting(true);
 
     try {
+      setIsSubmitting(true);
       await signIn(email, password);
-      // Navigation will happen automatically via useEffect
+      // Redirect happens instantly via AuthContext state update
     } catch (error: any) {
       setError(error.message || 'Invalid credentials');
-    } finally {
       setIsSubmitting(false);
     }
   };

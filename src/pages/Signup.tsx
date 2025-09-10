@@ -57,9 +57,9 @@ const Signup = () => {
       return;
     }
 
-    setIsSubmitting(true);
 
     try {
+      setIsSubmitting(true);
       // Split name into first and last name
       const nameParts = formData.name.trim().split(' ');
       const firstName = nameParts[0] || '';
@@ -71,10 +71,9 @@ const Signup = () => {
         phone: ''
       });
       
-      // Navigation will happen automatically via useEffect
+      // Redirect happens instantly via AuthContext state update
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
-    } finally {
       setIsSubmitting(false);
     }
   };
