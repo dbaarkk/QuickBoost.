@@ -8,14 +8,13 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { signIn, user, loading } = useAuth();
   const navigate = useNavigate();
 
   // Redirect immediately when user is authenticated
   useEffect(() => {
-    if (!loading && user) {
+    if (user && !loading) {
       navigate('/dashboard', { replace: true });
     }
   }, [user, loading, navigate]);
@@ -25,14 +24,17 @@ const Login = () => {
     setError('');
 
     try {
-      setIsSubmitting(true);
       await signIn(email, password);
-      // Redirect happens instantly via AuthContext state update
+      // Redirect happens via useEffect when user state updates
     } catch (error: any) {
       setError(error.message || 'Invalid credentials');
-      setIsSubmitting(false);
     }
   };
+
+  // Don't render if user is already authenticated
+  if (user && !loading) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -63,7 +65,6 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Enter your email"
-                disabled={isSubmitting}
                 required
               />
             </div>
@@ -79,14 +80,12 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Enter your password"
-                disabled={isSubmitting}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -95,10 +94,9 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
           >
-            {isSubmitting ? 'Signing In...' : 'Sign In'}
+            Sign In
           </button>
         </form>
 
