@@ -55,12 +55,24 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
 
-  // Only redirect after loading is complete
+  // Redirect to login if not authenticated
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Allow access to public routes regardless of auth state
+  const { user, loading } = useAuth();
+  
+  // Don't redirect while loading
+  if (loading) {
+    return <>{children}</>;
+  }
+  
+  // If user is authenticated, redirect to dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  // Allow access to public routes if not authenticated
   return <>{children}</>;
 };
 
