@@ -12,7 +12,6 @@ const Signup = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   
   const { signUp, user, loading } = useAuth();
@@ -20,7 +19,7 @@ const Signup = () => {
 
   // Redirect immediately when user is authenticated
   useEffect(() => {
-    if (!loading && user) {
+    if (user && !loading) {
       navigate('/dashboard', { replace: true });
     }
   }, [user, loading, navigate]);
@@ -57,9 +56,7 @@ const Signup = () => {
       return;
     }
 
-
     try {
-      setIsSubmitting(true);
       // Split name into first and last name
       const nameParts = formData.name.trim().split(' ');
       const firstName = nameParts[0] || '';
@@ -71,12 +68,16 @@ const Signup = () => {
         phone: ''
       });
       
-      // Redirect happens instantly via AuthContext state update
+      // Redirect happens via useEffect when user state updates
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
-      setIsSubmitting(false);
     }
   };
+
+  // Don't render if user is already authenticated
+  if (user && !loading) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -112,7 +113,6 @@ const Signup = () => {
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Enter your full name"
                 required
-                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -131,7 +131,6 @@ const Signup = () => {
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Enter your email address"
                 required
-                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -150,13 +149,11 @@ const Signup = () => {
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Create a password"
                 required
-                disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -177,13 +174,11 @@ const Signup = () => {
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Confirm your password"
                 required
-                disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                disabled={isSubmitting}
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -192,17 +187,9 @@ const Signup = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
           >
-            {isSubmitting ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Creating Account...
-              </div>
-            ) : (
-              'Create Account'
-            )}
+            Create Account
           </button>
         </form>
 
