@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
 
       try {
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const profileData = await getUserProfile(data.user.id);
     setProfile(profileData);
 
-    return data.user; // Return user immediately
+    // User state will be updated through onAuthStateChange
   } catch (error: any) {
     console.error('Sign in error:', error);
     throw new Error(error.message || 'Invalid credentials');
@@ -147,10 +147,10 @@ const signUp = async (email: string, password: string, userData: { first_name: s
       const profileData = await getUserProfile(signInData.user.id);
       setProfile(profileData);
 
-      return signInData.user; // Return user immediately
+      // User state will be updated through onAuthStateChange
+    } else {
+      throw new Error('Signup failed');
     }
-
-    throw new Error('Signup failed');
   } catch (error: any) {
     console.error('Signup error:', error);
     throw new Error(error.message || 'Failed to create account');
