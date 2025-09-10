@@ -238,7 +238,7 @@ const AddFunds: React.FC = () => {
                         <span className="font-mono text-gray-900 mr-3">aaryaveer@upi</span>
                         <button
                           type="button"
-                          onClick={() => handleCopy('6263288522@upi')}
+                          onClick={() => handleCopy('aaryaveer@upi')}
                           className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
                         >
                           {copied === '6263288522@upi' ? 'Copied!' : 'Copy'}
