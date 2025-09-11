@@ -291,7 +291,7 @@ const Dashboard: React.FC = () => {
                   <div className="text-2xl font-bold text-[#E0E0E0] mb-1">₹{profile?.balance?.toFixed(2) ?? 0}</div>
                   <div className="text-sm text-[#A0A0A0]">Account Balance</div>
                   <div className="w-full bg-[#2A2A2A] rounded-full h-2 mt-3">
-                    <div className="bg-[#00CFFF] h-2 rounded-full" style={{ width: '75%' }}></div>
+                    <div className="bg-[#00CFFF] h-2 rounded-full" style={{ width: '0%' }}></div>
                   </div>
                 </div>
                 <div className="text-center p-4 bg-[#1E1E1E] rounded-xl">
