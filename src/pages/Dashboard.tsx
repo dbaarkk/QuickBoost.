@@ -205,7 +205,7 @@ const Dashboard: React.FC = () => {
               <span className="text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </Link>
             <nav className="flex items-center space-x-6">
-              <Link to="/add-funds" className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">  Add Funds</Link>
+              className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">
                className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">
               <div className="flex items-center space-x-2 bg-[#2A2A2A] px-4 py-2 rounded-lg">
                 <Wallet className="h-4 w-4 text-[#00CFFF]" />
