@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Filter,
   ArrowRight,
   ShoppingCart,
-  AlertCircle,
   Star,
   TrendingUp,
   Instagram,
@@ -14,40 +13,65 @@ import {
   Users,
   Clock
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { getServices, Service } from '../lib/supabase';
+
+// Direct services data - no loading required
+const servicesData = [
+  // Instagram Services
+  { id: 1, name: 'Instagram Followers - High Quality', platform: 'Instagram', category: 'Followers', price: 25.00, min_order: 100, max_order: 100000, description: 'Get high-quality Instagram followers from real accounts with profile pictures', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
+  { id: 2, name: 'Instagram Likes - Instant', platform: 'Instagram', category: 'Likes', price: 10.00, min_order: 50, max_order: 50000, description: 'Instant Instagram likes for your posts from active users', delivery_time: '0-30 minutes', rating: 4.9, is_active: true },
+  { id: 3, name: 'Instagram Views - Real', platform: 'Instagram', category: 'Views', price: 5.00, min_order: 1000, max_order: 1000000, description: 'Real Instagram story/reel views from active users', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
+  { id: 4, name: 'Instagram Comments - Custom', platform: 'Instagram', category: 'Comments', price: 80.00, min_order: 10, max_order: 1000, description: 'Custom Instagram comments from real users', delivery_time: '1-6 hours', rating: 4.6, is_active: true },
+  { id: 5, name: 'Instagram Story Views', platform: 'Instagram', category: 'Views', price: 3.00, min_order: 500, max_order: 500000, description: 'Instagram story views from real active users', delivery_time: '0-2 hours', rating: 4.7, is_active: true },
+  { id: 6, name: 'Instagram Reel Views', platform: 'Instagram', category: 'Views', price: 4.00, min_order: 1000, max_order: 1000000, description: 'High-quality Instagram reel views for better reach', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
+  { id: 7, name: 'Instagram Auto Likes', platform: 'Instagram', category: 'Likes', price: 15.00, min_order: 100, max_order: 10000, description: 'Automatic likes for your future Instagram posts', delivery_time: 'Instant', rating: 4.5, is_active: true },
+  { id: 8, name: 'Instagram Saves', platform: 'Instagram', category: 'Saves', price: 20.00, min_order: 50, max_order: 25000, description: 'Instagram post saves from real users', delivery_time: '0-2 hours', rating: 4.4, is_active: true },
+  { id: 9, name: 'Instagram Shares', platform: 'Instagram', category: 'Shares', price: 25.00, min_order: 25, max_order: 10000, description: 'Instagram post shares to stories from real users', delivery_time: '0-3 hours', rating: 4.3, is_active: true },
+  { id: 10, name: 'Instagram Live Video Views', platform: 'Instagram', category: 'Views', price: 8.00, min_order: 100, max_order: 50000, description: 'Live video views during your Instagram live sessions', delivery_time: 'Instant', rating: 4.6, is_active: true },
+
+  // YouTube Services
+  { id: 11, name: 'YouTube Views - Real', platform: 'YouTube', category: 'Views', price: 5.00, min_order: 1000, max_order: 1000000, description: 'Real YouTube views from active users worldwide', delivery_time: '1-6 hours', rating: 4.7, is_active: true },
+  { id: 12, name: 'YouTube Subscribers', platform: 'YouTube', category: 'Subscribers', price: 50.00, min_order: 50, max_order: 10000, description: 'High-quality YouTube subscribers with profile pictures', delivery_time: '0-2 hours', rating: 4.6, is_active: true },
+  { id: 13, name: 'YouTube Likes', platform: 'YouTube', category: 'Likes', price: 15.00, min_order: 100, max_order: 50000, description: 'YouTube video likes from real users', delivery_time: '0-2 hours', rating: 4.5, is_active: true },
+  { id: 14, name: 'YouTube Comments', platform: 'YouTube', category: 'Comments', price: 100.00, min_order: 5, max_order: 500, description: 'Custom YouTube comments from real users', delivery_time: '2-12 hours', rating: 4.4, is_active: true },
+  { id: 15, name: 'YouTube Watch Time', platform: 'YouTube', category: 'Watch Time', price: 12.00, min_order: 1000, max_order: 100000, description: 'Increase YouTube watch time for monetization', delivery_time: '1-3 hours', rating: 4.8, is_active: true },
+  { id: 16, name: 'YouTube Shorts Views', platform: 'YouTube', category: 'Views', price: 3.00, min_order: 1000, max_order: 1000000, description: 'YouTube Shorts views from real users', delivery_time: '0-2 hours', rating: 4.7, is_active: true },
+  { id: 17, name: 'YouTube Dislikes', platform: 'YouTube', category: 'Dislikes', price: 20.00, min_order: 50, max_order: 10000, description: 'YouTube video dislikes from real users', delivery_time: '0-3 hours', rating: 4.2, is_active: true },
+  { id: 18, name: 'YouTube Shares', platform: 'YouTube', category: 'Shares', price: 30.00, min_order: 25, max_order: 5000, description: 'YouTube video shares from real users', delivery_time: '0-4 hours', rating: 4.3, is_active: true },
+
+  // Facebook Services
+  { id: 19, name: 'Facebook Page Likes', platform: 'Facebook', category: 'Likes', price: 10.00, min_order: 100, max_order: 50000, description: 'Facebook page likes from real users with active profiles', delivery_time: '1-3 hours', rating: 4.5, is_active: true },
+  { id: 20, name: 'Facebook Followers', platform: 'Facebook', category: 'Followers', price: 30.00, min_order: 100, max_order: 25000, description: 'Facebook profile/page followers from real accounts', delivery_time: '1-4 hours', rating: 4.3, is_active: true },
+  { id: 21, name: 'Facebook Post Likes', platform: 'Facebook', category: 'Likes', price: 8.00, min_order: 50, max_order: 25000, description: 'Facebook post likes from real active users', delivery_time: '0-2 hours', rating: 4.4, is_active: true },
+  { id: 22, name: 'Facebook Comments', platform: 'Facebook', category: 'Comments', price: 60.00, min_order: 10, max_order: 1000, description: 'Custom Facebook comments from real users', delivery_time: '2-8 hours', rating: 4.2, is_active: true },
+  { id: 23, name: 'Facebook Shares', platform: 'Facebook', category: 'Shares', price: 25.00, min_order: 25, max_order: 5000, description: 'Facebook post shares from real users', delivery_time: '1-4 hours', rating: 4.1, is_active: true },
+  { id: 24, name: 'Facebook Video Views', platform: 'Facebook', category: 'Views', price: 6.00, min_order: 1000, max_order: 500000, description: 'Facebook video views from real users', delivery_time: '0-3 hours', rating: 4.5, is_active: true },
+
+  // Twitter Services
+  { id: 25, name: 'Twitter Followers', platform: 'Twitter', category: 'Followers', price: 40.00, min_order: 100, max_order: 25000, description: 'High-quality Twitter followers from real accounts', delivery_time: '0-2 hours', rating: 4.4, is_active: true },
+  { id: 26, name: 'Twitter Likes', platform: 'Twitter', category: 'Likes', price: 20.00, min_order: 50, max_order: 10000, description: 'Twitter post likes from active users', delivery_time: '0-1 hours', rating: 4.5, is_active: true },
+  { id: 27, name: 'Twitter Retweets', platform: 'Twitter', category: 'Retweets', price: 35.00, min_order: 25, max_order: 5000, description: 'Twitter retweets from real active accounts', delivery_time: '0-2 hours', rating: 4.3, is_active: true },
+  { id: 28, name: 'Twitter Comments', platform: 'Twitter', category: 'Comments', price: 80.00, min_order: 10, max_order: 500, description: 'Custom Twitter replies from real users', delivery_time: '1-6 hours', rating: 4.2, is_active: true },
+  { id: 29, name: 'Twitter Views', platform: 'Twitter', category: 'Views', price: 4.00, min_order: 1000, max_order: 1000000, description: 'Twitter post views from real users', delivery_time: '0-2 hours', rating: 4.6, is_active: true },
+  { id: 30, name: 'Twitter Spaces Listeners', platform: 'Twitter', category: 'Listeners', price: 50.00, min_order: 50, max_order: 5000, description: 'Twitter Spaces live listeners', delivery_time: 'Instant', rating: 4.4, is_active: true },
+
+  // Telegram Services
+  { id: 31, name: 'Telegram Members', platform: 'Telegram', category: 'Members', price: 60.00, min_order: 100, max_order: 50000, description: 'Real Telegram channel/group members', delivery_time: '1-6 hours', rating: 4.6, is_active: true },
+  { id: 32, name: 'Telegram Views', platform: 'Telegram', category: 'Views', price: 8.00, min_order: 500, max_order: 100000, description: 'Telegram post views from real users', delivery_time: '0-2 hours', rating: 4.7, is_active: true },
+  { id: 33, name: 'Telegram Reactions', platform: 'Telegram', category: 'Reactions', price: 25.00, min_order: 50, max_order: 10000, description: 'Telegram post reactions from active users', delivery_time: '0-1 hours', rating: 4.5, is_active: true },
+  { id: 34, name: 'Telegram Shares', platform: 'Telegram', category: 'Shares', price: 30.00, min_order: 25, max_order: 5000, description: 'Telegram post shares from real users', delivery_time: '0-3 hours', rating: 4.3, is_active: true },
+
+  // LinkedIn Services
+  { id: 35, name: 'LinkedIn Followers', platform: 'LinkedIn', category: 'Followers', price: 80.00, min_order: 50, max_order: 10000, description: 'Professional LinkedIn followers from real accounts', delivery_time: '2-6 hours', rating: 4.4, is_active: true },
+  { id: 36, name: 'LinkedIn Likes', platform: 'LinkedIn', category: 'Likes', price: 40.00, min_order: 25, max_order: 5000, description: 'LinkedIn post likes from professional users', delivery_time: '1-3 hours', rating: 4.3, is_active: true },
+  { id: 37, name: 'LinkedIn Connections', platform: 'LinkedIn', category: 'Connections', price: 100.00, min_order: 10, max_order: 2000, description: 'LinkedIn connection requests from real professionals', delivery_time: '6-24 hours', rating: 4.2, is_active: true },
+  { id: 38, name: 'LinkedIn Views', platform: 'LinkedIn', category: 'Views', price: 15.00, min_order: 100, max_order: 25000, description: 'LinkedIn profile/post views from active users', delivery_time: '0-2 hours', rating: 4.5, is_active: true },
+  { id: 39, name: 'LinkedIn Comments', platform: 'LinkedIn', category: 'Comments', price: 120.00, min_order: 5, max_order: 500, description: 'Professional LinkedIn comments from real users', delivery_time: '2-12 hours', rating: 4.1, is_active: true },
+  { id: 40, name: 'LinkedIn Shares', platform: 'LinkedIn', category: 'Shares', price: 60.00, min_order: 10, max_order: 1000, description: 'LinkedIn post shares from professional users', delivery_time: '1-6 hours', rating: 4.2, is_active: true }
+];
 
 const Services: React.FC = () => {
-  const { user } = useAuth();
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoading(true);
-        setError('');
-        const servicesData = await getServices();
-        if (Array.isArray(servicesData)) {
-          setServices(servicesData);
-        } else {
-          setServices([]);
-          setError('Failed to load services');
-        }
-      } catch (error) {
-        console.error('Error fetching services:', error);
-        setServices([]);
-        setError('Failed to load services. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchServices();
-  }, []);
 
   const getServiceIcon = (platform: string) => {
     switch (platform) {
@@ -84,39 +108,14 @@ const Services: React.FC = () => {
   };
 
   // Get unique platforms and categories from services
-  const platforms = ['all', ...Array.from(new Set(services.map(service => service.platform)))];
-  const categories = ['all', ...Array.from(new Set(services.map(service => service.category)))];
+  const platforms = ['all', ...Array.from(new Set(servicesData.map(service => service.platform)))];
+  const categories = ['all', ...Array.from(new Set(servicesData.map(service => service.category)))];
 
-  const filteredServices = services.filter(service => {
+  const filteredServices = servicesData.filter(service => {
     const platformMatch = selectedPlatform === 'all' || service.platform === selectedPlatform;
     const categoryMatch = selectedCategory === 'all' || service.category === selectedCategory;
-    return platformMatch && categoryMatch;
+    return platformMatch && categoryMatch && service.is_active;
   });
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-2">
-              <Link to="/" className="flex items-center">
-                <TrendingUp className="h-6 w-6 text-indigo-600" />
-                <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading services...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -240,15 +239,10 @@ const Services: React.FC = () => {
           ))}
         </div>
 
-        {filteredServices.length === 0 && !loading && (
+        {filteredServices.length === 0 && (
           <div className="text-center py-12">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {error || 'No services found'}
-            </h3>
-            <p className="text-gray-500">
-              {error ? 'Please refresh the page to try again.' : 'Try adjusting your filters to see more services.'}
-            </p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
+            <p className="text-gray-500">Try adjusting your filters to see more services.</p>
           </div>
         )}
       </div>
