@@ -21,6 +21,7 @@ const Services: React.FC = () => {
   const { user } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -28,11 +29,18 @@ const Services: React.FC = () => {
     const fetchServices = async () => {
       try {
         setLoading(true);
+        setError('');
         const servicesData = await getServices();
-        setServices(Array.isArray(servicesData) ? servicesData : []);
+        if (Array.isArray(servicesData)) {
+          setServices(servicesData);
+        } else {
+          setServices([]);
+          setError('Failed to load services');
+        }
       } catch (error) {
         console.error('Error fetching services:', error);
         setServices([]);
+        setError('Failed to load services. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -235,8 +243,12 @@ const Services: React.FC = () => {
         {filteredServices.length === 0 && !loading && (
           <div className="text-center py-12">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
-            <p className="text-gray-500">Try adjusting your filters to see more services.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {error || 'No services found'}
+            </h3>
+            <p className="text-gray-500">
+              {error ? 'Please refresh the page to try again.' : 'Try adjusting your filters to see more services.'}
+            </p>
           </div>
         )}
       </div>

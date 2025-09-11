@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   TrendingUp,
@@ -7,9 +8,11 @@ import {
   CheckCircle,
   Shield,
   Clock,
+  AlertTriangle,
+  History
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { createDeposit } from '../lib/supabase';
+import { createDeposit, getUserDeposits, Deposit } from '../lib/supabase';
 
 const wallets = [
   { name: 'Solana', address: '99q2VEJtZjt56UjJuSLb45mkdrAnA4Lsb7q33uKUQo1P' },
@@ -21,7 +24,7 @@ const wallets = [
 ];
 
 const AddFunds: React.FC = () => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'crypto'>('upi');
   const [utrNumber, setUtrNumber] = useState('');
@@ -30,8 +33,35 @@ const AddFunds: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [deposits, setDeposits] = useState<Deposit[]>([]);
+  const [depositsLoading, setDepositsLoading] = useState(true);
 
   const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
+
+  // Fetch user deposits
+  useEffect(() => {
+    const fetchDeposits = async () => {
+      if (!user) return;
+      
+      try {
+        setDepositsLoading(true);
+        const { data, error } = await getUserDeposits(user.id);
+        if (error) {
+          console.error('Error fetching deposits:', error);
+          setDeposits([]);
+        } else {
+          setDeposits(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching deposits:', error);
+        setDeposits([]);
+      } finally {
+        setDepositsLoading(false);
+      }
+    };
+
+    fetchDeposits();
+  }, [user]);
 
   const handleAmountSelect = (value: number) => setAmount(value.toString());
 
@@ -44,8 +74,14 @@ const AddFunds: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!amount || parseFloat(amount) <= 0) {
+    const amountValue = parseFloat(amount);
+    if (!amount || amountValue <= 0) {
       setSubmitError('Please enter a valid amount');
+      return;
+    }
+    
+    if (amountValue < 10) {
+      setSubmitError('Minimum deposit amount is ₹10');
       return;
     }
 
@@ -76,12 +112,35 @@ const AddFunds: React.FC = () => {
         setAmount('');
         setUtrNumber('');
         setTxid('');
+        // Refresh deposits list
+        if (user) {
+          getUserDeposits(user.id).then(({ data }) => {
+            if (data) setDeposits(data);
+          });
+        }
         setTimeout(() => setShowSuccess(false), 5000);
       }
       setIsSubmitting(false);
     });
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'verified': return 'text-green-700 bg-green-100';
+      case 'pending': return 'text-yellow-700 bg-yellow-100';
+      case 'rejected': return 'text-red-700 bg-red-100';
+      default: return 'text-gray-700 bg-gray-100';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'verified': return 'Verified';
+      case 'pending': return 'Pending';
+      case 'rejected': return 'Rejected';
+      default: return status;
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -102,9 +161,9 @@ const AddFunds: React.FC = () => {
           <p className="text-gray-600">Add money to your account to start placing orders instantly</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Payment Form */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="space-y-4">
             <div className="bg-white rounded-xl shadow-sm border">
               <div className="p-4 border-b">
                 <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
@@ -153,6 +212,10 @@ const AddFunds: React.FC = () => {
                     min={10}
                     required
                   />
+                  <div className="mt-2 flex items-center text-sm text-amber-600">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    <span>Minimum deposit amount is ₹10</span>
+                  </div>
                 </div>
 
                 {/* Payment Method */}
@@ -204,18 +267,15 @@ const AddFunds: React.FC = () => {
                 {/* Verification Fields */}
                 {paymentMethod === 'upi' && (
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Amount (₹)</label>
-                      <input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="Enter amount in ₹"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        min={10}
-                        required
-                      />
+                    <div className="bg-blue-50 rounded-xl p-4 mb-4">
+                      <h4 className="font-medium text-blue-900 mb-2">UPI Payment Instructions:</h4>
+                      <ol className="text-sm text-blue-800 space-y-1">
+                        <li>1. Pay the exact amount to the UPI ID below</li>
+                        <li>2. Submit your 12-digit UTR number</li>
+                        <li>3. Wait 2-5 minutes for verification</li>
+                      </ol>
                     </div>
+                    
                     <input
                       type="text"
                       value={utrNumber}
@@ -250,18 +310,15 @@ const AddFunds: React.FC = () => {
 
                 {paymentMethod === 'crypto' && (
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Amount (USD)</label>
-                      <input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="Enter amount in USD"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        min={1}
-                        required
-                      />
+                    <div className="bg-orange-50 rounded-xl p-4 mb-4">
+                      <h4 className="font-medium text-orange-900 mb-2">Crypto Payment Instructions:</h4>
+                      <ol className="text-sm text-orange-800 space-y-1">
+                        <li>1. Send the exact amount to the wallet address</li>
+                        <li>2. Submit your transaction ID (TXID)</li>
+                        <li>3. Wait 2-5 minutes for verification</li>
+                      </ol>
                     </div>
+                    
                     <input
                       type="text"
                       value={txid}
@@ -338,6 +395,50 @@ const AddFunds: React.FC = () => {
               )}
             </div>
 
+            {/* Recent Deposits */}
+            <div className="bg-white rounded-xl shadow-sm border">
+              <div className="p-4 border-b flex items-center">
+                <History className="h-5 w-5 text-gray-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Recent Deposits</h3>
+              </div>
+              
+              {depositsLoading ? (
+                <div className="p-4 text-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto mb-2" />
+                  <p className="text-gray-600 text-sm">Loading deposits...</p>
+                </div>
+              ) : deposits.length > 0 ? (
+                <div className="divide-y divide-gray-200">
+                  {deposits.slice(0, 5).map((deposit) => (
+                    <div key={deposit.id} className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">₹{deposit.amount.toFixed(2)}</span>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
+                          {getStatusLabel(deposit.status)}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <div className="flex justify-between">
+                          <span>{deposit.payment_method.toUpperCase()}</span>
+                          <span>{new Date(deposit.created_at).toLocaleDateString()}</span>
+                        </div>
+                        {deposit.utr_number && (
+                          <div className="mt-1">UTR: {deposit.utr_number}</div>
+                        )}
+                        {deposit.txid && (
+                          <div className="mt-1">TXID: {deposit.txid.slice(0, 20)}...</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  <p>No deposits yet</p>
+                </div>
+              )}
+            </div>
+
             <div className="bg-white rounded-xl shadow-sm border p-4">
               <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
                 <Shield className="h-5 w-5 mr-2 text-green-600" />
@@ -355,7 +456,7 @@ const AddFunds: React.FC = () => {
                   <Clock className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
                   <div>
                     <div className="font-medium text-gray-900">Instant Credit</div>
-                    <div className="text-sm text-gray-600">Funds are credited within 5-10 minutes</div>
+                    <div className="text-sm text-gray-600">Funds are credited within 2-5 minutes</div>
                   </div>
                 </div>
                 <div className="flex items-start">

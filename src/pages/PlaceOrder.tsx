@@ -24,6 +24,7 @@ const PlaceOrder: React.FC = () => {
 
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [quantity, setQuantity] = useState<string>('');
   const [link, setLink] = useState<string>('');
@@ -38,11 +39,18 @@ const PlaceOrder: React.FC = () => {
     const fetchServices = async () => {
       try {
         setLoading(true);
+        setError('');
         const servicesData = await getServices();
-        setServices(Array.isArray(servicesData) ? servicesData : []);
+        if (Array.isArray(servicesData)) {
+          setServices(servicesData);
+        } else {
+          setServices([]);
+          setError('Failed to load services');
+        }
       } catch (error) {
         console.error('Error fetching services:', error);
         setServices([]);
+        setError('Failed to load services. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -244,11 +252,14 @@ const PlaceOrder: React.FC = () => {
                 {loading ? (
                   <div className="flex justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" />
+                    <span className="ml-2 text-gray-600">Loading services...</span>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {filteredServices.length === 0 ? (
-                      <div className="text-center py-6 text-gray-500">No services found.</div>
+                      <div className="text-center py-6 text-gray-500">
+                        {error || 'No services found. Try adjusting your filters.'}
+                      </div>
                     ) : (
                       filteredServices.map((service) => (
                         <div
