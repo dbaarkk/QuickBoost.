@@ -197,7 +197,8 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#121212]">
       {/* Header */}
-      <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A] sticky top-0 z-50">
+      <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A] sticky top-0 z-50">AddFunds<Link>
+      </Link>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to="/" className="flex items-center space-x-3">
