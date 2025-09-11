@@ -142,14 +142,14 @@ const AddFunds: React.FC = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#121212]">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-2">
             <Link to="/" className="flex items-center">
-              <TrendingUp className="h-6 w-6 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
+              <TrendingUp className="h-6 w-6 text-[#00CFFF]" />
+              <span className="ml-2 text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </Link>
           </div>
         </div>
@@ -157,36 +157,36 @@ const AddFunds: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Add Funds to Your Account</h1>
-          <p className="text-gray-600">Add money to your account to start placing orders instantly</p>
+          <h1 className="text-2xl font-bold text-[#E0E0E0] mb-1">Add Funds to Your Account</h1>
+          <p className="text-[#A0A0A0]">Add money to your account to start placing orders instantly</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Payment Form */}
           <div className="space-y-4">
-            <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-4 border-b">
-                <h2 className="text-lg font-semibold text-gray-900">Payment Details</h2>
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A]">
+              <div className="p-4 border-b border-[#2A2A2A]">
+                <h2 className="text-lg font-semibold text-[#E0E0E0]">Payment Details</h2>
               </div>
               <form onSubmit={handleSubmit} className="p-4 space-y-4">
                 {showSuccess && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
-                    <span className="text-green-800 font-medium">
+                  <div className="bg-[#00CFFF]/10 border border-[#00CFFF]/30 rounded-lg p-4 flex items-center">
+                    <CheckCircle className="h-5 w-5 text-[#00CFFF] mr-3" />
+                    <span className="text-[#00CFFF] font-medium">
                       ✅ Transaction is being verified, please wait 1-2 minutes
                     </span>
                   </div>
                 )}
 
                 {submitError && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                    <p className="text-red-800 text-sm">{submitError}</p>
+                  <div className="bg-[#FF5C5C]/10 border border-[#FF5C5C]/30 rounded-lg p-3">
+                    <p className="text-[#FF5C5C] text-sm">{submitError}</p>
                   </div>
                 )}
 
                 {/* Amount Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Amount (₹)</label>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Select Amount (₹)</label>
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {predefinedAmounts.map((value) => (
                       <button
@@ -195,8 +195,8 @@ const AddFunds: React.FC = () => {
                         onClick={() => handleAmountSelect(value)}
                         className={`p-4 text-center border rounded-xl font-semibold transition-all hover:scale-105 ${
                           amount === value.toString()
-                            ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md'
-                            : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                            ? 'border-[#00CFFF] bg-[#00CFFF]/10 text-[#00CFFF] shadow-md'
+                            : 'border-[#2A2A2A] hover:border-[#00CFFF]/50 hover:bg-[#1E1E1E]'
                         }`}
                       >
                         ₹{value}
@@ -208,56 +208,56 @@ const AddFunds: React.FC = () => {
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="Enter custom amount"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+                    className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 text-lg"
                     min={10}
                     required
                   />
-                  <div className="mt-2 flex items-center text-sm text-amber-600">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
+                  <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">
+                    <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />
                     <span>Minimum deposit amount is ₹10</span>
                   </div>
                 </div>
 
                 {/* Payment Method */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Choose Payment Method</label>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Choose Payment Method</label>
                   <div className="space-y-3">
-                    <label className="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                    <label className="flex items-center p-4 border border-[#2A2A2A] rounded-xl cursor-pointer hover:bg-[#1E1E1E] transition-colors">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="upi"
                         checked={paymentMethod === 'upi'}
                         onChange={(e) => setPaymentMethod(e.target.value as 'upi' | 'crypto')}
-                        className="text-indigo-600 focus:ring-indigo-500"
+                        className="text-[#00CFFF] focus:ring-[#00CFFF]"
                       />
                       <div className="ml-4 flex items-center">
-                        <div className="bg-green-100 p-2 rounded-lg mr-3">
-                          <Smartphone className="h-5 w-5 text-green-600" />
+                        <div className="bg-[#00CFFF]/20 p-2 rounded-lg mr-3">
+                          <Smartphone className="h-5 w-5 text-[#00CFFF]" />
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900">UPI Payment</div>
-                          <div className="text-sm text-gray-500">Pay via PhonePe, Google Pay, Paytm</div>
+                          <div className="font-medium text-[#E0E0E0]">UPI Payment</div>
+                          <div className="text-sm text-[#A0A0A0]">Pay via PhonePe, Google Pay, Paytm</div>
                         </div>
                       </div>
                     </label>
 
-                    <label className="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                    <label className="flex items-center p-4 border border-[#2A2A2A] rounded-xl cursor-pointer hover:bg-[#1E1E1E] transition-colors">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="crypto"
                         checked={paymentMethod === 'crypto'}
                         onChange={(e) => setPaymentMethod(e.target.value as 'upi' | 'crypto')}
-                        className="text-indigo-600 focus:ring-indigo-500"
+                        className="text-[#00CFFF] focus:ring-[#00CFFF]"
                       />
                       <div className="ml-4 flex items-center">
-                        <div className="bg-orange-100 p-2 rounded-lg mr-3">
-                          <Smartphone className="h-5 w-5 text-orange-600" />
+                        <div className="bg-[#7B61FF]/20 p-2 rounded-lg mr-3">
+                          <Smartphone className="h-5 w-5 text-[#7B61FF]" />
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900">Cryptocurrency</div>
-                          <div className="text-sm text-gray-500">Bitcoin, Ethereum, Solana, etc.</div>
+                          <div className="font-medium text-[#E0E0E0]">Cryptocurrency</div>
+                          <div className="text-sm text-[#A0A0A0]">Bitcoin, Ethereum, Solana, etc.</div>
                         </div>
                       </div>
                     </label>
@@ -267,9 +267,9 @@ const AddFunds: React.FC = () => {
                 {/* Verification Fields */}
                 {paymentMethod === 'upi' && (
                   <div className="space-y-4">
-                    <div className="bg-blue-50 rounded-xl p-4 mb-4">
-                      <h4 className="font-medium text-blue-900 mb-2">UPI Payment Instructions:</h4>
-                      <ol className="text-sm text-blue-800 space-y-1">
+                    <div className="bg-[#00CFFF]/10 rounded-xl p-4 mb-4 border border-[#00CFFF]/30">
+                      <h4 className="font-medium text-[#00CFFF] mb-2">UPI Payment Instructions:</h4>
+                      <ol className="text-sm text-[#E0E0E0] space-y-1">
                         <li>1. Pay the exact amount to the UPI ID below</li>
                         <li>2. Submit your 12-digit UTR number</li>
                         <li>3. Wait 2-5 minutes for verification</li>
@@ -281,27 +281,27 @@ const AddFunds: React.FC = () => {
                       value={utrNumber}
                       onChange={(e) => setUtrNumber(e.target.value)}
                       placeholder="Enter 12-digit UTR number"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
                       required
                     />
 
-                    <div className="bg-gray-50 rounded-xl p-4 text-center">
+                    <div className="bg-[#1E1E1E] rounded-xl p-4 text-center border border-[#2A2A2A]">
                       <img
                         src="/IMG_20250906_102052.jpg"
                         alt="UPI QR"
                         className="h-32 w-32 mx-auto mb-3"
                       />
-                      <p className="text-sm text-gray-600 mb-2">
+                      <p className="text-sm text-[#A0A0A0] mb-2">
                         Scan this QR code with your UPI app
                       </p>
-                      <div className="flex justify-center items-center bg-white p-2 rounded-lg border">
-                        <span className="font-mono text-gray-900 mr-3">aaryaveer@upi</span>
+                      <div className="flex justify-center items-center bg-[#2A2A2A] p-2 rounded-lg border border-[#2A2A2A]">
+                        <span className="font-mono text-[#E0E0E0] mr-3">aaryaveer@upi</span>
                         <button
                           type="button"
                           onClick={() => handleCopy('aaryaveer@upi')}
-                          className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                          className="flex items-center text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium transition-colors"
                         >
-                          {copied === '6263288522@upi' ? 'Copied!' : 'Copy'}
+                          {copied === 'aaryaveer@upi' ? 'Copied!' : 'Copy'}
                         </button>
                       </div>
                     </div>
@@ -310,9 +310,9 @@ const AddFunds: React.FC = () => {
 
                 {paymentMethod === 'crypto' && (
                   <div className="space-y-4">
-                    <div className="bg-orange-50 rounded-xl p-4 mb-4">
-                      <h4 className="font-medium text-orange-900 mb-2">Crypto Payment Instructions:</h4>
-                      <ol className="text-sm text-orange-800 space-y-1">
+                    <div className="bg-[#7B61FF]/10 rounded-xl p-4 mb-4 border border-[#7B61FF]/30">
+                      <h4 className="font-medium text-[#7B61FF] mb-2">Crypto Payment Instructions:</h4>
+                      <ol className="text-sm text-[#E0E0E0] space-y-1">
                         <li>1. Send the exact amount to the wallet address</li>
                         <li>2. Submit your transaction ID (TXID)</li>
                         <li>3. Wait 2-5 minutes for verification</li>
@@ -324,7 +324,7 @@ const AddFunds: React.FC = () => {
                       value={txid}
                       onChange={(e) => setTxid(e.target.value)}
                       placeholder="Enter transaction hash/ID"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
                       required
                     />
 
@@ -332,15 +332,15 @@ const AddFunds: React.FC = () => {
                       {wallets.map((wallet) => (
                         <div
                           key={wallet.name}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 rounded-lg p-3 border break-words"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#1E1E1E] rounded-lg p-3 border border-[#2A2A2A] break-words"
                         >
-                          <span className="font-mono text-gray-900 break-all">
+                          <span className="font-mono text-[#E0E0E0] break-all">
                             {wallet.name}: {wallet.address}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleCopy(wallet.address)}
-                            className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium mt-2 sm:mt-0"
+                            className="flex items-center text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium mt-2 sm:mt-0 transition-colors"
                           >
                             {copied === wallet.address ? 'Copied!' : 'Copy'}
                           </button>
@@ -353,7 +353,7 @@ const AddFunds: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-xl font-semibold transition-colors flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-glow-cyan disabled:shadow-none"
                 >
                   {isSubmitting ? (
                     <>
@@ -373,21 +373,21 @@ const AddFunds: React.FC = () => {
 
           {/* Right Side Info */}
           <div className="space-y-4">
-            <div className="bg-white rounded-xl shadow-sm border p-4">
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] p-4">
               <div className="flex items-center mb-4">
-                <div className="bg-green-100 p-3 rounded-xl mr-4">
-                  <Wallet className="h-6 w-6 text-green-600" />
+                <div className="bg-[#00CFFF]/20 p-3 rounded-xl mr-4">
+                  <Wallet className="h-6 w-6 text-[#00CFFF]" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Current Balance</h3>
-                  <p className="text-3xl font-bold text-green-600">₹{profile?.balance.toFixed(2) || '0.00'}</p>
+                  <h3 className="text-lg font-semibold text-[#E0E0E0]">Current Balance</h3>
+                  <p className="text-3xl font-bold text-[#00CFFF]">₹{profile?.balance.toFixed(2) || '0.00'}</p>
                 </div>
               </div>
               {amount && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600">
+                <div className="bg-[#1E1E1E] rounded-lg p-4 border border-[#2A2A2A]">
+                  <p className="text-sm text-[#A0A0A0]">
                     After adding ₹{amount}, your balance will be:{' '}
-                    <span className="font-semibold text-gray-900 ml-1">
+                    <span className="font-semibold text-[#E0E0E0] ml-1">
                       ₹{((profile?.balance || 0) + parseFloat(amount || '0')).toFixed(2)}
                     </span>
                   </p>
@@ -396,28 +396,28 @@ const AddFunds: React.FC = () => {
             </div>
 
             {/* Recent Deposits */}
-            <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-4 border-b flex items-center">
-                <History className="h-5 w-5 text-gray-600 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">Recent Deposits</h3>
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A]">
+              <div className="p-4 border-b border-[#2A2A2A] flex items-center">
+                <History className="h-5 w-5 text-[#A0A0A0] mr-2" />
+                <h3 className="text-lg font-semibold text-[#E0E0E0]">Recent Deposits</h3>
               </div>
               
               {depositsLoading ? (
                 <div className="p-4 text-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto mb-2" />
-                  <p className="text-gray-600 text-sm">Loading deposits...</p>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#00CFFF] mx-auto mb-2" />
+                  <p className="text-[#A0A0A0] text-sm">Loading deposits...</p>
                 </div>
               ) : deposits.length > 0 ? (
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-[#2A2A2A]">
                   {deposits.slice(0, 5).map((deposit) => (
                     <div key={deposit.id} className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-gray-900">₹{deposit.amount.toFixed(2)}</span>
+                        <span className="font-medium text-[#E0E0E0]">₹{deposit.amount.toFixed(2)}</span>
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
                           {getStatusLabel(deposit.status)}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-[#A0A0A0]">
                         <div className="flex justify-between">
                           <span>{deposit.payment_method.toUpperCase()}</span>
                           <span>{new Date(deposit.created_at).toLocaleDateString()}</span>
@@ -434,36 +434,36 @@ const AddFunds: React.FC = () => {
                 </div>
               ) : (
                 <div className="p-4 text-center text-gray-500">
-                  <p>No deposits yet</p>
+                  <p className="text-[#A0A0A0]">No deposits yet</p>
                 </div>
               )}
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border p-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
-                <Shield className="h-5 w-5 mr-2 text-green-600" />
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] p-4">
+              <h3 className="text-base font-semibold text-[#E0E0E0] mb-3 flex items-center">
+                <Shield className="h-5 w-5 mr-2 text-[#00CFFF]" />
                 Security & Support
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start">
-                  <Shield className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
+                  <Shield className="h-5 w-5 text-[#00CFFF] mr-3 mt-0.5" />
                   <div>
-                    <div className="font-medium text-gray-900">100% Secure</div>
-                    <div className="text-sm text-gray-600">All transactions are encrypted and secure</div>
+                    <div className="font-medium text-[#E0E0E0]">100% Secure</div>
+                    <div className="text-sm text-[#A0A0A0]">All transactions are encrypted and secure</div>
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <Clock className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
+                  <Clock className="h-5 w-5 text-[#7B61FF] mr-3 mt-0.5" />
                   <div>
-                    <div className="font-medium text-gray-900">Instant Credit</div>
-                    <div className="text-sm text-gray-600">Funds are credited within 2-5 minutes</div>
+                    <div className="font-medium text-[#E0E0E0]">Instant Credit</div>
+                    <div className="text-sm text-[#A0A0A0]">Funds are credited within 2-5 minutes</div>
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <Smartphone className="h-5 w-5 text-indigo-600 mr-3 mt-0.5" />
+                  <Smartphone className="h-5 w-5 text-[#A085FF] mr-3 mt-0.5" />
                   <div>
-                    <div className="font-medium text-gray-900">Contact Us</div>
-                    <div className="text-sm text-gray-600">Email: quickboostbusiness@gmail.com</div>
+                    <div className="font-medium text-[#E0E0E0]">Contact Us</div>
+                    <div className="text-sm text-[#A0A0A0]">Email: quickboostbusiness@gmail.com</div>
                   </div>
                 </div>
               </div>

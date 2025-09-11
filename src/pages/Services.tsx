@@ -118,18 +118,18 @@ const Services: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#121212]">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-2">
             <Link to="/" className="flex items-center">
-              <TrendingUp className="h-6 w-6 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
+              <TrendingUp className="h-6 w-6 text-[#00CFFF]" />
+              <span className="ml-2 text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </Link>
             <nav className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Dashboard</Link>
-              <Link to="/place-order" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Place Order</Link>
+              <Link to="/dashboard" className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">Dashboard</Link>
+              <Link to="/place-order" className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">Place Order</Link>
             </nav>
           </div>
         </div>
@@ -137,26 +137,26 @@ const Services: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Services</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold text-[#E0E0E0] mb-4">Our Services</h1>
+          <p className="text-xl text-[#A0A0A0] max-w-3xl mx-auto">
             Boost your social media presence with our premium services. Choose from a wide range of platforms and engagement types.
           </p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-[#2A2A2A] rounded-lg shadow-lg p-6 mb-8 border border-[#2A2A2A]">
           <div className="flex items-center gap-4 mb-4">
-            <Filter className="h-5 w-5 text-gray-500" />
-            <h3 className="text-lg font-semibold text-gray-900">Filter Services</h3>
+            <Filter className="h-5 w-5 text-[#A0A0A0]" />
+            <h3 className="text-lg font-semibold text-[#E0E0E0]">Filter Services</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
+              <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Platform</label>
               <select
                 value={selectedPlatform}
                 onChange={(e) => setSelectedPlatform(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
               >
                 {platforms.map(platform => (
                   <option key={platform} value={platform}>
@@ -167,11 +167,11 @@ const Services: React.FC = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Category</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
               >
                 {categories.map(category => (
                   <option key={category} value={category}>
@@ -186,15 +186,15 @@ const Services: React.FC = () => {
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map((service) => (
-            <div key={service.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6">
+            <div key={service.id} className="bg-[#2A2A2A] rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-[#2A2A2A]">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${getPlatformColor(service.platform)}`}>
                     {getServiceIcon(service.platform)}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{service.name}</h3>
-                    <p className="text-sm text-gray-500">{service.platform}</p>
+                    <h3 className="font-semibold text-[#E0E0E0]">{service.name}</h3>
+                    <p className="text-sm text-[#A0A0A0]">{service.platform}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
@@ -203,33 +203,33 @@ const Services: React.FC = () => {
                 </div>
               </div>
               
-              <p className="text-gray-600 text-sm mb-4">{service.description}</p>
+              <p className="text-[#A0A0A0] text-sm mb-4">{service.description}</p>
               
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Price per 1000:</span>
-                  <span className="font-medium">₹{service.price}</span>
+                  <span className="text-[#A0A0A0]">Price per 1000:</span>
+                  <span className="font-medium text-[#E0E0E0]">₹{service.price}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Min Order:</span>
-                  <span className="font-medium">{service.min_order.toLocaleString()}</span>
+                  <span className="text-[#A0A0A0]">Min Order:</span>
+                  <span className="font-medium text-[#E0E0E0]">{service.min_order.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Max Order:</span>
-                  <span className="font-medium">{service.max_order.toLocaleString()}</span>
+                  <span className="text-[#A0A0A0]">Max Order:</span>
+                  <span className="font-medium text-[#E0E0E0]">{service.max_order.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Delivery:</span>
+                  <span className="text-[#A0A0A0]">Delivery:</span>
                   <div className="flex items-center">
-                    <Clock className="h-3 w-3 mr-1 text-gray-400" />
-                    <span className="font-medium">{service.delivery_time}</span>
+                    <Clock className="h-3 w-3 mr-1 text-[#A0A0A0]" />
+                    <span className="font-medium text-[#E0E0E0]">{service.delivery_time}</span>
                   </div>
                 </div>
               </div>
               
               <Link
                 to="/place-order"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white py-2 px-4 rounded-md transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-glow-cyan"
               >
                 <ShoppingCart className="h-4 w-4" />
                 Order Now
@@ -241,8 +241,8 @@ const Services: React.FC = () => {
 
         {filteredServices.length === 0 && (
           <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
-            <p className="text-gray-500">Try adjusting your filters to see more services.</p>
+            <h3 className="text-lg font-medium text-[#E0E0E0] mb-2">No services found</h3>
+            <p className="text-[#A0A0A0]">Try adjusting your filters to see more services.</p>
           </div>
         )}
       </div>

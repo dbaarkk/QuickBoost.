@@ -227,20 +227,20 @@ const PlaceOrder: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#121212]">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-2">
             <Link to="/" className="flex items-center">
-              <TrendingUp className="h-6 w-6 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">QuickBoost</span>
+              <TrendingUp className="h-6 w-6 text-[#00CFFF]" />
+              <span className="ml-2 text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </Link>
             <nav className="flex items-center space-x-4">
-              <Link to="/add-funds" className="text-gray-700 hover:text-indigo-600 text-sm font-medium">Add Funds</Link>
+              <Link to="/add-funds" className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">Add Funds</Link>
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Balance:</span>
-                <span className="text-sm font-semibold text-green-600">₹{(profile?.balance ?? 0).toFixed(2)}</span>
+                <span className="text-sm text-[#A0A0A0]">Balance:</span>
+                <span className="text-sm font-semibold text-[#00CFFF]">₹{(profile?.balance ?? 0).toFixed(2)}</span>
               </div>
             </nav>
           </div>
@@ -249,34 +249,34 @@ const PlaceOrder: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Place New Order</h1>
-          <p className="text-gray-600">Select a service and place your order instantly</p>
+          <h1 className="text-2xl font-bold text-[#E0E0E0] mb-1">Place New Order</h1>
+          <p className="text-[#A0A0A0]">Select a service and place your order instantly</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Services List */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-4 border-b">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">Select Service</h2>
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A]">
+              <div className="p-4 border-b border-[#2A2A2A]">
+                <h2 className="text-lg font-semibold text-[#E0E0E0] mb-3">Select Service</h2>
 
                 {/* Filters */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
                     <input
                       type="text"
                       placeholder="Search services..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
                     />
                   </div>
 
                   <select
                     value={selectedPlatform}
                     onChange={(e) => setSelectedPlatform(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
                   >
                     {platforms.map(platform => (
                       <option key={platform} value={platform}>
@@ -291,7 +291,7 @@ const PlaceOrder: React.FC = () => {
               <div className="p-4">
                 <div className="space-y-3">
                   {filteredServices.length === 0 ? (
-                    <div className="text-center py-6 text-gray-500">
+                    <div className="text-center py-6 text-[#A0A0A0]">
                       No services found. Try adjusting your filters.
                     </div>
                   ) : (
@@ -300,7 +300,7 @@ const PlaceOrder: React.FC = () => {
                         key={service.id}
                         onClick={() => setSelectedService(service)}
                         className={`p-3 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          selectedService?.id === service.id ? 'border-indigo-500 bg-indigo-50 shadow-md' : 'border-gray-200 hover:border-gray-300'
+                          selectedService?.id === service.id ? 'border-[#00CFFF] bg-[#00CFFF]/10 shadow-md' : 'border-[#2A2A2A] hover:border-[#00CFFF]/50'
                         }`}
                       >
                         <div className="flex items-start justify-between">
@@ -309,9 +309,9 @@ const PlaceOrder: React.FC = () => {
                               {getPlatformIcon(service.platform)}
                             </div>
                             <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900 mb-1">{service.name}</h3>
-                              <p className="text-sm text-gray-600 mb-2">{service.description}</p>
-                              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                              <h3 className="font-semibold text-[#E0E0E0] mb-1">{service.name}</h3>
+                              <p className="text-sm text-[#A0A0A0] mb-2">{service.description}</p>
+                              <div className="flex items-center space-x-4 text-sm text-[#A0A0A0]">
                                 <div className="flex items-center">
                                   <Clock className="h-4 w-4 mr-1" />
                                   <span>{service.delivery_time}</span>
@@ -326,8 +326,8 @@ const PlaceOrder: React.FC = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-lg font-bold text-gray-900">₹{service.price}</div>
-                            <div className="text-sm text-gray-500">per 1000</div>
+                            <div className="text-lg font-bold text-[#E0E0E0]">₹{service.price}</div>
+                            <div className="text-sm text-[#A0A0A0]">per 1000</div>
                           </div>
                         </div>
                       </div>
@@ -340,9 +340,9 @@ const PlaceOrder: React.FC = () => {
 
           {/* Order Form */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border sticky top-4">
-              <div className="p-4 border-b">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] sticky top-4">
+              <div className="p-4 border-b border-[#2A2A2A]">
+                <h2 className="text-lg font-semibold text-[#E0E0E0] flex items-center">
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Order Details
                 </h2>
@@ -350,58 +350,58 @@ const PlaceOrder: React.FC = () => {
 
               <form onSubmit={handleSubmit} className="p-4">
                 {submitSuccess && (
-                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
-                    <span className="text-green-800 font-medium">Order placed successfully!</span>
+                  <div className="mb-4 p-3 bg-[#00CFFF]/10 border border-[#00CFFF]/30 rounded-lg flex items-center">
+                    <CheckCircle className="h-5 w-5 text-[#00CFFF] mr-3" />
+                    <span className="text-[#00CFFF] font-medium">Order placed successfully!</span>
                   </div>
                 )}
 
                 {submitError && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-800 text-sm">{submitError}</p>
+                  <div className="mb-4 p-3 bg-[#FF5C5C]/10 border border-[#FF5C5C]/30 rounded-lg">
+                    <p className="text-[#FF5C5C] text-sm">{submitError}</p>
                   </div>
                 )}
 
                 {selectedService ? (
-                  <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <div className="mb-4 p-3 bg-[#1E1E1E] rounded-lg border border-[#2A2A2A]">
                     <div className="flex items-center space-x-2 mb-2">
                       <div className={`p-1 rounded ${getPlatformColor(selectedService.platform)}`}>
                         {getPlatformIcon(selectedService.platform)}
                       </div>
-                      <span className="font-medium text-gray-900">{selectedService.name}</span>
+                      <span className="font-medium text-[#E0E0E0]">{selectedService.name}</span>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-[#A0A0A0]">
                       <div>Price: ₹{selectedService.price} per 1000</div>
                       <div>Min: {selectedService.min_order.toLocaleString()} | Max: {selectedService.max_order.toLocaleString()}</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-4 p-3 bg-gray-50 rounded-lg text-center text-gray-500">
-                    <Info className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                  <div className="mb-4 p-3 bg-[#1E1E1E] rounded-lg text-center text-[#A0A0A0] border border-[#2A2A2A]">
+                    <Info className="h-8 w-8 mx-auto mb-2 text-[#A0A0A0]" />
                     <p>Please select a service from the list</p>
                   </div>
                 )}
 
                 {/* Link Input */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Link <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                    Link <span className="text-[#FF5C5C]">*</span>
                   </label>
                   <input
                     type="url"
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
                     placeholder="Enter your profile/post URL"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">Enter the complete URL of your profile or post</p>
+                  <p className="text-xs text-[#A0A0A0] mt-1">Enter the complete URL of your profile or post</p>
                 </div>
 
                 {/* Quantity Input */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quantity <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                    Quantity <span className="text-[#FF5C5C]">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -411,13 +411,13 @@ const PlaceOrder: React.FC = () => {
                       placeholder="Enter quantity"
                       min={selectedService?.min_order ?? 1}
                       max={selectedService?.max_order ?? 999999}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
                       required
                     />
-                    <Calculator className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Calculator className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
                   </div>
                   {selectedService && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[#A0A0A0] mt-1">
                       Min: {selectedService.min_order.toLocaleString()} | Max: {selectedService.max_order.toLocaleString()}
                     </p>
                   )}
@@ -425,19 +425,19 @@ const PlaceOrder: React.FC = () => {
 
                 {/* Price Calculation */}
                 {selectedService && quantity && (
-                  <div className="mb-4 p-3 bg-indigo-50 rounded-lg">
+                  <div className="mb-4 p-3 bg-[#00CFFF]/10 rounded-lg border border-[#00CFFF]/30">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600">Quantity:</span>
-                      <span className="font-medium">{parseInt(quantity || '0', 10).toLocaleString()}</span>
+                      <span className="text-sm text-[#A0A0A0]">Quantity:</span>
+                      <span className="font-medium text-[#E0E0E0]">{parseInt(quantity || '0', 10).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600">Rate:</span>
-                      <span className="font-medium">₹{selectedService.price} per 1000</span>
+                      <span className="text-sm text-[#A0A0A0]">Rate:</span>
+                      <span className="font-medium text-[#E0E0E0]">₹{selectedService.price} per 1000</span>
                     </div>
-                    <div className="border-t border-indigo-200 pt-2">
+                    <div className="border-t border-[#00CFFF]/30 pt-2">
                       <div className="flex justify-between items-center">
-                        <span className="font-semibold text-gray-900">Total:</span>
-                        <span className="text-xl font-bold text-indigo-600">₹{calculateTotal().toFixed(2)}</span>
+                        <span className="font-semibold text-[#E0E0E0]">Total:</span>
+                        <span className="text-xl font-bold text-[#00CFFF]">₹{calculateTotal().toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -447,7 +447,7 @@ const PlaceOrder: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!selectedService || !quantity || !link || isSubmitting}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-glow-cyan disabled:shadow-none"
                 >
                   {isSubmitting ? (
                     <>
@@ -463,12 +463,12 @@ const PlaceOrder: React.FC = () => {
                 </button>
 
                 {/* Info */}
-                <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2 flex items-center">
-                    <Info className="h-4 w-4 mr-2 text-yellow-600" />
+                <div className="mt-4 p-3 bg-[#7B61FF]/10 rounded-lg border border-[#7B61FF]/30">
+                  <h4 className="font-medium text-[#E0E0E0] mb-2 flex items-center">
+                    <Info className="h-4 w-4 mr-2 text-[#7B61FF]" />
                     Order Information
                   </h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
+                  <ul className="text-sm text-[#A0A0A0] space-y-1">
                     <li>• Orders are processed automatically</li>
                     <li>• Delivery starts within the specified time</li>
                     <li>• Refill guarantee available</li>
