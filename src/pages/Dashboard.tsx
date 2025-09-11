@@ -35,14 +35,11 @@ import { getUserOrders, Order } from '../lib/supabase';
 const Dashboard: React.FC = () => {
   const { user, profile } = useAuth();
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
-  const [ordersLoading, setOrdersLoading] = useState(true);
 
   // Fetch recent orders
   useEffect(() => {
     const fetchOrders = async () => {
       if (!user) return;
-
-      setOrdersLoading(true);
 
       const { data, error } = await getUserOrders(user.id);
       if (error) {
@@ -56,8 +53,6 @@ const Dashboard: React.FC = () => {
       } else {
         setRecentOrders([]);
       }
-
-      setOrdersLoading(false);
     };
 
     fetchOrders();
@@ -110,13 +105,13 @@ const Dashboard: React.FC = () => {
       color: 'text-red-500'
     },
     {
-      name: 'Facebook Likes',
-      platform: 'Facebook',
-      icon: <Facebook className="h-5 w-5" />,
-      price: '₹10',
-      rating: 4.5,
-      popular: false,
-      color: 'text-blue-500'
+      name: 'Google Reviews',
+      platform: 'Google',
+      icon: <Star className="h-5 w-5" />,
+      price: '₹300',
+      rating: 4.9,
+      popular: true,
+      color: 'text-yellow-500'
     },
     {
       name: 'Twitter Followers',
@@ -311,12 +306,12 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="text-center p-4 bg-[#1E1E1E] rounded-xl">
                   <div className="flex items-center justify-center w-12 h-12 bg-[#A085FF]/20 rounded-full mx-auto mb-3">
-                    <TrendingUp className="h-6 w-6 text-[#A085FF]" />
+                    <BarChart3 className="h-6 w-6 text-[#A085FF]" />
                   </div>
                   <div className="text-2xl font-bold text-[#E0E0E0] mb-1">₹{profile?.total_spent?.toFixed(2) ?? 0}</div>
                   <div className="text-sm text-[#A0A0A0]">Total Spent</div>
                   <div className="w-full bg-[#2A2A2A] rounded-full h-2 mt-3">
-                    <div className="bg-[#A085FF] h-2 rounded-full" style={{ width: `${Math.min((profile?.total_spent ?? 0) / 50, 100)}%` }}></div>
+                    <div className="bg-[#A085FF] h-2 rounded-full" style={{ width: `${Math.min(((profile?.total_spent ?? 0) / 1000) * 100, 100)}%` }}></div>
                   </div>
                 </div>
               </div>
@@ -324,36 +319,37 @@ const Dashboard: React.FC = () => {
 
             {/* Top Services */}
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-[#E0E0E0] flex items-center">
-                  <Star className="h-5 w-5 mr-2 text-[#00CFFF]" />
-                  Top Services
-                </h2>
-                <Link to="/services" className="text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium transition-colors">
-                  View All
-                </Link>
-              </div>
+              <h2 className="text-xl font-semibold text-[#E0E0E0] mb-6 flex items-center">
+                <Star className="h-5 w-5 mr-2 text-[#00CFFF]" />
+                Top Services
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {topServices.map((service, index) => (
-                  <div key={index} className="bg-[#1E1E1E] p-4 rounded-xl hover:bg-[#1E1E1E]/80 transition-all duration-300 group cursor-pointer">
+                  <Link
+                    key={index}
+                    to="/place-order"
+                    className="bg-[#1E1E1E] p-4 rounded-xl hover:bg-[#1E1E1E]/80 transition-all duration-300 hover:scale-105 group border border-[#2A2A2A]"
+                  >
                     <div className="flex items-center justify-between mb-3">
-                      <div className={`p-2 rounded-lg bg-gray-100 ${service.color}`}>
+                      <div className={`p-2 rounded-lg bg-[#2A2A2A] ${service.color}`}>
                         {service.icon}
                       </div>
                       {service.popular && (
-                        <span className="bg-[#00CFFF]/20 text-[#00CFFF] text-xs px-2 py-1 rounded-full">Popular</span>
+                        <span className="bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] text-white text-xs px-2 py-1 rounded-full">
+                          Popular
+                        </span>
                       )}
                     </div>
-                    <h3 className="font-semibold text-[#E0E0E0] mb-1 group-hover:text-[#00CFFF] transition-colors">{service.name}</h3>
+                    <h3 className="font-semibold text-[#E0E0E0] mb-1">{service.name}</h3>
                     <p className="text-sm text-[#A0A0A0] mb-2">{service.platform}</p>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-[#00CFFF]">{service.price}</span>
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                        <span className="text-xs text-[#A0A0A0]">{service.rating}</span>
+                      <span className="text-lg font-bold text-[#00CFFF]">{service.price}</span>
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                        <span className="text-sm text-[#A0A0A0]">{service.rating}</span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -365,14 +361,12 @@ const Dashboard: React.FC = () => {
                   <Activity className="h-5 w-5 mr-2 text-[#7B61FF]" />
                   Recent Orders
                 </h2>
+                <Link to="/place-order" className="text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium transition-colors">
+                  View All
+                </Link>
               </div>
 
-              {ordersLoading ? (
-                <div className="p-6 text-center text-[#A0A0A0]">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00CFFF] mx-auto mb-2"></div>
-                  Loading orders...
-                </div>
-              ) : recentOrders.length > 0 ? (
+              {recentOrders.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-[#2A2A2A]">
                     <thead className="bg-[#1E1E1E]">
@@ -433,7 +427,7 @@ const Dashboard: React.FC = () => {
                   <p className="text-[#A0A0A0] mb-6">Start by placing your first order</p>
                   <Link
                     to="/place-order"
-                    className="inline-flex items-center bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300"
+                    className="inline-flex items-center bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-[#00CFFF]/25"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Place First Order
@@ -443,7 +437,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Sidebar */}
+          {/* Right Column - Sidebar */}
           <div className="xl:col-span-1 space-y-6">
             {/* Notifications */}
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
@@ -453,7 +447,10 @@ const Dashboard: React.FC = () => {
               </h3>
               <div className="space-y-4">
                 {announcements.map((announcement, index) => (
-                  <div key={index} className={`bg-gradient-to-r ${announcement.color} p-4 rounded-xl border animate-pulse`}>
+                  <div
+                    key={index}
+                    className={`p-4 rounded-xl bg-gradient-to-r ${announcement.color} border transition-all duration-300 hover:scale-105`}
+                  >
                     <h4 className="font-semibold text-[#E0E0E0] mb-2">{announcement.title}</h4>
                     <p className="text-sm text-[#A0A0A0]">{announcement.message}</p>
                   </div>
@@ -461,7 +458,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Gamification */}
+            {/* Achievements */}
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
               <h3 className="text-lg font-semibold text-[#E0E0E0] mb-4 flex items-center">
                 <Award className="h-5 w-5 mr-2 text-[#7B61FF]" />
@@ -470,18 +467,15 @@ const Dashboard: React.FC = () => {
               <div className="space-y-4">
                 {achievements.map((achievement, index) => (
                   <div key={index} className="flex items-center space-x-3 p-3 bg-[#1E1E1E] rounded-xl">
-                    <div className={`p-2 rounded-full ${achievement.completed ? 'bg-green-500/20' : 'bg-gray-500/20'}`}>
+                    <div className={`p-2 rounded-lg ${achievement.completed ? 'bg-green-500/20' : 'bg-[#2A2A2A]'}`}>
                       <div className={achievement.color}>
                         {achievement.icon}
                       </div>
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-medium text-[#E0E0E0] text-sm">{achievement.title}</h4>
-                        {achievement.completed && <CheckCircle className="h-4 w-4 text-green-400" />}
-                      </div>
-                      <p className="text-xs text-[#A0A0A0] mb-2">{achievement.description}</p>
-                      <div className="w-full bg-[#2A2A2A] rounded-full h-1.5">
+                      <h4 className="font-medium text-[#E0E0E0] text-sm">{achievement.title}</h4>
+                      <p className="text-xs text-[#A0A0A0]">{achievement.description}</p>
+                      <div className="w-full bg-[#2A2A2A] rounded-full h-1.5 mt-2">
                         <div
                           className={`h-1.5 rounded-full transition-all duration-500 ${achievement.completed ? 'bg-green-400' : 'bg-[#00CFFF]'}`}
                           style={{ width: `${achievement.progress}%` }}
@@ -500,23 +494,17 @@ const Dashboard: React.FC = () => {
                 Need Help?
               </h3>
               <p className="text-sm text-[#A0A0A0] mb-4">
-                Get instant support from our team. We're here to help you 24/7!
+                Get instant support from our team. We're here to help you 24/7.
               </p>
               <a
                 href="https://t.me/quickboostsupport"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-[#0088cc] hover:bg-[#0077b3] text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center space-x-2 hover:scale-105 shadow-lg hover:shadow-[#0088cc]/25"
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-blue-500/25 hover:scale-105"
               >
-                <Send className="h-5 w-5" />
-                <span>Contact Support</span>
+                <Send className="h-5 w-5 mr-2" />
+                Contact Support
               </a>
-              <div className="mt-4 text-center">
-                <div className="flex items-center justify-center space-x-2 text-xs text-[#A0A0A0]">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span>Usually replies within minutes</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

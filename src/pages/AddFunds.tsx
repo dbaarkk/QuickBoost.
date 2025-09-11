@@ -34,7 +34,6 @@ const AddFunds: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [deposits, setDeposits] = useState<Deposit[]>([]);
-  const [depositsLoading, setDepositsLoading] = useState(true);
 
   const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
 
@@ -44,7 +43,6 @@ const AddFunds: React.FC = () => {
       if (!user) return;
       
       try {
-        setDepositsLoading(true);
         const { data, error } = await getUserDeposits(user.id);
         if (error) {
           console.error('Error fetching deposits:', error);
@@ -55,8 +53,6 @@ const AddFunds: React.FC = () => {
       } catch (error) {
         console.error('Error fetching deposits:', error);
         setDeposits([]);
-      } finally {
-        setDepositsLoading(false);
       }
     };
 
@@ -402,12 +398,7 @@ const AddFunds: React.FC = () => {
                 <h3 className="text-lg font-semibold text-[#E0E0E0]">Recent Deposits</h3>
               </div>
               
-              {depositsLoading ? (
-                <div className="p-4 text-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#00CFFF] mx-auto mb-2" />
-                  <p className="text-[#A0A0A0] text-sm">Loading deposits...</p>
-                </div>
-              ) : deposits.length > 0 ? (
+              {deposits.length > 0 ? (
                 <div className="divide-y divide-[#2A2A2A]">
                   {deposits.slice(0, 5).map((deposit) => (
                     <div key={deposit.id} className="p-4">
