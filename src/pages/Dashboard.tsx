@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
       name: 'Instagram Followers',
       platform: 'Instagram',
       icon: <Instagram className="h-5 w-5" />,
-      price: '₹25',
+      price: '₹50',
       rating: 4.8,
       popular: true,
       color: 'text-pink-500'
