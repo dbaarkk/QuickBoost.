@@ -223,7 +223,7 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between relative z-10">
             <div className="mb-6 lg:mb-0">
               <h1 className="text-3xl font-bold text-[#E0E0E0] mb-2">
-                Welcome back, {profile?.first_name ?? 'User'}! 👋
+                Welcome back {profile?.first_name ?? 'User'} 👋
               </h1>
               <p className="text-[#A0A0A0] text-lg mb-4">Ready to boost your social media presence today?</p>
               <div className="flex flex-wrap items-center gap-6">
