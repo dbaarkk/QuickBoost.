@@ -21,14 +21,14 @@ import { createOrder } from '../lib/supabase';
 // Direct services data - no loading required
 const servicesData = [
   // Instagram Services
-  { id: 1, name: 'Instagram Followers - High Quality', platform: 'Instagram', category: 'Followers', price: 25.00, min_order: 100, max_order: 100000, description: 'Get high-quality Instagram followers from real accounts with profile pictures', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
+  { id: 1, name: 'Instagram Followers - High Quality', platform: 'Instagram', category: 'Followers', price: 50.00, min_order: 100, max_order: 100000, description: 'Get high-quality Instagram followers from real accounts with profile pictures', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
   { id: 2, name: 'Instagram Likes - Instant', platform: 'Instagram', category: 'Likes', price: 10.00, min_order: 50, max_order: 50000, description: 'Instant Instagram likes for your posts from active users', delivery_time: '0-30 minutes', rating: 4.9, is_active: true },
   { id: 3, name: 'Instagram Views - Real', platform: 'Instagram', category: 'Views', price: 5.00, min_order: 1000, max_order: 1000000, description: 'Real Instagram story/reel views from active users', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
   { id: 4, name: 'Instagram Comments - Custom', platform: 'Instagram', category: 'Comments', price: 80.00, min_order: 10, max_order: 1000, description: 'Custom Instagram comments from real users', delivery_time: '1-6 hours', rating: 4.6, is_active: true },
-  { id: 5, name: 'Instagram Story Views', platform: 'Instagram', category: 'Views', price: 3.00, min_order: 500, max_order: 500000, description: 'Instagram story views from real active users', delivery_time: '0-2 hours', rating: 4.7, is_active: true },
+  { id: 5, name: 'Instagram Story Views', platform: 'Instagram', category: 'Views', price: 1.00, min_order: 500, max_order: 500000, description: 'Instagram story views from real active users', delivery_time: '0-2 hours', rating: 4.7, is_active: true },
   { id: 6, name: 'Instagram Reel Views', platform: 'Instagram', category: 'Views', price: 4.00, min_order: 1000, max_order: 1000000, description: 'High-quality Instagram reel views for better reach', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
   { id: 7, name: 'Instagram Auto Likes', platform: 'Instagram', category: 'Likes', price: 15.00, min_order: 100, max_order: 10000, description: 'Automatic likes for your future Instagram posts', delivery_time: 'Instant', rating: 4.5, is_active: true },
-  { id: 8, name: 'Instagram Saves', platform: 'Instagram', category: 'Saves', price: 20.00, min_order: 50, max_order: 25000, description: 'Instagram post saves from real users', delivery_time: '0-2 hours', rating: 4.4, is_active: true },
+  { id: 8, name: 'Instagram Saves', platform: 'Instagram', category: 'Saves', price: 15.00, min_order: 50, max_order: 25000, description: 'Instagram post saves from real users', delivery_time: '0-2 hours', rating: 4.4, is_active: true },
   { id: 9, name: 'Instagram Shares', platform: 'Instagram', category: 'Shares', price: 25.00, min_order: 25, max_order: 10000, description: 'Instagram post shares to stories from real users', delivery_time: '0-3 hours', rating: 4.3, is_active: true },
   { id: 10, name: 'Instagram Live Video Views', platform: 'Instagram', category: 'Views', price: 8.00, min_order: 100, max_order: 50000, description: 'Live video views during your Instagram live sessions', delivery_time: 'Instant', rating: 4.6, is_active: true },
 
