@@ -61,20 +61,20 @@ const Dashboard: React.FC = () => {
 
   const quickActions = [
     {
-      title: 'Place New Order',
-      description: 'Browse services and place orders',
-      icon: <ShoppingCart className="h-6 w-6" />,
-      link: '/place-order',
-      color: 'from-[#00CFFF] to-[#0AC5FF]',
-      hoverColor: 'hover:shadow-[#00CFFF]/25'
-    },
-    {
       title: 'View Services',
       description: 'Browse all available services',
       icon: <Eye className="h-6 w-6" />,
       link: '/services',
       color: 'from-[#A085FF] to-[#7B61FF]',
       hoverColor: 'hover:shadow-[#A085FF]/25'
+    },
+    {
+      title: 'Place New Order',
+      description: 'Browse services and place orders',
+      icon: <ShoppingCart className="h-6 w-6" />,
+      link: '/place-order',
+      color: 'from-[#00CFFF] to-[#0AC5FF]',
+      hoverColor: 'hover:shadow-[#00CFFF]/25'
     }
   ];
 
@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
       name: 'Instagram Followers',
       platform: 'Instagram',
       icon: <Instagram className="h-5 w-5" />,
-      price: '₹25',
+      price: '₹60',
       rating: 4.8,
       popular: true,
       color: 'text-pink-500'
