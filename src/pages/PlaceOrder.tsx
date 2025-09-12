@@ -13,7 +13,8 @@ import {
   Facebook,
   Twitter,
   Users,
-  CheckCircle
+  CheckCircle,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createOrder } from '../lib/supabase';
@@ -21,7 +22,7 @@ import { createOrder } from '../lib/supabase';
 // Direct services data - no loading required
 const servicesData = [
   // Instagram Services
-  { id: 1, name: 'Instagram Followers - High Quality', platform: 'Instagram', category: 'Followers', price: 50.00, min_order: 100, max_order: 100000, description: 'Get high-quality Instagram followers from real accounts with profile pictures', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
+  { id: 1, name: 'Instagram Followers - High Quality', platform: 'Instagram', category: 'Followers', price: 60.00, min_order: 100, max_order: 100000, description: 'Get high-quality Instagram followers from real accounts with profile pictures', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
   { id: 2, name: 'Instagram Likes - Instant', platform: 'Instagram', category: 'Likes', price: 10.00, min_order: 50, max_order: 50000, description: 'Instant Instagram likes for your posts from active users', delivery_time: '0-30 minutes', rating: 4.9, is_active: true },
   { id: 3, name: 'Instagram Views - Real', platform: 'Instagram', category: 'Views', price: 5.00, min_order: 1000, max_order: 1000000, description: 'Real Instagram story/reel views from active users', delivery_time: '0-1 hours', rating: 4.8, is_active: true },
   { id: 4, name: 'Instagram Comments - Custom', platform: 'Instagram', category: 'Comments', price: 80.00, min_order: 10, max_order: 1000, description: 'Custom Instagram comments from real users', delivery_time: '1-6 hours', rating: 4.6, is_active: true },
@@ -73,7 +74,19 @@ const servicesData = [
   { id: 40, name: 'LinkedIn Shares', platform: 'LinkedIn', category: 'Shares', price: 60.00, min_order: 10, max_order: 1000, description: 'LinkedIn post shares from professional users', delivery_time: '1-6 hours', rating: 4.2, is_active: true },
 
   // Google Services
-  { id: 41, name: 'Google Reviews', platform: 'Google', category: 'Reviews', price: 300.00, min_order: 5, max_order: 100, description: 'High-quality Google business reviews from real users', delivery_time: '1-3 days', rating: 4.9, is_active: true }
+  { id: 41, name: 'Google Reviews', platform: 'Google', category: 'Reviews', price: 300.00, min_order: 5, max_order: 100, description: 'High-quality Google business reviews from real users', delivery_time: '1-3 days', rating: 4.9, is_active: true },
+
+  // Website Traffic Services
+  { id: 42, name: 'Website Traffic from United States', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from United States users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 43, name: 'Website Traffic from United Kingdom', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from United Kingdom users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 44, name: 'Website Traffic from Canada', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from Canada users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 45, name: 'Website Traffic from Australia', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from Australia users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 46, name: 'Website Traffic from Germany', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from Germany users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 47, name: 'Website Traffic from France', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from France users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 48, name: 'Website Traffic from Japan', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from Japan users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 49, name: 'Website Traffic from Brazil', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from Brazil users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 50, name: 'Website Traffic from India', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from India users', delivery_time: '1-24 hours', rating: 4.7, is_active: true },
+  { id: 51, name: 'Website Traffic from Netherlands', platform: 'Traffic', category: 'Traffic', price: 500.00, min_order: 1000, max_order: 100000, description: 'High-quality website traffic from Netherlands users', delivery_time: '1-24 hours', rating: 4.7, is_active: true }
 ];
 
 interface Service {
@@ -96,6 +109,7 @@ const PlaceOrder: React.FC = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [quantity, setQuantity] = useState<string>('');
   const [link, setLink] = useState<string>('');
+  const [customField, setCustomField] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -132,6 +146,8 @@ const PlaceOrder: React.FC = () => {
         return <Facebook className="h-5 w-5" />;
       case 'Twitter':
         return <Twitter className="h-5 w-5" />;
+      case 'Traffic':
+        return <Globe className="h-5 w-5" />;
       default:
         return <Users className="h-5 w-5" />;
     }
@@ -151,6 +167,8 @@ const PlaceOrder: React.FC = () => {
         return 'text-cyan-600 bg-cyan-100';
       case 'LinkedIn':
         return 'text-blue-800 bg-blue-100';
+      case 'Traffic':
+        return 'text-blue-600 bg-blue-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }
@@ -215,6 +233,7 @@ const PlaceOrder: React.FC = () => {
         setSubmitSuccess(true);
         setQuantity('');
         setLink('');
+        setCustomField('');
         setSelectedService(null);
         // refresh profile (update balance) if available
         if (refreshProfile) {
@@ -227,6 +246,18 @@ const PlaceOrder: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getCustomFieldLabel = () => {
+    if (!selectedService) return '';
+    
+    if (selectedService.name.toLowerCase().includes('instagram') && selectedService.category === 'Comments') {
+      return 'What is your reel or post about?';
+    }
+    if (selectedService.platform === 'Google' && selectedService.category === 'Reviews') {
+      return 'What is your brand, store, or business about?';
+    }
+    return '';
   };
 
   return (
@@ -401,6 +432,23 @@ const PlaceOrder: React.FC = () => {
                   <p className="text-xs text-[#A0A0A0] mt-1">Enter the complete URL of your profile or post</p>
                 </div>
 
+                {/* Custom Field for Instagram Comments and Google Reviews */}
+                {getCustomFieldLabel() && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                      {getCustomFieldLabel()} <span className="text-[#FF5C5C]">*</span>
+                    </label>
+                    <textarea
+                      value={customField}
+                      onChange={(e) => setCustomField(e.target.value)}
+                      placeholder="Please describe your content/business..."
+                      className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 resize-none"
+                      rows={3}
+                      required
+                    />
+                  </div>
+                )}
+
                 {/* Quantity Input */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
@@ -449,7 +497,7 @@ const PlaceOrder: React.FC = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={!selectedService || !quantity || !link || isSubmitting}
+                  disabled={!selectedService || !quantity || !link || (getCustomFieldLabel() && !customField) || isSubmitting}
                   className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-glow-cyan disabled:shadow-none"
                 >
                   {isSubmitting ? (

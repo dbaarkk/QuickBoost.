@@ -4,7 +4,6 @@ import {
   TrendingUp, 
   Wallet, 
   ShoppingCart, 
-  Plus, 
   Eye, 
   Clock, 
   CheckCircle, 
@@ -27,10 +26,12 @@ import {
   Gift,
   Send,
   TrendingDown,
-  Activity
+  Activity,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserOrders, Order } from '../lib/supabase';
+import StaggeredMenu from '../components/StaggeredMenu';
 
 const Dashboard: React.FC = () => {
   const { user, profile } = useAuth();
@@ -68,14 +69,6 @@ const Dashboard: React.FC = () => {
       hoverColor: 'hover:shadow-[#00CFFF]/25'
     },
     {
-      title: 'Add Funds',
-      description: 'Add money to your account',
-      icon: <Plus className="h-6 w-6" />,
-      link: '/add-funds',
-      color: 'from-[#7B61FF] to-[#A085FF]',
-      hoverColor: 'hover:shadow-[#7B61FF]/25'
-    },
-    {
       title: 'View Services',
       description: 'Browse all available services',
       icon: <Eye className="h-6 w-6" />,
@@ -105,13 +98,13 @@ const Dashboard: React.FC = () => {
       color: 'text-red-500'
     },
     {
-      name: 'Google Reviews',
-      platform: 'Google',
-      icon: <Star className="h-5 w-5" />,
-      price: '₹300',
+      name: 'Website Traffic (US)',
+      platform: 'Traffic',
+      icon: <Globe className="h-5 w-5" />,
+      price: '₹500',
       rating: 4.9,
       popular: true,
-      color: 'text-yellow-500'
+      color: 'text-blue-500'
     },
     {
       name: 'Twitter Followers',
@@ -166,6 +159,23 @@ const Dashboard: React.FC = () => {
     }
   ];
 
+  const menuItems = [
+    { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
+    { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
+    { label: 'Services', ariaLabel: 'View services', link: '/services' },
+    { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
+    { label: 'Recent Orders', ariaLabel: 'View recent orders', link: '/dashboard' },
+    { label: 'Recent Deposits', ariaLabel: 'View recent deposits', link: '/add-funds' },
+    { label: 'Achievements', ariaLabel: 'View achievements', link: '/dashboard' },
+    { label: 'Announcements', ariaLabel: 'View announcements', link: '/dashboard' },
+    { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
+  ];
+
+  const socialItems = [
+    { label: 'Telegram', link: 'https://t.me/quickboostsupport' },
+    { label: 'Email', link: 'mailto:quickboostbusiness@gmail.com' }
+  ];
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed': return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -197,16 +207,26 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#121212]">
       {/* Header */}
-      <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A] sticky top-0 z-50">AddFunds<Link>
-      </Link> <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A] sticky top-0 z-50">
+        <StaggeredMenu
+          position="right"
+          items={menuItems}
+          socialItems={socialItems}
+          displaySocials={true}
+          displayItemNumbering={true}
+          menuButtonColor="#2A2A2A"
+          openMenuButtonColor="#fff"
+          changeMenuColorOnOpen={true}
+          colors={['#B19EEF', '#5227FF']}
+          accentColor="#00CFFF"
+        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to="/" className="flex items-center space-x-3">
               <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
               <span className="text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </Link>
-            <nav className="flex items-center space-x-6">
-              className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">
-               className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">
+            <nav className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 bg-[#2A2A2A] px-4 py-2 rounded-lg">
                 <Wallet className="h-4 w-4 text-[#00CFFF]" />
                 <span className="text-sm text-[#A0A0A0]">Balance:</span>
@@ -260,7 +280,7 @@ const Dashboard: React.FC = () => {
                 <Zap className="h-5 w-5 mr-2 text-[#00CFFF]" />
                 Quick Actions
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quickActions.map((action, index) => (
                   <Link
                     key={index}
@@ -430,7 +450,7 @@ const Dashboard: React.FC = () => {
                     to="/place-order"
                     className="inline-flex items-center bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-[#00CFFF]/25"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <ShoppingCart className="h-4 w-4 mr-2" />
                     Place First Order
                   </Link>
                 </div>

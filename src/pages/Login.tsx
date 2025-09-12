@@ -37,15 +37,22 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#121212] to-[#1E1E1E] flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#1a0a2e] to-[#16213e] animate-gradient-shift">
+        <div className="absolute inset-0 bg-gradient-to-tr from-purple-900/20 via-transparent to-blue-900/20 animate-pulse"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-float-delayed"></div>
+      </div>
+      
       <div className="max-w-md w-full bg-[#2A2A2A] rounded-2xl shadow-2xl p-8 border border-[#2A2A2A]">
         <div className="text-center mb-8">
           <Link to="/" className="flex items-center justify-center mb-4">
             <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
-            <span className="ml-2 text-2xl font-bold text-[#E0E0E0]">QuickBoost</span>
+            <span className="ml-2 text-2xl font-black text-[#E0E0E0] tracking-tight">QuickBoost</span>
           </Link>
-          <h1 className="text-3xl font-bold text-[#E0E0E0] mb-2">Welcome Back</h1>
-          <p className="text-[#A0A0A0]">Sign in to your QuickBoost account</p>
+          <h1 className="text-3xl font-black text-[#E0E0E0] mb-2 tracking-tight">Welcome Back</h1>
+          <p className="text-[#A0A0A0] font-medium">Sign in to your QuickBoost account</p>
         </div>
 
         {error && (
@@ -94,7 +101,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white py-3 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-glow-cyan font-medium"
+            className="w-full bg-white hover:bg-gray-100 text-black py-4 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl font-black text-lg tracking-tight hover:scale-105"
           >
             Sign In
           </button>
