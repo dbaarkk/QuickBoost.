@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import Iridescence from '../components/Iridescence';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -39,16 +38,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4">
-      {/* Iridescence Background */}
-      <div className="absolute inset-0 z-0">
-        <Iridescence
-          color={[0.5, 0.3, 0.8]}
-          speed={0.5}
-          amplitude={0.2}
-          mouseReact={true}
-        />
-      </div>
-      
       <div className="max-w-md w-full glass-card p-8 relative z-10">
         <div className="text-center mb-8">
           <Link to="/" className="flex items-center justify-center mb-4">

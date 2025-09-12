@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Menu, X, Mail, MessageCircle } from 'lucide-react';
 
 interface MenuItem {
@@ -44,6 +45,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   onMenuClose,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -52,6 +54,14 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     } else {
       onMenuClose?.();
     }
+  };
+
+  const handleMenuItemClick = (link: string) => {
+    if (link !== '#') {
+      navigate(link);
+    }
+    setIsOpen(false);
+    onMenuClose?.();
   };
 
   useEffect(() => {
@@ -79,7 +89,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       {/* Menu Button */}
       <button
         onClick={toggleMenu}
-        className="fixed top-4 right-4 z-50 p-3 rounded-full transition-all duration-300 hover:scale-110"
+        className="p-3 rounded-full transition-all duration-300 hover:scale-110"
         style={{
           backgroundColor: isOpen && changeMenuColorOnOpen ? openMenuButtonColor : menuButtonColor,
           color: isOpen && changeMenuColorOnOpen ? '#000' : '#000',
@@ -162,10 +172,9 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     </div>
                   ) : (
                     <a
-                      href={item.link}
+                      onClick={() => handleMenuItemClick(item.link)}
                       aria-label={item.ariaLabel}
                       className="block text-4xl font-bold text-white hover:opacity-80 transition-opacity duration-300 cursor-pointer"
-                      onClick={toggleMenu}
                     >
                       {displayItemNumbering && (
                         <span className="text-2xl opacity-60 mr-4">

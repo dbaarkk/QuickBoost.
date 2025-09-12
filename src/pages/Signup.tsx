@@ -81,16 +81,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4">
-      {/* Iridescence Background */}
-      <div className="absolute inset-0 z-0">
-        <Iridescence
-          color={[0.5, 0.3, 0.8]}
-          speed={0.5}
-          amplitude={0.2}
-          mouseReact={true}
-        />
-      </div>
-      
       <div className="max-w-md w-full glass-card p-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
