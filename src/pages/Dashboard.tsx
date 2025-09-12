@@ -224,7 +224,7 @@ const Dashboard: React.FC = () => {
         
         {/* Balance and Menu positioned correctly */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-2">
             {/* Balance on the left (red area) */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 bg-[#2A2A2A] px-4 py-2 rounded-lg">
