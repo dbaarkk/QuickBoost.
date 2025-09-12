@@ -223,7 +223,7 @@ const Dashboard: React.FC = () => {
         {/* Balance and Menu positioned correctly */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            {/* Balance on the left (red area) */}
+            {/* Balance on the left */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 bg-[#2A2A2A] px-4 py-2 rounded-lg">
                 <Wallet className="h-4 w-4 text-[#00CFFF]" />
@@ -232,25 +232,29 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            {/* Menu on the right (blue area) */}
-            <StaggeredMenu
-              position="right"
-              items={[
-                { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
-                { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
-                { label: 'Services', ariaLabel: 'View services', link: '/services' },
-                { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
-                { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
-              ]}
-              socialItems={socialItems}
-              displaySocials={true}
-              displayItemNumbering={true}
-              menuButtonColor="#2A2A2A"
-              openMenuButtonColor="#fff"
-              changeMenuColorOnOpen={true}
-              colors={['#B19EEF', '#5227FF']}
-              accentColor="#00CFFF"
-            />
+            {/* Menu on the right - wrapped in container to match balance height */}
+            <div className="flex items-center">
+              <div className="bg-[#2A2A2A] px-2 py-2 rounded-lg">
+                <StaggeredMenu
+                  position="right"
+                  items={[
+                    { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
+                    { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
+                    { label: 'Services', ariaLabel: 'View services', link: '/services' },
+                    { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
+                    { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
+                  ]}
+                  socialItems={socialItems}
+                  displaySocials={true}
+                  displayItemNumbering={true}
+                  menuButtonColor="#2A2A2A"
+                  openMenuButtonColor="#fff"
+                  changeMenuColorOnOpen={true}
+                  colors={['#B19EEF', '#5227FF']}
+                  accentColor="#00CFFF"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -331,267 +335,211 @@ const Dashboard: React.FC = () => {
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
               <h2 className="text-xl font-semibold text-[#E0E0E0] mb-6 flex items-center">
                 <BarChart3 className="h-5 w-5 mr-2 text-[#7B61FF]" />
-                Activity Overview
+                Your Activity
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-4 bg-[#1E1E1E] rounded-xl">
-                  <div className="flex items-center justify-center w-12 h-12 bg-[#00CFFF]/20 rounded-full mx-auto mb-3">
-                    <Wallet className="h-6 w-6 text-[#00CFFF]" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#E0E0E0] mb-1">₹{profile?.balance?.toFixed(2) ?? 0}</div>
-                  <div className="text-sm text-[#A0A0A0]">Account Balance</div>
-                  <div className="w-full bg-[#2A2A2A] rounded-full h-2 mt-3">
-                    <div className="bg-[#00CFFF] h-2 rounded-full" style={{ width: '0%' }}></div>
-                  </div>
-                </div>
-                <div className="text-center p-4 bg-[#1E1E1E] rounded-xl">
-                  <div className="flex items-center justify-center w-12 h-12 bg-[#7B61FF]/20 rounded-full mx-auto mb-3">
-                    <ShoppingCart className="h-6 w-6 text-[#7B61FF]" />
+              
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-[#1E1E1E] p-4 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <ShoppingCart className="h-5 w-5 text-[#00CFFF]" />
+                    <span className="text-xs text-green-400">+5%</span>
                   </div>
                   <div className="text-2xl font-bold text-[#E0E0E0] mb-1">{profile?.total_orders ?? 0}</div>
                   <div className="text-sm text-[#A0A0A0]">Total Orders</div>
-                  <div className="w-full bg-[#2A2A2A] rounded-full h-2 mt-3">
-                    <div className="bg-[#7B61FF] h-2 rounded-full" style={{ width: `${Math.min((profile?.total_orders ?? 0) * 10, 100)}%` }}></div>
-                  </div>
                 </div>
-                <div className="text-center p-4 bg-[#1E1E1E] rounded-xl">
-                  <div className="flex items-center justify-center w-12 h-12 bg-[#A085FF]/20 rounded-full mx-auto mb-3">
-                    <BarChart3 className="h-6 w-6 text-[#A085FF]" />
+                
+                <div className="bg-[#1E1E1E] p-4 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <Wallet className="h-5 w-5 text-[#7B61FF]" />
+                    <span className="text-xs text-green-400">+12%</span>
                   </div>
-                  <div className="text-2xl font-bold text-[#E0E0E0] mb-1">₹{profile?.total_spent?.toFixed(2) ?? 0}</div>
+                  <div className="text-2xl font-bold text-[#E0E0E0] mb-1">₹{profile?.total_spent?.toFixed(0) ?? 0}</div>
                   <div className="text-sm text-[#A0A0A0]">Total Spent</div>
-                  <div className="w-full bg-[#2A2A2A] rounded-full h-2 mt-3">
-                    <div className="bg-[#A085FF] h-2 rounded-full" style={{ width: `${Math.min(((profile?.total_spent ?? 0) / 1000) * 100, 100)}%` }}></div>
+                </div>
+                
+                <div className="bg-[#1E1E1E] p-4 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <Users className="h-5 w-5 text-[#00CFFF]" />
+                    <span className="text-xs text-green-400">+18%</span>
                   </div>
+                  <div className="text-2xl font-bold text-[#E0E0E0] mb-1">12.5K</div>
+                  <div className="text-sm text-[#A0A0A0]">Followers Gained</div>
+                </div>
+                
+                <div className="bg-[#1E1E1E] p-4 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <Award className="h-5 w-5 text-yellow-400" />
+                    <span className="text-xs text-blue-400">Member</span>
+                  </div>
+                  <div className="text-2xl font-bold text-[#E0E0E0] mb-1">Level 2</div>
+                  <div className="text-sm text-[#A0A0A0]">Account Tier</div>
                 </div>
               </div>
-            </div>
 
-            {/* Top Services */}
-            <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
-              <h2 className="text-xl font-semibold text-[#E0E0E0] mb-6 flex items-center">
-                <Star className="h-5 w-5 mr-2 text-[#00CFFF]" />
-                Top Services
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  {
-                    name: 'Instagram Followers',
-                    platform: 'Instagram',
-                    icon: <Instagram className="h-5 w-5" />,
-                    price: '₹60',
-                    rating: 4.8,
-                    popular: true,
-                    color: 'text-pink-500'
-                  },
-                  {
-                    name: 'YouTube Views',
-                    platform: 'YouTube',
-                    icon: <Youtube className="h-5 w-5" />,
-                    price: '₹5',
-                    rating: 4.7,
-                    popular: true,
-                    color: 'text-red-500'
-                  },
-                  {
-                    name: 'Google Reviews',
-                    platform: 'Google',
-                    icon: <Star className="h-5 w-5" />,
-                    price: '₹300',
-                    rating: 4.9,
-                    popular: true,
-                    color: 'text-yellow-500'
-                  },
-                  {
-                    name: 'Website Traffic (US)',
-                    platform: 'Traffic',
-                    icon: <Globe className="h-5 w-5" />,
-                    price: '₹500',
-                    rating: 4.9,
-                    popular: true,
-                    color: 'text-blue-500'
-                  }
-                ].map((service, index) => (
-                  <Link
-                    key={index}
-                    to="/place-order"
-                    className="bg-[#1E1E1E] p-4 rounded-xl hover:bg-[#1E1E1E]/80 transition-all duration-300 hover:scale-105 group border border-[#2A2A2A]"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={`p-2 rounded-lg bg-[#2A2A2A] ${service.color}`}>
-                        {service.icon}
-                      </div>
-                      {service.popular && (
-                        <span className="bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] text-white text-xs px-2 py-1 rounded-full">
-                          Popular
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="font-semibold text-[#E0E0E0] mb-1">{service.name}</h3>
-                    <p className="text-sm text-[#A0A0A0] mb-2">{service.platform}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-[#00CFFF]">{service.price}</span>
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-                        <span className="text-sm text-[#A0A0A0]">{service.rating}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Orders */}
-            <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A]">
-              <div className="px-6 py-4 border-b border-[#2A2A2A] flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-[#E0E0E0] flex items-center">
-                  <Activity className="h-5 w-5 mr-2 text-[#7B61FF]" />
+              {/* Recent Orders Table */}
+              <div className="bg-[#1E1E1E] rounded-xl p-4">
+                <h3 className="text-lg font-medium text-[#E0E0E0] mb-4 flex items-center">
+                  <Activity className="h-4 w-4 mr-2 text-[#00CFFF]" />
                   Recent Orders
-                </h2>
-                <Link to="/place-order" className="text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium transition-colors">
-                  View All
-                </Link>
+                </h3>
+                {recentOrders.length > 0 ? (
+                  <div className="space-y-3">
+                    {recentOrders.slice(0, 3).map((order) => (
+                      <div key={order.id} className="flex items-center justify-between p-3 bg-[#2A2A2A] rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          {getStatusIcon(order.status)}
+                          <div>
+                            <div className="text-sm font-medium text-[#E0E0E0]">#{order.id.slice(0, 8)}</div>
+                            <div className="text-xs text-[#A0A0A0]">{order.service?.name || 'Unknown Service'}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-[#00CFFF]">₹{order.amount.toFixed(2)}</div>
+                          <div className="text-xs text-[#A0A0A0]">{order.progress}% complete</div>
+                        </div>
+                      </div>
+                    ))}
+                    <Link
+                      to="/orders"
+                      className="block text-center text-sm text-[#00CFFF] hover:text-[#7B61FF] mt-3 py-2"
+                    >
+                      View all orders →
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <ShoppingCart className="h-10 w-10 text-[#A0A0A0] mx-auto mb-3" />
+                    <h3 className="text-base font-medium text-[#E0E0E0] mb-2">No orders yet</h3>
+                    <p className="text-[#A0A0A0] mb-4">Start by placing your first order</p>
+                    <Link
+                      to="/place-order"
+                      className="inline-flex items-center bg-[#00CFFF] hover:bg-[#0AC5FF] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Place First Order
+                    </Link>
+                  </div>
+                )}
               </div>
-
-              {recentOrders.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-[#2A2A2A]">
-                    <thead className="bg-[#1E1E1E]">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                          Order Details
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                          Progress
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                          Amount
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-[#2A2A2A] divide-y divide-[#2A2A2A]">
-                      {recentOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-[#1E1E1E] transition-colors">
-                          <td className="px-6 py-4">
-                            <div>
-                              <div className="text-sm font-medium text-[#E0E0E0]">#{order.id.slice(0, 8)}</div>
-                              <div className="text-sm text-[#A0A0A0]">{order.service?.name || 'Unknown Service'}</div>
-                              <div className="text-xs text-[#A0A0A0]">{order.quantity.toLocaleString()} items</div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center">
-                              {getStatusIcon(order.status)}
-                              <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                                {getStatusLabel(order.status)}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="w-full bg-[#1E1E1E] rounded-full h-2">
-                              <div
-                                className="bg-[#00CFFF] h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${order.progress}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-xs text-[#A0A0A0] mt-1">{order.progress}%</span>
-                          </td>
-                          <td className="px-6 py-4 text-sm font-medium text-[#E0E0E0]">
-                            ₹{order.amount.toFixed(2)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <ShoppingCart className="h-12 w-12 text-[#A0A0A0] mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-[#E0E0E0] mb-2">No orders yet</h3>
-                  <p className="text-[#A0A0A0] mb-6">Start by placing your first order</p>
-                  <Link
-                    to="/place-order"
-                    className="inline-flex items-center bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-[#00CFFF]/25"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Place First Order
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Right Column - Sidebar */}
+          {/* Right Sidebar */}
           <div className="xl:col-span-1 space-y-6">
-            {/* Notifications */}
+            {/* Top Services */}
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
               <h3 className="text-lg font-semibold text-[#E0E0E0] mb-4 flex items-center">
-                <Bell className="h-5 w-5 mr-2 text-[#00CFFF]" />
-                Announcements
+                <Star className="h-4 w-4 mr-2 text-yellow-400" />
+                Popular Services
               </h3>
-              <div className="space-y-4">
-                {announcements.map((announcement, index) => (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-xl bg-gradient-to-r ${announcement.color} border transition-all duration-300 hover:scale-105`}
-                  >
-                    <h4 className="font-semibold text-[#E0E0E0] mb-2">{announcement.title}</h4>
-                    <p className="text-sm text-[#A0A0A0]">{announcement.message}</p>
+              <div className="space-y-3">
+                {topServices.map((service, index) => (
+                  <div key={index} className="bg-[#1E1E1E] p-3 rounded-xl group hover:bg-[#2A2A2A] transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <div className={service.color}>
+                          {service.icon}
+                        </div>
+                        <span className="text-sm font-medium text-[#E0E0E0]">{service.name}</span>
+                        {service.popular && (
+                          <span className="bg-gradient-to-r from-[#00CFFF] to-[#7B61FF] text-white text-xs px-2 py-1 rounded-full">
+                            Hot
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                        <span className="text-xs text-[#A0A0A0]">{service.rating}</span>
+                      </div>
+                      <span className="text-sm font-bold text-[#00CFFF]">{service.price}</span>
+                    </div>
                   </div>
                 ))}
+                <Link
+                  to="/services"
+                  className="block text-center text-sm text-[#00CFFF] hover:text-[#7B61FF] mt-3 py-2"
+                >
+                  View all services →
+                </Link>
               </div>
             </div>
 
             {/* Achievements */}
-            <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
+          <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
               <h3 className="text-lg font-semibold text-[#E0E0E0] mb-4 flex items-center">
-                <Award className="h-5 w-5 mr-2 text-[#7B61FF]" />
+                <Trophy className="h-4 w-4 mr-2 text-yellow-400" />
                 Achievements
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {achievements.map((achievement, index) => (
-                  <div key={index} className="flex items-center space-x-3 p-3 bg-[#1E1E1E] rounded-xl">
-                    <div className={`p-2 rounded-lg ${achievement.completed ? 'bg-green-500/20' : 'bg-[#2A2A2A]'}`}>
-                      <div className={achievement.color}>
-                        {achievement.icon}
+                  <div key={index} className="bg-[#1E1E1E] p-3 rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <div className={achievement.color}>
+                          {achievement.icon}
+                        </div>
+                        <span className="text-sm font-medium text-[#E0E0E0]">{achievement.title}</span>
                       </div>
+                      {achievement.completed && (
+                        <CheckCircle className="h-4 w-4 text-green-400" />
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-[#E0E0E0] text-sm">{achievement.title}</h4>
-                      <p className="text-xs text-[#A0A0A0]">{achievement.description}</p>
-                      <div className="w-full bg-[#2A2A2A] rounded-full h-1.5 mt-2">
-                        <div
-                          className={`h-1.5 rounded-full transition-all duration-500 ${achievement.completed ? 'bg-green-400' : 'bg-[#00CFFF]'}`}
-                          style={{ width: `${achievement.progress}%` }}
-                        ></div>
-                      </div>
+                    <p className="text-xs text-[#A0A0A0] mb-2">{achievement.description}</p>
+                    <div className="w-full bg-[#2A2A2A] rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-[#00CFFF] to-[#7B61FF] h-2 rounded-full transition-all duration-300"
+                        style={{ width: ${achievement.progress}% }}
+                      ></div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Support Section */}
+            {/* Announcements */}
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
               <h3 className="text-lg font-semibold text-[#E0E0E0] mb-4 flex items-center">
-                <MessageCircle className="h-5 w-5 mr-2 text-[#00CFFF]" />
+                <Bell className="h-4 w-4 mr-2 text-[#00CFFF]" />
+                Announcements
+              </h3>
+              <div className="space-y-3">
+                {announcements.map((announcement, index) => (
+                  <div key={index} className={bg-gradient-to-r ${announcement.color} p-4 rounded-xl border}>
+                    <h4 className="text-sm font-medium text-[#E0E0E0] mb-1">{announcement.title}</h4>
+                    <p className="text-xs text-[#A0A0A0]">{announcement.message}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Quick Contact */}
+            <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
+              <h3 className="text-lg font-semibold text-[#E0E0E0] mb-4 flex items-center">
+                <MessageCircle className="h-4 w-4 mr-2 text-[#00CFFF]" />
                 Need Help?
               </h3>
-              <p className="text-sm text-[#A0A0A0] mb-4">
-                Get instant support from our team. We're here to help you 24/7.
-              </p>
-              <a
-                href="https://t.me/quickboostsupport"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-blue-500/25 hover:scale-105"
-              >
-                <Send className="h-5 w-5 mr-2" />
-                Contact Support
-              </a>
+              <div className="space-y-3">
+                <a
+                  href="https://t.me/quickboostsupport"
+                  className="flex items-center justify-between bg-[#1E1E1E] p-3 rounded-xl hover:bg-[#2A2A2A] transition-colors group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Send className="h-4 w-4 text-[#00CFFF]" />
+                    <span className="text-sm text-[#E0E0E0]">Telegram Support</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-[#A0A0A0] group-hover:translate-x-1 transition-transform" />
+                </a>
+                <a
+                  href="mailto:quickboostbusiness@gmail.com"
+                  className="flex items-center justify-between bg-[#1E1E1E] p-3 rounded-xl hover:bg-[#2A2A2A] transition-colors group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <MessageCircle className="h-4 w-4 text-[#7B61FF]" />
+                    <span className="text-sm text-[#E0E0E0]">Email Support</span></div>
+                  <ArrowRight className="h-4 w-4 text-[#A0A0A0] group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -599,5 +547,4 @@ const Dashboard: React.FC = () => {
     </div>
   );
 };
-
 export default Dashboard;
