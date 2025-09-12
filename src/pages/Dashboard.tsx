@@ -213,8 +213,10 @@ const Dashboard: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-center">
               <Link to="/dashboard" className="flex items-center space-x-4 py-2">
-                <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
-                <span className="text-xl font-black text-[#E0E0E0] tracking-tight">QuickBoost</span>
+                <>
+                  <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
+                  <span className="text-xl font-black text-[#E0E0E0] tracking-tight">QuickBoost</span>
+                </>
               </Link>
             </div>
           </div>
