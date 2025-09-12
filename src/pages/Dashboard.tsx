@@ -208,9 +208,28 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-[#121212]">
       {/* Header */}
       <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A] sticky top-0 z-50">
+        {/* Logo at the very top center */}
+        <div className="bg-[#121212] border-b border-[#2A2A2A] py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center">
+              <Link to="/" className="flex items-center space-x-3">
+                <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
+                <span className="text-xl font-black text-[#E0E0E0] tracking-tight">QuickBoost</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+        
+        {/* Balance and Menu */}
         <StaggeredMenu
           position="right"
-          items={menuItems}
+          items={[
+            { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
+            { label: 'Services', ariaLabel: 'View services', link: '/services' },
+            { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
+            { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
+            { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
+          ]}
           socialItems={socialItems}
           displaySocials={true}
           displayItemNumbering={true}
@@ -222,17 +241,14 @@ const Dashboard: React.FC = () => {
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="flex items-center space-x-3">
-              <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
-              <span className="text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
-            </Link>
-            <nav className="flex items-center space-x-4">
+            <div></div>
+            <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 bg-[#2A2A2A] px-4 py-2 rounded-lg">
                 <Wallet className="h-4 w-4 text-[#00CFFF]" />
                 <span className="text-sm text-[#A0A0A0]">Balance:</span>
                 <span className="text-sm font-semibold text-[#00CFFF]">₹{profile?.balance?.toFixed(2) ?? 0}</span>
               </div>
-            </nav>
+            </div>
           </div>
         </div>
       </header>
@@ -280,7 +296,18 @@ const Dashboard: React.FC = () => {
                 <Zap className="h-5 w-5 mr-2 text-[#00CFFF]" />
                 Quick Actions
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Link
+                  to="/add-funds"
+                  className="bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] text-white p-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#00CFFF]/25 group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <Wallet className="h-6 w-6" />
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <div className="text-lg font-semibold mb-1">Add Funds</div>
+                  <p className="text-sm opacity-90">Add money to your account</p>
+                </Link>
                 {quickActions.map((action, index) => (
                   <Link
                     key={index}
@@ -345,7 +372,44 @@ const Dashboard: React.FC = () => {
                 Top Services
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {topServices.map((service, index) => (
+                {[
+                  {
+                    name: 'Instagram Followers',
+                    platform: 'Instagram',
+                    icon: <Instagram className="h-5 w-5" />,
+                    price: '₹60',
+                    rating: 4.8,
+                    popular: true,
+                    color: 'text-pink-500'
+                  },
+                  {
+                    name: 'YouTube Views',
+                    platform: 'YouTube',
+                    icon: <Youtube className="h-5 w-5" />,
+                    price: '₹5',
+                    rating: 4.7,
+                    popular: true,
+                    color: 'text-red-500'
+                  },
+                  {
+                    name: 'Google Reviews',
+                    platform: 'Google',
+                    icon: <Star className="h-5 w-5" />,
+                    price: '₹300',
+                    rating: 4.9,
+                    popular: true,
+                    color: 'text-yellow-500'
+                  },
+                  {
+                    name: 'Website Traffic (US)',
+                    platform: 'Traffic',
+                    icon: <Globe className="h-5 w-5" />,
+                    price: '₹500',
+                    rating: 4.9,
+                    popular: true,
+                    color: 'text-blue-500'
+                  }
+                ].map((service, index) => (
                   <Link
                     key={index}
                     to="/place-order"

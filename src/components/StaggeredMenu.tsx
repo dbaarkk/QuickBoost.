@@ -162,7 +162,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     </div>
                   ) : (
                     <a
-                      href={item.link}
+                      href={item.link === '#' ? '#' : item.link}
                       aria-label={item.ariaLabel}
                       className="block text-4xl font-bold text-white hover:opacity-80 transition-opacity duration-300"
                       onClick={toggleMenu}
