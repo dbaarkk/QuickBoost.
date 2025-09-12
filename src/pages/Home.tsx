@@ -7,7 +7,6 @@ import {
   Zap, 
   Shield, 
   Star, 
-  ArrowRight,
   CheckCircle,
   Award
 } from 'lucide-react';
@@ -80,7 +79,7 @@ const Home: React.FC = () => {
               <span className="ml-2 text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </div>
             <div className="flex items-center space-x-4">
-              {!user && <Link to="/login" className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">Login</Link>}
+              {/* Login button removed */}
             </div>
           </div>
         </div>
@@ -102,22 +101,15 @@ const Home: React.FC = () => {
               Get real followers, likes, views, and engagement at the most competitive prices. 
               Trusted by 50,000+ customers across India.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Buttons moved slightly down by adding margin-top */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
               <Link
                 to={user ? "/dashboard" : "/signup"}
                 className="modern-btn-primary text-lg px-8 py-4 rounded-full font-bold transition-all duration-300 hover:scale-105"
               >
                 {user ? "Continue" : "Start Now - It's Free"}
-                <ArrowRight className="ml-2 h-5 w-5" />
+                {/* Arrow removed */}
               </Link>
-              {!user && (
-                <Link
-                  to="/login"
-                  className="modern-btn-secondary text-lg px-8 py-4 rounded-full font-bold transition-all duration-300 hover:scale-105"
-                >
-                  Login
-                </Link>
-              )}
             </div>
           </div>
         </div>
@@ -208,7 +200,7 @@ const Home: React.FC = () => {
             className="btn-primary btn-modern text-lg"
           >
             {user ? "Continue" : "Get Started Today"}
-            <ArrowRight className="ml-2 h-5 w-5" />
+            {/* Arrow removed */}
           </Link>
         </div>
       </section>
