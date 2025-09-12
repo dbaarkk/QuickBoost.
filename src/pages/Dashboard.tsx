@@ -212,7 +212,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-[#121212] border-b border-[#2A2A2A] py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-center">
-        <div className="flex items-center space-x-4 py-2">
+              <Link to="/dashboard" className="flex items-center space-x-4 py-2">
                 <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
                 <span className="text-xl font-black text-[#E0E0E0] tracking-tight">QuickBoost</span>
               </Link>
@@ -576,26 +576,39 @@ const Dashboard: React.FC = () => {
 
             {/* Support Section */}
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
-        {/* Menu on the right (blue area) - aligned with balance */}
-        <div className="py-2">
-          <StaggeredMenu
-            position="right"
-            items={[
-              { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
-              { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
-              { label: 'Services', ariaLabel: 'View services', link: '/services' },
-              { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
-              { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
-            ]}
-            socialItems={socialItems}
-            displaySocials={true}
-            displayItemNumbering={true}
-            menuButtonColor="#2A2A2A"
-            openMenuButtonColor="#fff"
-            changeMenuColorOnOpen={true}
-            colors={['#B19EEF', '#5227FF']}
-            accentColor="#00CFFF"
-          />
+              <h3 className="text-lg font-semibold text-[#E0E0E0] mb-4 flex items-center">
+                <MessageCircle className="h-5 w-5 mr-2 text-[#00CFFF]" />
+                Need Help?
+              </h3>
+              <p className="text-[#A0A0A0] text-sm mb-4">
+                Our support team is here to help you 24/7
+              </p>
+              <div className="space-y-3">
+                <a
+                  href="https://t.me/quickboostsupport"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between w-full bg-[#1E1E1E] hover:bg-[#1E1E1E]/80 p-3 rounded-lg transition-colors group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Send className="h-4 w-4 text-[#00CFFF]" />
+                    <span className="text-sm text-[#E0E0E0]">Telegram Support</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-[#A0A0A0] group-hover:translate-x-1 transition-transform" />
+                </a>
+                <a
+                  href="mailto:quickboostbusiness@gmail.com"
+                  className="flex items-center justify-between w-full bg-[#1E1E1E] hover:bg-[#1E1E1E]/80 p-3 rounded-lg transition-colors group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <MessageCircle className="h-4 w-4 text-[#7B61FF]" />
+                    <span className="text-sm text-[#E0E0E0]">Email Support</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-[#A0A0A0] group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
