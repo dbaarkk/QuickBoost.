@@ -10,6 +10,7 @@ import {
   CheckCircle,
   Award
 } from 'lucide-react';
+import Carousel from '../components/Carousel';
 
 const Home: React.FC = () => {
   const { user } = useAuth();
