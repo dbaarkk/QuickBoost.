@@ -11,7 +11,8 @@ import {
   Twitter,
   Facebook,
   Users,
-  Clock
+  Clock,
+  Globe
 } from 'lucide-react';
 
 // Direct services data - no loading required

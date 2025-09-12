@@ -220,28 +220,10 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         
-        {/* Balance and Menu */}
-        <StaggeredMenu
-          position="right"
-          items={[
-            { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
-            { label: 'Services', ariaLabel: 'View services', link: '/services' },
-            { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
-            { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
-            { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
-          ]}
-          socialItems={socialItems}
-          displaySocials={true}
-          displayItemNumbering={true}
-          menuButtonColor="#2A2A2A"
-          openMenuButtonColor="#fff"
-          changeMenuColorOnOpen={true}
-          colors={['#B19EEF', '#5227FF']}
-          accentColor="#00CFFF"
-        />
+        {/* Balance and Menu positioned correctly */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div></div>
+            {/* Balance on the left (red area) */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 bg-[#2A2A2A] px-4 py-2 rounded-lg">
                 <Wallet className="h-4 w-4 text-[#00CFFF]" />
@@ -249,6 +231,26 @@ const Dashboard: React.FC = () => {
                 <span className="text-sm font-semibold text-[#00CFFF]">₹{profile?.balance?.toFixed(2) ?? 0}</span>
               </div>
             </div>
+            
+            {/* Menu on the right (blue area) */}
+            <StaggeredMenu
+              position="right"
+              items={[
+                { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
+                { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
+                { label: 'Services', ariaLabel: 'View services', link: '/services' },
+                { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
+                { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
+              ]}
+              socialItems={socialItems}
+              displaySocials={true}
+              displayItemNumbering={true}
+              menuButtonColor="#2A2A2A"
+              openMenuButtonColor="#fff"
+              changeMenuColorOnOpen={true}
+              colors={['#B19EEF', '#5227FF']}
+              accentColor="#00CFFF"
+            />
           </div>
         </div>
       </header>
