@@ -164,7 +164,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     <a
                       href={item.link}
                       aria-label={item.ariaLabel}
-                      className="block text-4xl font-bold text-white hover:opacity-80 transition-opacity duration-300"
+                      className="block text-4xl font-bold text-white hover:opacity-80 transition-opacity duration-300 cursor-pointer"
                       onClick={toggleMenu}
                     >
                       {displayItemNumbering && (

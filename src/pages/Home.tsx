@@ -205,6 +205,31 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* Why Choose QuickBoost Carousel */}
+      <section className="py-12 bg-[#121212]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#E0E0E0] mb-4">
+              Why Choose QuickBoost?
+            </h2>
+            <p className="text-xl text-[#A0A0A0] max-w-2xl mx-auto">
+              Discover the top reasons why thousands trust QuickBoost for their social media growth
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <Carousel
+              baseWidth={400}
+              autoplay={true}
+              autoplayDelay={4000}
+              pauseOnHover={true}
+              loop={true}
+              round={false}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-[#1E1E1E] text-[#E0E0E0] py-8 border-t border-[#2A2A2A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

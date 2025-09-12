@@ -212,7 +212,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-[#121212] border-b border-[#2A2A2A] py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-center">
-              <Link to="/" className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4 py-2">
                 <TrendingUp className="h-8 w-8 text-[#00CFFF]" />
                 <span className="text-xl font-black text-[#E0E0E0] tracking-tight">QuickBoost</span>
               </Link>
@@ -576,24 +576,26 @@ const Dashboard: React.FC = () => {
 
             {/* Support Section */}
             <div className="bg-[#2A2A2A] rounded-2xl shadow-lg border border-[#2A2A2A] p-6">
-              <h3 className="text-lg font-semibold text-[#E0E0E0] mb-4 flex items-center">
-                <MessageCircle className="h-5 w-5 mr-2 text-[#00CFFF]" />
-                Need Help?
-              </h3>
-              <p className="text-sm text-[#A0A0A0] mb-4">
-                Get instant support from our team. We're here to help you 24/7.
-              </p>
-              <a
-                href="https://t.me/quickboostsupport"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-blue-500/25 hover:scale-105"
-              >
-                <Send className="h-5 w-5 mr-2" />
-                Contact Support
-              </a>
-            </div>
-          </div>
+        {/* Menu on the right (blue area) - aligned with balance */}
+        <div className="py-2">
+          <StaggeredMenu
+            position="right"
+            items={[
+              { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
+              { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
+              { label: 'Services', ariaLabel: 'View services', link: '/services' },
+              { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
+              { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
+            ]}
+            socialItems={socialItems}
+            displaySocials={true}
+            displayItemNumbering={true}
+            menuButtonColor="#2A2A2A"
+            openMenuButtonColor="#fff"
+            changeMenuColorOnOpen={true}
+            colors={['#B19EEF', '#5227FF']}
+            accentColor="#00CFFF"
+          />
         </div>
       </div>
     </div>
