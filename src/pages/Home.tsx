@@ -105,7 +105,7 @@ const Home: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to={user ? "/dashboard" : "/signup"}
-                className="inline-flex items-center bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-glow-cyan"
+                className="btn-accent btn-modern text-lg"
               >
                 {user ? "Continue" : "Start Now - It's Free"}
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -197,7 +197,7 @@ const Home: React.FC = () => {
           </p>
           <Link
             to={user ? "/dashboard" : "/signup"}
-            className="inline-flex items-center bg-white hover:bg-gray-100 text-[#121212] px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="btn-primary btn-modern text-lg"
           >
             {user ? "Continue" : "Get Started Today"}
             <ArrowRight className="ml-2 h-5 w-5" />

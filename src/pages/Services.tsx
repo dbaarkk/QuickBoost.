@@ -248,7 +248,7 @@ const Services: React.FC = () => {
               
               <Link
                 to="/place-order"
-                className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] text-white py-2 px-4 rounded-md transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-glow-cyan"
+                className="w-full btn-accent py-2 px-4 text-sm flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
                 Order Now

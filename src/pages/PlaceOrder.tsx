@@ -498,7 +498,7 @@ const PlaceOrder: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!selectedService || !quantity || !link || (getCustomFieldLabel() && !customField) || isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] hover:from-[#0AC5FF] hover:to-[#00CFFF] disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-glow-cyan disabled:shadow-none"
+                  className="w-full btn-accent disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] py-3 px-4 flex items-center justify-center disabled:shadow-none"
                 >
                   {isSubmitting ? (
                     <>
