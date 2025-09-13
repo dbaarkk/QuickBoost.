@@ -94,10 +94,10 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={loading}
             className="w-full btn-primary btn-modern disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? (
+            {loading ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2"></div>
                 Signing In...
