@@ -37,7 +37,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen auth-background-animated flex items-center justify-center p-4">
       <div className="max-w-md w-full glass-card p-8 relative z-10">
         <div className="text-center mb-8">
           <Link to="/" className="flex items-center justify-center mb-4">
