@@ -80,7 +80,21 @@ const Home: React.FC = () => {
               <span className="ml-2 text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </div>
             <div className="flex items-center space-x-4">
-              {/* Login button removed */}
+              {!user ? (
+                <Link
+                  to="/login"
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Login
+                </Link>
+              ) : (
+                <Link
+                  to="/dashboard"
+                  className="bg-[#00CFFF] hover:bg-[#0AC5FF] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Dashboard
+                </Link>
+              )}
             </div>
           </div>
         </div>

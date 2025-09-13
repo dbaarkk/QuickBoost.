@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import AddFunds from './pages/AddFunds';
 import Services from './pages/Services';
 import PlaceOrder from './pages/PlaceOrder';
+import MyOrders from './pages/MyOrders';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 
@@ -70,6 +71,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/add-funds" element={<ProtectedRoute><AddFunds /></ProtectedRoute>} />
       <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
       <Route path="/place-order" element={<ProtectedRoute><PlaceOrder /></ProtectedRoute>} />
+      <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
 
       {/* Redirect any unknown routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
