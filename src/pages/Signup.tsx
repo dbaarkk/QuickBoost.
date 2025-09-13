@@ -187,9 +187,17 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full btn-primary btn-modern"
+            disabled={isLoading}
+            className="w-full btn-primary btn-modern disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2"></div>
+                Creating Account...
+              </div>
+            ) : (
+              'Create Account'
+            )}
           </button>
         </form>
 
