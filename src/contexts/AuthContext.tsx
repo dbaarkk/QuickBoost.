@@ -79,8 +79,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
+
+      console.log('Auth state change:', event, session?.user?.email);
 
       try {
         if (session?.user) {
@@ -104,37 +106,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
     try {
-      console.log('Attempting signup with:', { email, userData });
+      console.log('Starting signup process...');
       
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData,
-          emailRedirectTo: undefined
+          data: userData
         }
       });
 
       console.log('Signup response:', { data, error });
+
       if (error) {
-        console.error('Signup error:', error.message);
+        console.error('Signup error:', error);
         throw new Error(error.message);
       }
 
       if (data.user) {
-        console.log('Signup successful, user created:', data.user.id);
-        // User will be automatically signed in and redirected via auth state change
+        console.log('User created successfully:', data.user.id);
+        // The auth state change will handle setting user and profile
       }
 
     } catch (error: any) {
-      console.error('Signup error:', error);
+      console.error('Signup failed:', error);
       throw error;
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting signin with:', email);
+      console.log('Starting signin process...');
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -142,33 +144,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       console.log('Signin response:', { data, error });
+
       if (error) {
-        console.error('Sign in error:', error.message);
+        console.error('Signin error:', error);
         throw new Error(error.message);
       }
 
       if (data.user) {
-        console.log('Signin successful:', data.user.id);
+        console.log('User signed in successfully:', data.user.id);
+        // The auth state change will handle setting user and profile
       }
 
     } catch (error: any) {
-      console.error('Sign in error:', error);
+      console.error('Signin failed:', error);
       throw error;
     }
   };
 
-
   const signOut = async () => {
-    setLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
       setUser(null);
       setProfile(null);
-      setLoading(false);
     } catch (error: any) {
-      setLoading(false);
       throw new Error(error.message || 'Failed to sign out');
     }
   };

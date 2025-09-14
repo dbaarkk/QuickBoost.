@@ -8,13 +8,15 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { signIn, user, loading } = useAuth();
+  const { signIn, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect immediately when user is authenticated
+  // Redirect when user is authenticated
   useEffect(() => {
     if (user) {
+      console.log('User authenticated, redirecting to dashboard...');
       navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
@@ -26,35 +28,42 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
+    
     setError('');
+    setIsSubmitting(true);
 
-    // Client-side validation
+    // Basic validation
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setIsSubmitting(false);
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address');
+      setIsSubmitting(false);
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
+      setIsSubmitting(false);
       return;
     }
 
     try {
+      console.log('Attempting login with:', email);
       await signIn(email, password);
-      // Immediate redirect to dashboard
-      navigate('/dashboard', { replace: true });
+      console.log('Login successful, should redirect automatically');
+      // Navigation will happen automatically via useEffect when user state changes
     } catch (error: any) {
-      console.error('Login failed:', error.message);
-      if (error.message.includes('Invalid login credentials')) {
-        setError('Invalid email or password. Please check your credentials.');
-      } else if (error.message.includes('Email not confirmed')) {
-        setError('Please check your email and confirm your account.');
-      } else if (error.message.includes('User not found')) {
-        setError('Email not registered. Please sign up first.');
-      } else {
-        setError('Login failed. Please check your credentials and try again.');
-      }
+      console.error('Login error:', error);
+      setError('Invalid email or password. Please check your credentials and try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -88,6 +97,7 @@ const Login = () => {
                 className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#00CFFF]/50 focus:border-[#00CFFF] transition-all duration-300 backdrop-blur-sm"
                 placeholder="Enter your email"
                 required
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -103,11 +113,13 @@ const Login = () => {
                 className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#00CFFF]/50 focus:border-[#00CFFF] transition-all duration-300 backdrop-blur-sm"
                 placeholder="Enter your password"
                 required
+                disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -116,10 +128,10 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={false}
+            disabled={isSubmitting}
             className="w-full btn-primary btn-modern disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isSubmitting ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
 

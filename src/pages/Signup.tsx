@@ -13,16 +13,18 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { signUp, user, loading } = useAuth();
+  const { signUp, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect immediately when user is authenticated
+  // Redirect when user is authenticated
   useEffect(() => {
-    if (user && !loading) {
+    if (user) {
+      console.log('User authenticated, redirecting to dashboard...');
       navigate('/dashboard', { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -33,32 +35,47 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
+    
     setError('');
+    setIsSubmitting(true);
 
-    // Client-side validation
+    // Validation
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Please fill in all fields');
+      setIsSubmitting(false);
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
+      setIsSubmitting(false);
       return;
     }
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
+      setIsSubmitting(false);
       return;
     }
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      setIsSubmitting(false);
       return;
     }
 
     if (!formData.name.trim()) {
       setError('Please enter your full name');
+      setIsSubmitting(false);
       return;
     }
 
     try {
+      console.log('Attempting signup with:', formData.email);
+      
       // Split name into first and last name
       const nameParts = formData.name.trim().split(' ');
       const firstName = nameParts[0] || '';
@@ -70,22 +87,22 @@ const Signup = () => {
         phone: ''
       });
       
-      // Immediate redirect to dashboard
-      navigate('/dashboard', { replace: true });
+      console.log('Signup successful, should redirect automatically');
+      // Navigation will happen automatically via useEffect when user state changes
     } catch (error: any) {
-      console.error('Signup failed:', error.message);
-      if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+      console.error('Signup error:', error);
+      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
         setError('This email is already registered. Please sign in instead.');
-      } else if (error.message.includes('Invalid email')) {
-        setError('Please enter a valid email address');
       } else {
         setError('Account creation failed. Please check your details and try again.');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Don't render if user is already authenticated
-  if (user && !loading) {
+  if (user) {
     return null;
   }
 
@@ -123,6 +140,7 @@ const Signup = () => {
                 className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#00CFFF]/50 focus:border-[#00CFFF] transition-all duration-300 backdrop-blur-sm"
                 placeholder="Enter your full name"
                 required
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -141,6 +159,7 @@ const Signup = () => {
                 className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#00CFFF]/50 focus:border-[#00CFFF] transition-all duration-300 backdrop-blur-sm"
                 placeholder="Enter your email address"
                 required
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -159,11 +178,13 @@ const Signup = () => {
                 className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#00CFFF]/50 focus:border-[#00CFFF] transition-all duration-300 backdrop-blur-sm"
                 placeholder="Create a password"
                 required
+                disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -184,11 +205,13 @@ const Signup = () => {
                 className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#00CFFF]/50 focus:border-[#00CFFF] transition-all duration-300 backdrop-blur-sm"
                 placeholder="Confirm your password"
                 required
+                disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                disabled={isSubmitting}
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -197,10 +220,10 @@ const Signup = () => {
 
           <button
             type="submit"
-            disabled={false}
+            disabled={isSubmitting}
             className="w-full btn-primary btn-modern disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {isSubmitting ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
