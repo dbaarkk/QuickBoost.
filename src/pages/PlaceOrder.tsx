@@ -115,6 +115,7 @@ const PlaceOrder: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string>('');
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+  const orderFormRef = useRef<HTMLDivElement>(null);
 
   // Derive platform list dynamically
   const platforms = useMemo(() => {

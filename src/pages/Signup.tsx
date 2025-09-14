@@ -24,7 +24,6 @@ const Signup = () => {
       console.log('User authenticated, redirecting to dashboard...');
       navigate('/dashboard', { replace: true });
     }
-  }, [user, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -36,42 +35,36 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isSubmitting) return;
-    
     setError('');
-    setIsSubmitting(true);
 
     // Validation
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
-      setIsSubmitting(false);
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
-      setIsSubmitting(false);
       return;
     }
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
-      setIsSubmitting(false);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
-      setIsSubmitting(false);
       return;
     }
 
     if (!formData.name.trim()) {
       setError('Please enter your full name');
-      setIsSubmitting(false);
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       console.log('Attempting signup with:', formData.email);
@@ -87,14 +80,13 @@ const Signup = () => {
         phone: ''
       });
       
-      console.log('Signup successful, should redirect automatically');
-      // Navigation will happen automatically via useEffect when user state changes
+      // Success - auth context will handle redirect
     } catch (error: any) {
       console.error('Signup error:', error);
-      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-        setError('This email is already registered. Please sign in instead.');
+      if (error.message.includes('already registered')) {
+        setError('Email already registered. Please sign in instead.');
       } else {
-        setError('Account creation failed. Please check your details and try again.');
+        setError('Signup failed. Please try again.');
       }
     } finally {
       setIsSubmitting(false);

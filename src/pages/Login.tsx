@@ -19,7 +19,6 @@ const Login = () => {
       console.log('User authenticated, redirecting to dashboard...');
       navigate('/dashboard', { replace: true });
     }
-  }, [user, navigate]);
 
   // Don't render if user is already authenticated
   if (user) {
@@ -29,39 +28,39 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isSubmitting) return;
-    
     setError('');
-    setIsSubmitting(true);
 
     // Basic validation
     if (!email || !password) {
       setError('Please fill in all fields');
-      setIsSubmitting(false);
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address');
-      setIsSubmitting(false);
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
-      setIsSubmitting(false);
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       console.log('Attempting login with:', email);
       await signIn(email, password);
-      console.log('Login successful, should redirect automatically');
-      // Navigation will happen automatically via useEffect when user state changes
+      // Success - auth context will handle redirect
     } catch (error: any) {
       console.error('Login error:', error);
-      setError('Invalid email or password. Please check your credentials and try again.');
+      // Only show error for actual auth failures
+      if (error.message.includes('Invalid login credentials')) {
+        setError('Invalid email or password');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
