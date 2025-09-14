@@ -29,9 +29,12 @@ const Login = () => {
     setError('');
 
     try {
+      console.log('Starting login process...');
       await signIn(email, password);
+      console.log('Login completed successfully');
       // Redirect happens via useEffect when user state updates
     } catch (error: any) {
+      console.error('Login failed:', error);
       setError(error.message || 'Invalid credentials');
     }
   };

@@ -62,14 +62,17 @@ const Signup = () => {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
+      console.log('Starting signup process...');
       await signUp(formData.email, formData.password, {
         first_name: firstName,
         last_name: lastName,
         phone: ''
       });
       
+      console.log('Signup completed successfully');
       // Redirect happens via useEffect when user state updates
     } catch (error: any) {
+      console.error('Signup failed:', error);
       setError(error.message || 'Failed to create account');
     }
   };
