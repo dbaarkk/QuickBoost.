@@ -420,17 +420,17 @@ const PlaceOrder: React.FC = () => {
                 {/* Link Input */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
-                    Link <span className="text-[#FF5C5C]">*</span>
+                    {getLinkLabel()} <span className="text-[#FF5C5C]">*</span>
                   </label>
                   <input
                     type="url"
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
-                    placeholder="Enter your profile/post URL"
+                    placeholder={getLinkPlaceholder()}
                     className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
                     required
                   />
-                  <p className="text-xs text-[#A0A0A0] mt-1">Enter the complete URL of your profile or post</p>
+                  <p className="text-xs text-[#A0A0A0] mt-1">{getLinkHelpText()}</p>
                 </div>
 
                 {/* Custom Field for Instagram Comments and Google Reviews */}
