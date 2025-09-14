@@ -113,16 +113,9 @@ const Signup = () => {
             <div className="relative z-10">
               {/* Header */}
               <div className="text-center mb-8">
-                <Link to="/" className="inline-flex items-center justify-center mb-6 group">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#7B61FF] to-[#00CFFF] rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative bg-[#121212] p-3 rounded-2xl border border-[#2A2A2A]">
-                      <TrendingUp className="h-8 w-8 text-[#7B61FF]" />
-                    </div>
-                  </div>
-                  <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-[#7B61FF] to-[#00CFFF] bg-clip-text text-transparent">
-                    QuickBoost
-                  </span>
+                <Link to="/" className="inline-flex items-center justify-center mb-6">
+                  <TrendingUp className="h-8 w-8 text-[#00CFFF] mr-3" />
+                  <span className="text-2xl font-bold text-[#E0E0E0]">QuickBoost</span>
                 </Link>
                 
                 <div className="space-y-2">
