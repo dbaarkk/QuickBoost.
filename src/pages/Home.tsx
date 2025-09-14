@@ -92,7 +92,7 @@ const Home: React.FC = () => {
                   to="/dashboard"
                   className="bg-[#00CFFF] hover:bg-[#0AC5FF] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  Dashboard
+                  Continue
                 </Link>
               )}
             </div>

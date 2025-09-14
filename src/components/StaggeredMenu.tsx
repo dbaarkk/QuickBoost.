@@ -89,10 +89,9 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       {/* Menu Button */}
       <button
         onClick={toggleMenu}
-        className="p-3 rounded-full transition-all duration-300 hover:scale-110"
+        className="p-3 rounded-full transition-all duration-300 hover:scale-110 bg-[#2A2A2A] hover:bg-[#1E1E1E]"
         style={{
-          backgroundColor: isOpen && changeMenuColorOnOpen ? openMenuButtonColor : menuButtonColor,
-          color: isOpen && changeMenuColorOnOpen ? '#000' : '#000',
+          color: '#E0E0E0',
         }}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
       >
@@ -120,7 +119,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`,
         }}
       >
-        <div className="text-center">
+        <div className="text-center max-w-2xl mx-auto px-4">
           {/* Logo */}
           {logoUrl && (
             <div className="mb-12">
@@ -146,11 +145,6 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   {item.label === 'Contact Us' ? (
                     <div className="space-y-4">
                       <div className="text-4xl font-bold text-white mb-4">
-                        {displayItemNumbering && (
-                          <span className="text-2xl opacity-60 mr-4">
-                            {String(index + 1).padStart(2, '0')}
-                          </span>
-                        )}
                         Contact Us
                       </div>
                       <div className="flex justify-center space-x-4">
@@ -176,11 +170,6 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                       aria-label={item.ariaLabel}
                       className="block text-4xl font-bold text-white hover:opacity-80 transition-opacity duration-300 cursor-pointer"
                     >
-                      {displayItemNumbering && (
-                        <span className="text-2xl opacity-60 mr-4">
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
-                      )}
                       {item.label}
                     </a>
                   )}
@@ -189,33 +178,6 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
             </ul>
           </nav>
 
-          {/* Social Links */}
-          {displaySocials && socialItems.length > 0 && (
-            <div
-              className={`transform transition-all duration-700 ${
-                isOpen
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-8 opacity-0'
-              }`}
-              style={{
-                transitionDelay: `${items.length * 100}ms`,
-              }}
-            >
-              <div className="flex justify-center space-x-8">
-                {socialItems.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/80 hover:text-white text-lg transition-colors duration-300"
-                  >
-                    {social.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </>
