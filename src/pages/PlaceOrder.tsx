@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   TrendingUp,
@@ -175,6 +176,20 @@ const PlaceOrder: React.FC = () => {
     }
   };
 
+  // Auto-scroll to order form when service is selected
+  const handleServiceSelect = (service: Service) => {
+    setSelectedService(service);
+    // Scroll to order form after a short delay
+    setTimeout(() => {
+      if (orderFormRef.current) {
+        orderFormRef.current.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 100);
+  };
+
   // calculate total based on price-per-1000 convention
   const calculateTotal = (): number => {
     const qty = parseInt(quantity || '0', 10) || 0;
@@ -247,6 +262,41 @@ const PlaceOrder: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Get appropriate labels and placeholders based on service
+  const getLinkLabel = () => {
+    if (!selectedService) return 'Link';
+    
+    // Check if it's a website traffic service
+    if (selectedService.platform === 'Traffic' && selectedService.category === 'Traffic') {
+      return 'Website Link';
+    }
+    
+    return 'Link';
+  };
+
+  const getLinkPlaceholder = () => {
+    if (!selectedService) return 'Enter link';
+    
+    // Check if it's a website traffic service
+    if (selectedService.platform === 'Traffic' && selectedService.category === 'Traffic') {
+      return 'Enter your website URL (e.g., https://yourwebsite.com)';
+    }
+    
+    // Default for social media services
+    return 'Enter profile/post URL';
+  };
+
+  const getLinkHelpText = () => {
+    if (!selectedService) return '';
+    
+    // Check if it's a website traffic service
+    if (selectedService.platform === 'Traffic' && selectedService.category === 'Traffic') {
+      return 'Enter the complete URL of your website';
+    }
+    
+    return 'Enter the URL of your profile or post';
   };
 
   const getCustomFieldLabel = () => {
@@ -333,7 +383,7 @@ const PlaceOrder: React.FC = () => {
                     filteredServices.map((service) => (
                       <div
                         key={service.id}
-                        onClick={() => setSelectedService(service)}
+                        onClick={() => handleServiceSelect(service)}
                         className={`p-3 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
                           selectedService?.id === service.id ? 'border-[#00CFFF] bg-[#00CFFF]/10 shadow-md' : 'border-[#2A2A2A] hover:border-[#00CFFF]/50'
                         }`}
@@ -375,7 +425,7 @@ const PlaceOrder: React.FC = () => {
 
           {/* Order Form */}
           <div className="lg:col-span-1">
-            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] sticky top-4 order-form-section">
+            <div ref={orderFormRef} className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] sticky top-4">
               <div className="p-4 border-b border-[#2A2A2A]">
                 <h2 className="text-lg font-semibold text-[#E0E0E0] flex items-center">
                   <ShoppingCart className="h-5 w-5 mr-2" />
