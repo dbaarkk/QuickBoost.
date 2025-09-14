@@ -35,7 +35,7 @@ const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
     return data;
   } catch (error) {
     console.error('Error fetching profile:', error);
-    await new Promise(resolve => setTimeout(resolve, 300)); // Wait 300ms between retries
+    await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms between retries
   }
 };
 
@@ -137,11 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Set user immediately for faster redirect
     setUser(data.user);
-    
-    // Update state immediately for instant redirect
-    setUser(data.user);
-    const profileData = await getUserProfile(data.user.id);
-    setProfile(profileData);
+    // Profile will be fetched by auth state change handler
   };
 
   const signOut = async () => {
