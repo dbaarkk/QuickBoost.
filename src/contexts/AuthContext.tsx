@@ -103,61 +103,80 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
+    setLoading(true);
     try {
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
+        setLoading(false);
         throw new Error('Please enter a valid email address.');
       }
 
       // Validate password length
       if (password.length < 6) {
+        setLoading(false);
         throw new Error('Password must be at least 6 characters long.');
       }
 
+      console.log('Attempting signup with:', { email, userData });
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData
+          data: userData,
+          emailRedirectTo: undefined
         }
       });
 
+      console.log('Signup response:', { data, error });
       if (error) {
         console.error('Signup error:', error);
+        setLoading(false);
         throw new Error(error.message || 'Account creation failed. Please try again.');
       }
 
       if (!data.user) {
+        setLoading(false);
         throw new Error('Account creation failed. Please try again.');
       }
 
+      // Success - loading will be set to false by auth state change
       // User will be set through onAuthStateChange
     } catch (error: any) {
       console.error('Signup error:', error);
+      setLoading(false);
       throw error; // Re-throw the error with user-friendly message
     }
   };
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
     try {
+      console.log('Attempting signin with:', email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
+      console.log('Signin response:', { data, error });
       if (error) {
         console.error('Sign in error:', error);
+        setLoading(false);
         throw new Error(error.message || 'Login failed. Please try again.');
       }
 
       if (!data.user) {
+        setLoading(false);
         throw new Error('Login failed. Please try again.');
       }
 
+      // Success - loading will be set to false by auth state change
       // User will be set through onAuthStateChange
     } catch (error: any) {
       console.error('Sign in error:', error);
+      setLoading(false);
       throw error; // Re-throw the error with user-friendly message
     }
   };
