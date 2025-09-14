@@ -242,6 +242,7 @@ const Dashboard: React.FC = () => {
                 { label: 'Place Order', ariaLabel: 'Place new order', link: '/place-order' },
                 { label: 'Services', ariaLabel: 'View services', link: '/services' },
                 { label: 'Add Funds', ariaLabel: 'Add funds to account', link: '/add-funds' },
+                { label: 'My Orders', ariaLabel: 'View my orders', link: '/my-orders' },
                 { label: 'Contact Us', ariaLabel: 'Contact support', link: '#' }
               ]}
               socialItems={socialItems}

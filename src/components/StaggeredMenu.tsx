@@ -57,7 +57,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   };
 
   const handleMenuItemClick = (link: string) => {
-    if (link !== '#') {
+    if (link && link !== '#') {
       navigate(link);
     }
     setIsOpen(false);

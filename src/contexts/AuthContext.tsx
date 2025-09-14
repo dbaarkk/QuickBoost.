@@ -110,51 +110,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Please enter a valid email address.');
       }
 
+      // Validate password length
+      if (password.length < 6) {
+        throw new Error('Password must be at least 6 characters long.');
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData,
-          emailRedirectTo: undefined // Disable email confirmation
+          data: userData
         }
       });
 
       if (error) {
-        // Handle specific error cases with user-friendly messages
-        if (error.message.includes('User already registered')) {
-          throw new Error('This email is already registered. Please sign in instead.');
-        }
-        if (error.message.includes('Password should be at least')) {
-          throw new Error('Password must be at least 6 characters long.');
-        }
-        if (error.message.includes('Unable to validate email address')) {
-          throw new Error('Please enter a valid email address.');
-        }
-        if (error.message.includes('Signup is disabled')) {
-          throw new Error('Account creation is temporarily disabled. Please try again later.');
-        }
+        console.error('Signup error:', error);
+        throw new Error(error.message || 'Account creation failed. Please try again.');
+      }
+
+      if (!data.user) {
         throw new Error('Account creation failed. Please try again.');
       }
 
-      if (data.user) {
-        // Automatically sign in the user after successful signup
-        const { error: signInError, data: signInData } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (signInError) {
-          throw new Error('Account created but login failed. Please try signing in manually.');
-        }
-
-        setUser(signInData.user);
-        const profileData = await getUserProfile(signInData.user.id);
-        setProfile(profileData);
-
-        // User state will be updated through onAuthStateChange
-      } else {
-        throw new Error('Account creation failed. Please try again.');
-      }
+      // User will be set through onAuthStateChange
     } catch (error: any) {
       console.error('Signup error:', error);
       throw error; // Re-throw the error with user-friendly message
@@ -169,26 +147,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        // Handle specific error cases with user-friendly messages
-        if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Invalid email or password. Please check your credentials.');
-        }
-        if (error.message.includes('Email not confirmed')) {
-          throw new Error('Please verify your email address before signing in.');
-        }
-        if (error.message.includes('User not found')) {
-          throw new Error('Email not registered. Please sign up first.');
-        }
+        console.error('Sign in error:', error);
+        throw new Error(error.message || 'Login failed. Please try again.');
+      }
+
+      if (!data.user) {
         throw new Error('Login failed. Please try again.');
       }
 
-      if (!data.user) throw new Error('Login failed. Please try again.');
-
-      setUser(data.user);
-      const profileData = await getUserProfile(data.user.id);
-      setProfile(profileData);
-
-      // User state will be updated through onAuthStateChange
+      // User will be set through onAuthStateChange
     } catch (error: any) {
       console.error('Sign in error:', error);
       throw error; // Re-throw the error with user-friendly message
