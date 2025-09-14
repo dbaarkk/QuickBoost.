@@ -42,7 +42,7 @@ const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const refreshProfile = async () => {
     if (!user) return;
@@ -56,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
 
     const initAuth = async () => {
       try {
@@ -64,8 +65,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (mounted) {
           if (session?.user) {
             setUser(session.user);
-            const profileData = await getUserProfile(session.user.id);
-            setProfile(profileData);
+            // Set profile immediately for faster loading
+            setProfile({
+              id: session.user.id,
+              email: session.user.email || '',
+              first_name: session.user.user_metadata?.first_name || '',
+              last_name: session.user.user_metadata?.last_name || '',
+              phone: session.user.user_metadata?.phone || '',
+              balance: 0,
+              total_orders: 0,
+              total_spent: 0,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+            // Fetch real profile data in background
+            getUserProfile(session.user.id).then(profileData => {
+              if (mounted && profileData) {
+                setProfile(profileData);
+              }
+            });
           }
           setLoading(false);
         }
@@ -85,8 +103,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         if (session?.user) {
           setUser(session.user);
-          const profileData = await getUserProfile(session.user.id);
-          setProfile(profileData);
+          // Set profile immediately for faster loading
+          setProfile({
+            id: session.user.id,
+            email: session.user.email || '',
+            first_name: session.user.user_metadata?.first_name || '',
+            last_name: session.user.user_metadata?.last_name || '',
+            phone: session.user.user_metadata?.phone || '',
+            balance: 0,
+            total_orders: 0,
+            total_spent: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+          // Fetch real profile data in background
+          getUserProfile(session.user.id).then(profileData => {
+            if (mounted && profileData) {
+              setProfile(profileData);
+            }
+          });
         } else {
           setUser(null);
           setProfile(null);
@@ -113,11 +148,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (error) throw error;
 
-    // Immediately update state for instant redirect
+    // Set user and profile immediately for instant redirect
     if (data.user) {
       setUser(data.user);
-      const profileData = await getUserProfile(data.user.id);
-      setProfile(profileData);
+      setProfile({
+        id: data.user.id,
+        email: data.user.email || '',
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        phone: userData.phone || '',
+        balance: 0,
+        total_orders: 0,
+        total_spent: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
     }
 
     // If user already exists but no session, sign them in
@@ -135,9 +180,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) throw error;
     if (!data.user) throw new Error('No user data received');
     
-    // Set user immediately for faster redirect
+    // Set user and profile immediately for instant redirect
     setUser(data.user);
-    // Profile will be fetched by auth state change handler
+    setProfile({
+      id: data.user.id,
+      email: data.user.email || '',
+      first_name: data.user.user_metadata?.first_name || '',
+      last_name: data.user.user_metadata?.last_name || '',
+      phone: data.user.user_metadata?.phone || '',
+      balance: 0,
+      total_orders: 0,
+      total_spent: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
   };
 
   const signOut = async () => {

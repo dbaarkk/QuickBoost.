@@ -15,11 +15,11 @@ const Login = () => {
 
   // Redirect immediately when user is authenticated
   useEffect(() => {
-    if (user && !loading) {
+    if (user) {
       console.log('✅ User authenticated, redirecting to dashboard');
       navigate('/dashboard', { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

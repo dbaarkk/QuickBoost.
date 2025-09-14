@@ -44,14 +44,27 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
 
-  // Redirect to login if not authenticated
-  return user ? <>{children}</> : <Navigate to="/login" replace />;
+  // Show loading or redirect to login if not authenticated
+  if (user === null) {
+    // Check if we're already on login/signup page to prevent redirect loop
+    const currentPath = window.location.pathname;
+    if (currentPath === '/login' || currentPath === '/signup' || currentPath === '/') {
+      return <Navigate to="/login" replace />;
+    }
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
 };
 
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   
-  // Allow access to public routes regardless of authentication status
+  // Redirect to dashboard if already authenticated
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
   return <>{children}</>;
 };
 
