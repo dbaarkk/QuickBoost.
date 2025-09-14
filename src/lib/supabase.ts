@@ -1,22 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase configuration with actual credentials
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://aubpburchvdzkbpfzbrn.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1YnBidXJjaHZkemticGZ6YnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNDkwOTksImV4cCI6MjA3MjkyNTA5OX0.I372F-Ml5Mv9LnKJGXphBKDcfF5H_g72racwq-il774';
+// Supabase configuration - using your actual credentials
+const supabaseUrl = 'https://aubpburchvdzkbpfzbrn.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1YnBidXJjaHZkemticGZ6YnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNDkwOTksImV4cCI6MjA3MjkyNTA5OX0.I372F-Ml5Mv9LnKJGXphBKDcfF5H_g72racwq-il774';
 
-// Create Supabase client with proper configuration
+// Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'implicit'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'quickboost-web',
-      'Access-Control-Allow-Origin': '*'
-    }
+    detectSessionInUrl: false
   }
 });
 

@@ -35,9 +35,10 @@ const Signup = () => {
     e.preventDefault();
     setError('');
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+    // Client-side validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -46,8 +47,9 @@ const Signup = () => {
       return;
     }
 
-    if (!formData.email.includes('@')) {
-      setError('Please enter a valid email address');
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -56,24 +58,32 @@ const Signup = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
       // Split name into first and last name
       const nameParts = formData.name.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      console.log('Starting signup process...');
       await signUp(formData.email, formData.password, {
         first_name: firstName,
         last_name: lastName,
         phone: ''
       });
       
-      console.log('Signup completed successfully');
       // Redirect happens via useEffect when user state updates
     } catch (error: any) {
-      console.error('Signup failed:', error);
-      setError(error.message || 'Failed to create account');
+      console.error('Signup failed:', error.message);
+      if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+        setError('This email is already registered. Please sign in instead.');
+      } else if (error.message.includes('Invalid email')) {
+        setError('Please enter a valid email address');
+      } else {
+        setError('Account creation failed. Please check your details and try again.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 

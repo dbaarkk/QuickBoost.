@@ -28,14 +28,36 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
+    // Client-side validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      console.log('Starting login process...');
       await signIn(email, password);
-      console.log('Login completed successfully');
       // Redirect happens via useEffect when user state updates
     } catch (error: any) {
-      console.error('Login failed:', error);
-      setError(error.message || 'Invalid credentials');
+      console.error('Login failed:', error.message);
+      if (error.message.includes('Invalid login credentials')) {
+        setError('Invalid email or password. Please check your credentials.');
+      } else if (error.message.includes('Email not confirmed')) {
+        setError('Please check your email and confirm your account.');
+      } else if (error.message.includes('User not found')) {
+        setError('Email not registered. Please sign up first.');
+      } else {
+        setError('Login failed. Please check your credentials and try again.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
