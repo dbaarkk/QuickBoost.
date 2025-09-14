@@ -39,27 +39,26 @@ const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   }
 };
 
+const fetchProfileWithRetry = async (userId: string, retries = 5): Promise<UserProfile | null> => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const profile = await getUserProfile(userId);
+      if (profile) {
+        return profile;
+      }
+      // Wait 1 second between retries for profile creation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      console.error(`Profile fetch attempt ${i + 1} failed:`, error);
+    }
+  }
+  return null;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const fetchProfileWithRetry = async (userId: string, retries = 5) => {
-    console.log(`Fetching profile for user ${userId}, retries left: ${retries}`);
-    
-    for (let i = 0; i < retries; i++) {
-      const profile = await getUserProfile(userId);
-      if (profile) {
-        console.log('Profile found:', profile);
-        setProfile(profile);
-        return;
-      }
-      console.log(`Profile not found, retry ${i + 1}/${retries}`);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s between retries
-    }
-    
-    console.log('Profile not found after all retries');
-  };
 
   const refreshProfile = async () => {
     if (!user) return;
@@ -76,14 +75,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const initAuth = async () => {
       try {
-        console.log('Initializing auth...');
         const { data: { session } } = await supabase.auth.getSession();
 
         if (mounted) {
           if (session?.user) {
-            console.log('Initial session found:', session.user.email);
             setUser(session.user);
-            fetchProfileWithRetry(session.user.id);
+            const profileData = await fetchProfileWithRetry(session.user.id);
+            setProfile(profileData);
           }
           setLoading(false);
         }
@@ -105,8 +103,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         if (session?.user) {
           setUser(session.user);
-          // Fetch profile with retry logic for new users
-          fetchProfileWithRetry(session.user.id);
+          // Fetch profile with retry for new users
+          const profileData = await fetchProfileWithRetry(session.user.id);
+          setProfile(profileData);
         } else {
           setUser(null);
           setProfile(null);
@@ -138,12 +137,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Signup error:', error);
-        throw error;
+        throw new Error(error.message);
       }
 
-      // Don't wait for profile - let auth state change handle it
-      console.log('Signup successful, auth state change will handle redirect');
-      return data;
+      if (data.user) {
+        console.log('User created successfully:', data.user.id);
+        // Auth state change will handle user setting and profile fetching
+      }
 
     } catch (error: any) {
       console.error('Signup failed:', error);
@@ -164,12 +164,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Signin error:', error);
-        throw error;
+        throw new Error(error.message);
       }
 
-      // Don't wait for profile - let auth state change handle it
-      console.log('Signin successful, auth state change will handle redirect');
-      return data;
+      if (data.user) {
+        console.log('User signed in successfully:', data.user.id);
+        // Auth state change will handle user setting and profile fetching
+      }
 
     } catch (error: any) {
       console.error('Signin failed:', error);
