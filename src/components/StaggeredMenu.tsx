@@ -89,7 +89,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       {/* Menu Button */}
       <button
         onClick={toggleMenu}
-        className="p-3 rounded-full transition-all duration-300 hover:scale-110 bg-[#2A2A2A] hover:bg-[#1E1E1E]"
+        className="p-3 rounded-full transition-all duration-300 hover:scale-110 bg-[#1E1E1E] hover:bg-[#121212]"
         style={{
           color: '#E0E0E0',
         }}
