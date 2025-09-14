@@ -103,18 +103,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
-    setLoading(true);
     try {
+      setLoading(true);
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        setLoading(false);
         throw new Error('Please enter a valid email address.');
       }
 
       // Validate password length
       if (password.length < 6) {
-        setLoading(false);
         throw new Error('Password must be at least 6 characters long.');
       }
 
@@ -124,35 +122,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
         options: {
-          data: userData,
-          emailRedirectTo: undefined
+          data: userData
         }
       });
 
       console.log('Signup response:', { data, error });
       if (error) {
         console.error('Signup error:', error);
-        setLoading(false);
-        throw new Error(error.message || 'Account creation failed. Please try again.');
+        if (error.message.includes('already registered')) {
+          throw new Error('This email is already registered. Please sign in instead.');
+        }
+        throw new Error('Account creation failed. Please check your details and try again.');
       }
 
       if (!data.user) {
-        setLoading(false);
         throw new Error('Account creation failed. Please try again.');
       }
 
-      // Success - loading will be set to false by auth state change
-      // User will be set through onAuthStateChange
+      console.log('Signup successful:', data.user);
+      // Auth state change will handle the rest
     } catch (error: any) {
       console.error('Signup error:', error);
-      setLoading(false);
       throw error; // Re-throw the error with user-friendly message
+    } finally {
+      setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
     try {
+      setLoading(true);
       console.log('Attempting signin with:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -163,21 +162,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Signin response:', { data, error });
       if (error) {
         console.error('Sign in error:', error);
-        setLoading(false);
-        throw new Error(error.message || 'Login failed. Please try again.');
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password. Please check your credentials.');
+        }
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('Please check your email and confirm your account.');
+        }
+        throw new Error('Login failed. Please check your credentials and try again.');
       }
 
       if (!data.user) {
-        setLoading(false);
         throw new Error('Login failed. Please try again.');
       }
 
-      // Success - loading will be set to false by auth state change
-      // User will be set through onAuthStateChange
+      console.log('Signin successful:', data.user);
+      // Auth state change will handle the rest
     } catch (error: any) {
       console.error('Sign in error:', error);
-      setLoading(false);
       throw error; // Re-throw the error with user-friendly message
+    } finally {
+      setLoading(false);
     }
   };
 

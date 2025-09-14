@@ -18,7 +18,6 @@ import { getUserOrders, Order } from '../lib/supabase';
 const MyOrders: React.FC = () => {
   const { user, profile } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -26,7 +25,6 @@ const MyOrders: React.FC = () => {
       if (!user) return;
 
       try {
-        setLoading(true);
         const { data, error } = await getUserOrders(user.id);
         if (error) {
           setError('Failed to load orders');
@@ -37,8 +35,6 @@ const MyOrders: React.FC = () => {
       } catch (err) {
         setError('Failed to load orders');
         setOrders([]);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -96,7 +92,6 @@ const MyOrders: React.FC = () => {
               <span className="ml-2 text-xl font-bold text-[#E0E0E0]">QuickBoost</span>
             </Link>
             <nav className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">Dashboard</Link>
               <Link to="/place-order" className="text-[#A0A0A0] hover:text-[#00CFFF] text-sm font-medium transition-colors">Place Order</Link>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-[#A0A0A0]">Balance:</span>
@@ -127,14 +122,6 @@ const MyOrders: React.FC = () => {
           <p className="text-[#A0A0A0]">Track and manage all your orders in one place</p>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00CFFF]"></div>
-            <span className="ml-3 text-[#A0A0A0]">Loading your orders...</span>
-          </div>
-        )}
-
         {/* Error State */}
         {error && (
           <div className="bg-[#FF5C5C]/10 border border-[#FF5C5C]/30 rounded-lg p-4 mb-6">
@@ -143,7 +130,7 @@ const MyOrders: React.FC = () => {
         )}
 
         {/* Orders List */}
-        {!loading && !error && (
+        {!error && (
           <>
             {orders.length === 0 ? (
               <div className="text-center py-16">
