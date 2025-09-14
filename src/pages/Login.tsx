@@ -40,11 +40,10 @@ const Login = () => {
       return;
     }
 
-    setLoading(true);
-
     try {
       await signIn(email, password);
-      // Redirect happens via useEffect when user state updates
+      // Immediate redirect to dashboard
+      navigate('/dashboard', { replace: true });
     } catch (error: any) {
       console.error('Login failed:', error.message);
       if (error.message.includes('Invalid login credentials')) {
@@ -56,8 +55,6 @@ const Login = () => {
       } else {
         setError('Login failed. Please check your credentials and try again.');
       }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -119,17 +116,10 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={false}
             className="w-full btn-primary btn-modern disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2"></div>
-                Signing In...
-              </div>
-            ) : (
-              'Sign In'
-            )}
+            Sign In
           </button>
         </form>
 

@@ -58,8 +58,6 @@ const Signup = () => {
       return;
     }
 
-    setLoading(true);
-
     try {
       // Split name into first and last name
       const nameParts = formData.name.trim().split(' ');
@@ -72,7 +70,8 @@ const Signup = () => {
         phone: ''
       });
       
-      // Redirect happens via useEffect when user state updates
+      // Immediate redirect to dashboard
+      navigate('/dashboard', { replace: true });
     } catch (error: any) {
       console.error('Signup failed:', error.message);
       if (error.message.includes('already registered') || error.message.includes('already been registered')) {
@@ -82,8 +81,6 @@ const Signup = () => {
       } else {
         setError('Account creation failed. Please check your details and try again.');
       }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -200,17 +197,10 @@ const Signup = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={false}
             className="w-full btn-primary btn-modern disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2"></div>
-                Creating Account...
-              </div>
-            ) : (
-              'Create Account'
-            )}
+            Create Account
           </button>
         </form>
 

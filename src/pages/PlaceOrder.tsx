@@ -374,7 +374,7 @@ const PlaceOrder: React.FC = () => {
 
           {/* Order Form */}
           <div className="lg:col-span-1">
-            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] sticky top-4">
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] sticky top-4 order-form-section">
               <div className="p-4 border-b border-[#2A2A2A]">
                 <h2 className="text-lg font-semibold text-[#E0E0E0] flex items-center">
                   <ShoppingCart className="h-5 w-5 mr-2" />
