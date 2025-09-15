@@ -1,0 +1,17 @@
+name: Complete SMM Orders Every Minute
+
+on:
+  schedule:
+    - cron: '*/1 * * * *'  # Runs every minute
+  workflow_dispatch:       # Allows manual run
+
+jobs:
+  complete-orders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Supabase Function to Complete Orders
+        run: |
+          curl -X POST https://aubpburchvdzkbpfzbrn.supabase.co/functions/v1/complete-orders \
+          -H "Content-Type: application/json" \
+          -H "x-api-key: quickboost-api-2024" \
+          -d '{}'
