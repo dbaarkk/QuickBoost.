@@ -77,7 +77,7 @@ const AddFunds: React.FC = () => {
     }
     
     if (amountValue < 10) {
-      setSubmitError('Minimum deposit amount is ₹10');
+      setSubmitError('Minimum deposit amount is ₹10 for upi and $1 for crypto');
       return;
     }
 
