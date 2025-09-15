@@ -38,7 +38,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   menuButtonColor = '#fff',
   openMenuButtonColor = '#fff',
   changeMenuColorOnOpen = true,
-  colors = ['#B19EEF', '#5227FF'],
+  colors = ['#2C2C2C', '#1A1A1A'], // Dark gray gradient
   logoUrl,
   accentColor = '#ff6b6b',
   onMenuOpen,
@@ -117,6 +117,7 @@ const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         }`}
         style={{
           background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`,
+          boxShadow: '0 0 20px rgba(255, 255, 255, 0.05), 0 4px 30px rgba(0, 0, 0, 0.5)',
         }}
       >
         <div className="text-center max-w-2xl mx-auto px-4">
