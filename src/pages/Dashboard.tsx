@@ -251,7 +251,7 @@ const Dashboard: React.FC = () => {
               menuButtonColor="#2A2A2A"
               openMenuButtonColor="#fff"
               changeMenuColorOnOpen={true}
-              colors={['#B19EEF', '#5227FF']}
+              colors={['#2C2C2C', '#1A1A1A']}
               accentColor="#00CFFF"
             />
           </div>
