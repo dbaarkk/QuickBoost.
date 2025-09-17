@@ -35,7 +35,9 @@ const AddFunds: React.FC = () => {
   const [submitError, setSubmitError] = useState('');
   const [deposits, setDeposits] = useState<Deposit[]>([]);
 
-  const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
+  // Separate predefined amounts for each payment method
+  const upiPredefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
+  const cryptoPredefinedAmounts = [10, 50, 100, 200, 500, 1000];
 
   // Fetch user deposits
   useEffect(() => {
@@ -76,8 +78,13 @@ const AddFunds: React.FC = () => {
       return;
     }
     
-    if (amountValue < 10) {
-      setSubmitError('Minimum deposit amount is ₹10 for upi and $1 for crypto');
+    if (paymentMethod === 'upi' && amountValue < 10) {
+      setSubmitError('Minimum deposit amount is ₹10 for upi');
+      return;
+    }
+    
+    if (paymentMethod === 'crypto' && amountValue < 1) {
+      setSubmitError('Minimum deposit is $1 for crypto');
       return;
     }
 
@@ -137,6 +144,17 @@ const AddFunds: React.FC = () => {
       default: return status;
     }
   };
+
+  // Get current predefined amounts based on payment method
+  const getCurrentPredefinedAmounts = () => {
+    return paymentMethod === 'upi' ? upiPredefinedAmounts : cryptoPredefinedAmounts;
+  };
+
+  // Get currency symbol based on payment method
+  const getCurrencySymbol = () => {
+    return paymentMethod === 'upi' ? '₹' : '$';
+  };
+
   return (
     <div className="min-h-screen bg-[#121212]">
       {/* Header */}
@@ -179,40 +197,6 @@ const AddFunds: React.FC = () => {
                     <p className="text-[#FF5C5C] text-sm">{submitError}</p>
                   </div>
                 )}
-
-                {/* Amount Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Select Amount (₹)</label>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {predefinedAmounts.map((value) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => handleAmountSelect(value)}
-                        className={`p-4 text-center border rounded-xl font-semibold transition-all hover:scale-105 ${
-                          amount === value.toString()
-                            ? 'border-[#00CFFF] bg-[#00CFFF]/10 text-[#00CFFF] shadow-md'
-                            : 'border-[#2A2A2A] hover:border-[#00CFFF]/50 hover:bg-[#1E1E1E]'
-                        }`}
-                      >
-                        ₹{value}
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter custom amount"
-                    className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 text-lg"
-                    min={10}
-                    required
-                  />
-                  <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">
-                    <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />
-                    <span>Minimum deposit amount is ₹10</span>
-                  </div>
-                </div>
 
                 {/* Payment Method */}
                 <div>
@@ -257,6 +241,47 @@ const AddFunds: React.FC = () => {
                         </div>
                       </div>
                     </label>
+                  </div>
+                </div>
+
+                {/* Amount Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
+                    Select Amount ({getCurrencySymbol()})
+                  </label>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    {getCurrentPredefinedAmounts().map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => handleAmountSelect(value)}
+                        className={`p-4 text-center border rounded-xl font-semibold transition-all hover:scale-105 ${
+                          amount === value.toString()
+                            ? 'border-[#00CFFF] bg-[#00CFFF]/10 text-[#00CFFF] shadow-md'
+                            : 'border-[#2A2A2A] hover:border-[#00CFFF]/50 hover:bg-[#1E1E1E]'
+                        }`}
+                      >
+                        {getCurrencySymbol()}{value}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter custom amount"
+                    className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 text-lg"
+                    min={paymentMethod === 'upi' ? 10 : 1}
+                    required
+                  />
+                  <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">
+                    <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />
+                    <span>
+                      {paymentMethod === 'upi' 
+                        ? 'Minimum deposit amount is ₹10' 
+                        : 'Minimum deposit is $1'
+                      }
+                    </span>
                   </div>
                 </div>
 
@@ -382,7 +407,7 @@ const AddFunds: React.FC = () => {
               {amount && (
                 <div className="bg-[#1E1E1E] rounded-lg p-4 border border-[#2A2A2A]">
                   <p className="text-sm text-[#A0A0A0]">
-                    After adding ₹{amount}, your balance will be:{' '}
+                    After adding {getCurrencySymbol()}{amount}, your balance will be:{' '}
                     <span className="font-semibold text-[#E0E0E0] ml-1">
                       ₹{((profile?.balance || 0) + parseFloat(amount || '0')).toFixed(2)}
                     </span>
