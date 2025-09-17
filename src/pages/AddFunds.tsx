@@ -13,12 +13,12 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createDeposit, getUserDeposits, Deposit } from '../lib/supabase';
+import { verifyCryptoPayment } from '../lib/cryptoVerification';
 
 const wallets = [
   { name: 'Solana', address: '99q2VEJtZjt56UjJuSLb45mkdrAnA4Lsb7q33uKUQo1P' },
   { name: 'Ethereum', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
   { name: 'Base', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
-  { name: 'Sui', address: '0xed8bb93f61609b27a2d586c658c17715f6fc6cfa8166b41aea6cad7f57f35d10' },
   { name: 'Polygon', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
   { name: 'Bitcoin', address: 'bc1qt3vl6de9j7q7lrmmwx2g3fnaf0m0cmmk9ct4f9' },
 ];
@@ -29,15 +29,15 @@ const AddFunds: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'crypto'>('upi');
   const [utrNumber, setUtrNumber] = useState('');
   const [txid, setTxid] = useState('');
+  const [selectedCrypto, setSelectedCrypto] = useState('ethereum');
   const [copied, setCopied] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [deposits, setDeposits] = useState<Deposit[]>([]);
+  const [verificationStatus, setVerificationStatus] = useState<'success' | 'pending' | 'error' | ''>('');
 
-  // Separate predefined amounts for each payment method
-  const upiPredefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
-  const cryptoPredefinedAmounts = [10, 50, 100, 200, 500, 1000];
+  const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
 
   // Fetch user deposits
   useEffect(() => {
@@ -69,7 +69,7 @@ const AddFunds: React.FC = () => {
     setTimeout(() => setCopied(''), 2000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const amountValue = parseFloat(amount);
@@ -78,13 +78,8 @@ const AddFunds: React.FC = () => {
       return;
     }
     
-    if (paymentMethod === 'upi' && amountValue < 10) {
-      setSubmitError('Minimum deposit amount is ₹10 for upi');
-      return;
-    }
-    
-    if (paymentMethod === 'crypto' && amountValue < 1) {
-      setSubmitError('Minimum deposit is $1 for crypto');
+    if (amountValue < 10) {
+      setSubmitError('Minimum deposit amount is ₹10 for upi and $1 for crypto');
       return;
     }
 
@@ -100,31 +95,66 @@ const AddFunds: React.FC = () => {
 
     setIsSubmitting(true);
     setSubmitError('');
+    setVerificationStatus('pending');
 
-    const depositData = {
-      amount: parseFloat(amount),
-      payment_method: paymentMethod,
-      ...(paymentMethod === 'upi' ? { utr_number: utrNumber } : { txid }),
-    };
+    try {
+      let depositStatus = 'pending';
+      
+      if (paymentMethod === 'crypto') {
+        // Verify crypto payment instantly
+        const verification = await verifyCryptoPayment(txid, selectedCrypto);
+        
+        if (verification.success) {
+          depositStatus = 'verified';
+          setVerificationStatus('success');
+        } else {
+          setVerificationStatus('error');
+          setSubmitError(verification.error || 'Payment verification failed. Please check transaction hash.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
 
-    createDeposit(depositData).then(({ data, error }) => {
+      const depositData = {
+        amount: amountValue,
+        payment_method: paymentMethod,
+        status: depositStatus,
+        ...(paymentMethod === 'upi' ? { 
+          utr_number: utrNumber 
+        } : { 
+          txid, 
+          crypto_type: selectedCrypto 
+        }),
+      };
+
+      const { data, error } = await createDeposit(depositData);
+      
       if (error) {
+        setVerificationStatus('error');
         setSubmitError(error.message);
       } else {
         setShowSuccess(true);
         setAmount('');
         setUtrNumber('');
         setTxid('');
+        
         // Refresh deposits list
         if (user) {
-          getUserDeposits(user.id).then(({ data }) => {
-            if (data) setDeposits(data);
-          });
+          const { data: depositsData } = await getUserDeposits(user.id);
+          if (depositsData) setDeposits(depositsData);
         }
-        setTimeout(() => setShowSuccess(false), 5000);
+        
+        setTimeout(() => {
+          setShowSuccess(false);
+          setVerificationStatus('');
+        }, 5000);
       }
+    } catch (error) {
+      setVerificationStatus('error');
+      setSubmitError('An unexpected error occurred');
+    } finally {
       setIsSubmitting(false);
-    });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -145,14 +175,15 @@ const AddFunds: React.FC = () => {
     }
   };
 
-  // Get current predefined amounts based on payment method
-  const getCurrentPredefinedAmounts = () => {
-    return paymentMethod === 'upi' ? upiPredefinedAmounts : cryptoPredefinedAmounts;
-  };
-
-  // Get currency symbol based on payment method
-  const getCurrencySymbol = () => {
-    return paymentMethod === 'upi' ? '₹' : '$';
+  const getVerificationMessage = () => {
+    if (verificationStatus === 'pending') {
+      return '🔄 Verifying transaction on blockchain...';
+    } else if (verificationStatus === 'success') {
+      return '✅ Payment verified successfully! Funds added to your account.';
+    } else if (verificationStatus === 'error') {
+      return '❌ Verification failed. Please check transaction hash.';
+    }
+    return '';
   };
 
   return (
@@ -187,7 +218,18 @@ const AddFunds: React.FC = () => {
                   <div className="bg-[#00CFFF]/10 border border-[#00CFFF]/30 rounded-lg p-4 flex items-center">
                     <CheckCircle className="h-5 w-5 text-[#00CFFF] mr-3" />
                     <span className="text-[#00CFFF] font-medium">
-                      ✅ Transaction is being verified, please wait 1-2 minutes
+                      {paymentMethod === 'crypto' 
+                        ? '✅ Payment verified successfully! Funds added to your account.' 
+                        : '✅ Transaction submitted for verification. Please wait 1-2 minutes.'}
+                    </span>
+                  </div>
+                )}
+
+                {verificationStatus === 'pending' && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 flex items-center">
+                    <Clock className="h-5 w-5 text-yellow-500 mr-3 animate-pulse" />
+                    <span className="text-yellow-500 font-medium">
+                      🔄 Verifying transaction on blockchain...
                     </span>
                   </div>
                 )}
@@ -197,6 +239,40 @@ const AddFunds: React.FC = () => {
                     <p className="text-[#FF5C5C] text-sm">{submitError}</p>
                   </div>
                 )}
+
+                {/* Amount Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Select Amount (₹)</label>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    {predefinedAmounts.map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => handleAmountSelect(value)}
+                        className={`p-4 text-center border rounded-xl font-semibold transition-all hover:scale-105 ${
+                          amount === value.toString()
+                            ? 'border-[#00CFFF] bg-[#00CFFF]/10 text-[#00CFFF] shadow-md'
+                            : 'border-[#2A2A2A] hover:border-[#00CFFF]/50 hover:bg-[#1E1E1E]'
+                        }`}
+                      >
+                        ₹{value}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter custom amount"
+                    className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 text-lg"
+                    min={10}
+                    required
+                  />
+                  <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">
+                    <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />
+                    <span>Minimum deposit amount is ₹10</span>
+                  </div>
+                </div>
 
                 {/* Payment Method */}
                 <div>
@@ -241,47 +317,6 @@ const AddFunds: React.FC = () => {
                         </div>
                       </div>
                     </label>
-                  </div>
-                </div>
-
-                {/* Amount Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
-                    Select Amount ({getCurrencySymbol()})
-                  </label>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {getCurrentPredefinedAmounts().map((value) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => handleAmountSelect(value)}
-                        className={`p-4 text-center border rounded-xl font-semibold transition-all hover:scale-105 ${
-                          amount === value.toString()
-                            ? 'border-[#00CFFF] bg-[#00CFFF]/10 text-[#00CFFF] shadow-md'
-                            : 'border-[#2A2A2A] hover:border-[#00CFFF]/50 hover:bg-[#1E1E1E]'
-                        }`}
-                      >
-                        {getCurrencySymbol()}{value}
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter custom amount"
-                    className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 text-lg"
-                    min={paymentMethod === 'upi' ? 10 : 1}
-                    required
-                  />
-                  <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">
-                    <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />
-                    <span>
-                      {paymentMethod === 'upi' 
-                        ? 'Minimum deposit amount is ₹10' 
-                        : 'Minimum deposit is $1'
-                      }
-                    </span>
                   </div>
                 </div>
 
@@ -336,9 +371,22 @@ const AddFunds: React.FC = () => {
                       <ol className="text-sm text-[#E0E0E0] space-y-1">
                         <li>1. Send the exact amount to the wallet address</li>
                         <li>2. Submit your transaction ID (TXID)</li>
-                        <li>3. Wait 2-5 minutes for verification</li>
+                        <li>3. Instant verification (usually within seconds)</li>
                       </ol>
                     </div>
+
+                    {/* Crypto Type Selection */}
+                    <select
+                      value={selectedCrypto}
+                      onChange={(e) => setSelectedCrypto(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF]"
+                    >
+                      <option value="ethereum">Ethereum</option>
+                      <option value="bitcoin">Bitcoin</option>
+                      <option value="solana">Solana</option>
+                      <option value="polygon">Polygon</option>
+                      <option value="base">Base</option>
+                    </select>
                     
                     <input
                       type="text"
@@ -350,23 +398,25 @@ const AddFunds: React.FC = () => {
                     />
 
                     <div className="space-y-2">
-                      {wallets.map((wallet) => (
-                        <div
-                          key={wallet.name}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#1E1E1E] rounded-lg p-3 border border-[#2A2A2A] break-words"
-                        >
-                          <span className="font-mono text-[#E0E0E0] break-all">
-                            {wallet.name}: {wallet.address}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopy(wallet.address)}
-                            className="flex items-center text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium mt-2 sm:mt-0 transition-colors"
+                      {wallets
+                        .filter(wallet => wallet.name.toLowerCase() === selectedCrypto)
+                        .map((wallet) => (
+                          <div
+                            key={wallet.name}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#1E1E1E] rounded-lg p-3 border border-[#2A2A2A] break-words"
                           >
-                            {copied === wallet.address ? 'Copied!' : 'Copy'}
-                          </button>
-                        </div>
-                      ))}
+                            <span className="font-mono text-[#E0E0E0] break-all">
+                              {wallet.name}: {wallet.address}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(wallet.address)}
+                              className="flex items-center text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium mt-2 sm:mt-0 transition-colors"
+                            >
+                              {copied === wallet.address ? 'Copied!' : 'Copy'}
+                            </button>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 )}
@@ -374,12 +424,12 @@ const AddFunds: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full btn-accent disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] py-3 px-6 flex items-center justify-center disabled:shadow-none"
+                  className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] text-white font-semibold py-3 px-6 rounded-xl hover:from-[#00CFFF]/90 hover:to-[#0AC5FF]/90 transition-all duration-300 disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] disabled:text-[#A0A0A0] flex items-center justify-center disabled:shadow-none"
                 >
                   {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Verifying...
+                      {paymentMethod === 'crypto' ? 'Verifying...' : 'Submitting...'}
                     </>
                   ) : (
                     <>
@@ -407,7 +457,7 @@ const AddFunds: React.FC = () => {
               {amount && (
                 <div className="bg-[#1E1E1E] rounded-lg p-4 border border-[#2A2A2A]">
                   <p className="text-sm text-[#A0A0A0]">
-                    After adding {getCurrencySymbol()}{amount}, your balance will be:{' '}
+                    After adding ₹{amount}, your balance will be:{' '}
                     <span className="font-semibold text-[#E0E0E0] ml-1">
                       ₹{((profile?.balance || 0) + parseFloat(amount || '0')).toFixed(2)}
                     </span>
@@ -442,7 +492,10 @@ const AddFunds: React.FC = () => {
                           <div className="mt-1">UTR: {deposit.utr_number}</div>
                         )}
                         {deposit.txid && (
-                          <div className="mt-1">TXID: {deposit.txid.slice(0, 20)}...</div>
+                          <div className="mt-1">TXID: {deposit.txid?.slice(0, 20)}...</div>
+                        )}
+                        {deposit.crypto_type && (
+                          <div className="mt-1">Network: {deposit.crypto_type.toUpperCase()}</div>
                         )}
                       </div>
                     </div>
@@ -472,7 +525,7 @@ const AddFunds: React.FC = () => {
                   <Clock className="h-5 w-5 text-[#7B61FF] mr-3 mt-0.5" />
                   <div>
                     <div className="font-medium text-[#E0E0E0]">Instant Credit</div>
-                    <div className="text-sm text-[#A0A0A0]">Funds are credited within 2-5 minutes</div>
+                    <div className="text-sm text-[#A0A0A0]">Crypto funds are credited instantly after verification</div>
                   </div>
                 </div>
                 <div className="flex items-start">
