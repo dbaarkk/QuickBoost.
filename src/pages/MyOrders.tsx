@@ -27,13 +27,11 @@ const MyOrders: React.FC = () => {
       try {
         const { data, error } = await getUserOrders(user.id);
         if (error) {
-          setError('Failed to load orders');
           setOrders([]);
         } else {
           setOrders(data || []);
         }
       } catch (err) {
-        setError('Failed to load orders');
         setOrders([]);
       }
     };
