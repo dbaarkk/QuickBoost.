@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, TrendingUp, Sparkles, Shield, Zap, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase'; // Import supabase directly
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -65,52 +64,25 @@ const Signup = () => {
     }
 
     try {
+      // Split name into first and last name
       const nameParts = formData.name.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
       console.log('📝 Attempting signup for:', formData.email);
-
-      // Call signUp from context
       await signUp(formData.email, formData.password, {
         first_name: firstName,
         last_name: lastName,
         phone: ''
       });
-
-      // Get session directly from supabase
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (session?.user) {
-        console.log('🔄 User signed up, navigating to dashboard:', session.user.id);
-
-        // Create profile immediately
-        await supabase.from('profiles').upsert({
-          id: session.user.id,
-          email: session.user.email || '',
-          first_name: firstName,
-          last_name: lastName,
-          phone: '',
-          balance: 0,
-          total_orders: 0,
-          total_spent: 0
-        }, { onConflict: 'id' });
-
-        // ✅ Navigate right after signup success
-        navigate('/dashboard', { replace: true });
-      }
+      
+      // Success - auth context will handle redirect via useEffect
     } catch (error: any) {
       console.error('❌ Signup error:', error);
       if (error.message?.includes('already registered')) {
         setError('Email already registered. Please sign in instead.');
-      } else if (error.message?.includes('email')) {
-        setError('Invalid email address format.');
       } else {
-        setError(error.message || 'Account creation failed. Please try again.');
+        setError('Signup failed. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
