@@ -76,7 +76,7 @@ const AddFunds: React.FC = () => {
     }
     
     if (amountValue < 10) {
-      setSubmitError('Minimum deposit amount is â‚¹10 for upi and $1 for crypto');
+      setSubmitError(`Minimum deposit amount is ₹10 for upi and $1 for crypto`);
       return;
     }
 
@@ -168,7 +168,7 @@ const AddFunds: React.FC = () => {
                   <div className="bg-[#00CFFF]/10 border border-[#00CFFF]/30 rounded-lg p-4 flex items-center">
                     <CheckCircle className="h-5 w-5 text-[#00CFFF] mr-3" />
                     <span className="text-[#00CFFF] font-medium">
-                      âœ… Transaction is being verified, please wait 1-2 minutes
+                      ✓ Transaction is being verified, please wait 1-2 minutes
                     </span>
                   </div>
                 )}
@@ -181,7 +181,7 @@ const AddFunds: React.FC = () => {
 
                 {/* Amount Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Select Amount (â‚¹)</label>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Select Amount (₹)</label>
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {predefinedAmounts.map((value) => (
                       <button
@@ -194,7 +194,7 @@ const AddFunds: React.FC = () => {
                             : 'border-[#2A2A2A] hover:border-[#00CFFF]/50 hover:bg-[#1E1E1E]'
                         }`}
                       >
-                        â‚¹{value}
+                        ₹{value}
                       </button>
                     ))}
                   </div>
@@ -209,7 +209,7 @@ const AddFunds: React.FC = () => {
                   />
                   <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">
                     <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />
-                    <span>Minimum deposit amount is â‚¹10</span>
+                    <span>Minimum deposit amount is ₹10</span>
                   </div>
                 </div>
 
@@ -375,15 +375,15 @@ const AddFunds: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-[#E0E0E0]">Current Balance</h3>
-                  <p className="text-3xl font-bold text-[#00CFFF]">â‚¹{profile?.balance.toFixed(2) || '0.00'}</p>
+                  <p className="text-3xl font-bold text-[#00CFFF]">₹{profile?.balance.toFixed(2) || '0.00'}</p>
                 </div>
               </div>
               {amount && (
                 <div className="bg-[#1E1E1E] rounded-lg p-4 border border-[#2A2A2A]">
                   <p className="text-sm text-[#A0A0A0]">
-                    After adding â‚¹{amount}, your balance will be:{' '}
+                    After adding ₹{amount}, your balance will be:{' '}
                     <span className="font-semibold text-[#E0E0E0] ml-1">
-                      â‚¹{((profile?.balance || 0) + parseFloat(amount || '0')).toFixed(2)}
+                      ₹{((profile?.balance || 0) + parseFloat(amount || '0')).toFixed(2)}
                     </span>
                   </p>
                 </div>
@@ -402,7 +402,7 @@ const AddFunds: React.FC = () => {
                   {deposits.slice(0, 5).map((deposit) => (
                     <div key={deposit.id} className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-[#E0E0E0]">â‚¹{deposit.amount.toFixed(2)}</span>
+                        <span className="font-medium text-[#E0E0E0]">₹{deposit.amount.toFixed(2)}</span>
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
                           {getStatusLabel(deposit.status)}
                         </span>
