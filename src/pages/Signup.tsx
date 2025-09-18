@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, TrendingUp, Sparkles, Shield, Zap, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase'; // Import supabase directly
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -70,17 +71,49 @@ const Signup = () => {
       const lastName = nameParts.slice(1).join(' ') || '';
 
       console.log('📝 Attempting signup for:', formData.email);
+      
+      // Call the signUp function from AuthContext
       await signUp(formData.email, formData.password, {
         first_name: firstName,
         last_name: lastName,
         phone: ''
       });
       
+      // IMMEDIATELY create the profile in case the trigger is slow
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        console.log('🔄 Creating profile immediately for user:', session.user.id);
+        
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: session.user.id,
+            email: session.user.email || '',
+            first_name: firstName,
+            last_name: lastName,
+            phone: '',
+            balance: 0,
+            total_orders: 0,
+            total_spent: 0
+          }, {
+            onConflict: 'id'
+          });
+
+        if (profileError) {
+          console.error('❌ Profile creation error:', profileError);
+        } else {
+          console.log('✅ Profile created successfully');
+        }
+      }
+      
       // Success - auth context will handle redirect via useEffect
     } catch (error: any) {
       console.error('❌ Signup error:', error);
       if (error.message?.includes('already registered')) {
         setError('Email already registered. Please sign in instead.');
+      } else if (error.message?.includes('email')) {
+        setError('Invalid email address format.');
       } else {
         setError('Signup failed. Please try again.');
       }
