@@ -12,7 +12,7 @@ import {
   History
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { createDeposit, getUserDeposits, Deposit } from '../lib/supabase';
+import { createDeposit, getUserDeposits, updateDepositStatus, Deposit } from '../lib/supabase';
 import { verifyCryptoPayment } from '../lib/cryptoVerification';
 
 const wallets = [
@@ -24,7 +24,7 @@ const wallets = [
 ];
 
 const AddFunds: React.FC = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, updateBalance } = useAuth();
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'crypto'>('upi');
   const [utrNumber, setUtrNumber] = useState('');
@@ -107,13 +107,14 @@ const AddFunds: React.FC = () => {
 
     try {
       let depositStatus = 'pending';
+      let depositId = null;
       
       // Only verify crypto payments automatically
       if (paymentMethod === 'crypto') {
         const verification = await verifyCryptoPayment(txid, 'auto');
         
         if (verification.success) {
-          depositStatus = 'verified';
+          depositStatus = 'success';
           setVerificationStatus('success');
         } else {
           setVerificationStatus('error');
@@ -141,10 +142,17 @@ const AddFunds: React.FC = () => {
         setVerificationStatus('error');
         setSubmitError(error.message);
       } else {
+        depositId = data?.[0]?.id;
         setShowSuccess(true);
         setAmount('');
         setUtrNumber('');
         setTxid('');
+        
+        // Update the user's balance in the AuthContext
+        if (depositStatus === 'success' && profile) {
+          const newBalance = (profile.balance || 0) + amountValue;
+          updateBalance(newBalance);
+        }
         
         // Refresh deposits list
         if (user) {
@@ -165,9 +173,39 @@ const AddFunds: React.FC = () => {
     }
   };
 
+  // Function to manually verify a deposit
+  const handleVerifyDeposit = async (depositId: string) => {
+    try {
+      const { error } = await updateDepositStatus(depositId, 'success');
+      
+      if (error) {
+        console.error('Error verifying deposit:', error);
+        return;
+      }
+      
+      // Update the deposit in local state
+      setDeposits(prevDeposits => 
+        prevDeposits.map(deposit => 
+          deposit.id === depositId 
+            ? { ...deposit, status: 'success' } 
+            : deposit
+        )
+      );
+      
+      // Update balance if the deposit was successful
+      const deposit = deposits.find(d => d.id === depositId);
+      if (deposit && profile) {
+        const newBalance = (profile.balance || 0) + deposit.amount;
+        updateBalance(newBalance);
+      }
+    } catch (error) {
+      console.error('Error verifying deposit:', error);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'verified': return 'text-green-700 bg-green-100';
+      case 'success': return 'text-green-700 bg-green-100';
       case 'pending': return 'text-yellow-700 bg-yellow-100';
       case 'rejected': return 'text-red-700 bg-red-100';
       default: return 'text-gray-700 bg-gray-100';
@@ -176,7 +214,7 @@ const AddFunds: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'verified': return 'Verified';
+      case 'success': return 'Success';
       case 'pending': return 'Pending';
       case 'rejected': return 'Rejected';
       default: return status;
@@ -483,9 +521,19 @@ const AddFunds: React.FC = () => {
                     <div key={deposit.id} className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-[#E0E0E0]">₹{deposit.amount.toFixed(2)}</span>
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
-                          {getStatusLabel(deposit.status)}
-                        </span>
+                        <div className="flex items-center">
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
+                            {getStatusLabel(deposit.status)}
+                          </span>
+                          {deposit.status === 'pending' && (
+                            <button
+                              onClick={() => handleVerifyDeposit(deposit.id)}
+                              className="ml-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                              Verify
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="text-sm text-[#A0A0A0]">
                         <div className="flex justify-between">
