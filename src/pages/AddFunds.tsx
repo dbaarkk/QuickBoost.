@@ -12,7 +12,7 @@ import {
   History
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { createDeposit, getUserDeposits, updateDepositStatus, Deposit } from '../lib/supabase';
+import { createDeposit, getUserDeposits, updateDepositStatus, Deposit } from '../lib/supabase.ts';
 import { verifyCryptoPayment } from '../lib/cryptoVerification';
 
 const wallets = [
