@@ -18,7 +18,6 @@ interface Profile {
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
-  loading: boolean;
   signUp: (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -36,7 +35,7 @@ export const useAuth = () => {
 const getUserProfile = async (userId: string): Promise<Profile | null> => {
   try {
     const { data, error } = await supabase
-      .from('profiles')  // Changed from 'user_profiles' to 'profiles'
+      .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -55,7 +54,6 @@ const getUserProfile = async (userId: string): Promise<Profile | null> => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const refreshProfile = async () => {
     if (!user) return;
@@ -71,48 +69,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
 
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (mounted) {
-          if (session?.user) {
-            setUser(session.user);
-            // Fetch real profile data immediately
-            const profileData = await getUserProfile(session.user.id);
-            if (profileData) {
+        if (mounted && session?.user) {
+          setUser(session.user);
+          // Fetch profile in background without blocking UI
+          getUserProfile(session.user.id).then(profileData => {
+            if (mounted && profileData) {
               setProfile(profileData);
-            } else {
-              // Create profile if it doesn't exist
-              const { data: newProfile } = await supabase
-                .from('profiles')
-                .insert({
-                  id: session.user.id,
-                  email: session.user.email || '',
-                  first_name: session.user.user_metadata?.first_name || '',
-                  last_name: session.user.user_metadata?.last_name || '',
-                  phone: session.user.user_metadata?.phone || '',
-                  balance: 0,
-                  total_orders: 0,
-                  total_spent: 0
-                })
-                .select()
-                .single();
-              
-              if (newProfile) {
-                setProfile(newProfile);
-              }
             }
-          }
-          setLoading(false);
+          });
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        if (mounted) {
-          setLoading(false);
-        }
       }
     };
 
@@ -121,20 +93,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
 
-      try {
-        if (session?.user) {
-          setUser(session.user);
-          // Fetch real profile data
-          const profileData = await getUserProfile(session.user.id);
-          if (profileData) {
+      if (session?.user) {
+        setUser(session.user);
+        // Fetch profile in background without blocking UI
+        getUserProfile(session.user.id).then(profileData => {
+          if (mounted && profileData) {
             setProfile(profileData);
           }
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-      } catch (error) {
-        console.error('Error handling auth state change:', error);
+        });
+      } else {
+        setUser(null);
+        setProfile(null);
       }
     });
 
@@ -158,8 +127,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (data.user) {
       setUser(data.user);
       
-      // Create profile in the correct table
-      const { data: profileData } = await supabase
+      // Create profile in background without blocking UI
+      supabase
         .from('profiles')
         .insert({
           id: data.user.id,
@@ -172,11 +141,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           total_spent: 0
         })
         .select()
-        .single();
-
-      if (profileData) {
-        setProfile(profileData);
-      }
+        .single()
+        .then(({ data: profileData }) => {
+          if (profileData) {
+            setProfile(profileData);
+          }
+        });
     }
   };
 
@@ -191,11 +161,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setUser(data.user);
     
-    // Fetch profile from correct table
-    const profileData = await getUserProfile(data.user.id);
-    if (profileData) {
-      setProfile(profileData);
-    }
+    // Fetch profile in background without blocking UI
+    getUserProfile(data.user.id).then(profileData => {
+      if (profileData) {
+        setProfile(profileData);
+      }
+    });
   };
 
   const signOut = async () => {
@@ -210,7 +181,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       user,
       profile,
-      loading,
       signUp,
       signIn,
       signOut,
