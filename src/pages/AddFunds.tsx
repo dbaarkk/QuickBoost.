@@ -9,185 +9,33 @@ import {
   Shield,
   Clock,
   AlertTriangle,
-  History,
-  ExternalLink,
-  X,
-  AlertCircle
+  History
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createDeposit, getUserDeposits, Deposit } from '../lib/supabase';
-import { verifyCryptoPayment } from '../lib/cryptoVerification';
 
 const wallets = [
   { name: 'Solana', address: '99q2VEJtZjt56UjJuSLb45mkdrAnA4Lsb7q33uKUQo1P' },
   { name: 'Ethereum', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
   { name: 'Base', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
+  { name: 'Sui', address: '0xed8bb93f61609b27a2d586c658c17715f6fc6cfa8166b41aea6cad7f57f35d10' },
   { name: 'Polygon', address: '0x9B4Eac49Ea99e73655Ad0ADA11bEAE7E1E326EB7' },
   { name: 'Bitcoin', address: 'bc1qt3vl6de9j7q7lrmmwx2g3fnaf0m0cmmk9ct4f9' },
 ];
-
-// UPI Deep Link Service
-const generateUPIDeepLink = (amount: number, upiId: string, note: string = 'QuickBoost Deposit') => {
-  const encodedNote = encodeURIComponent(note);
-  return `upi://pay?pa=${upiId}&pn=QuickBoost&am=${amount}&cu=INR&tn=${encodedNote}`;
-};
-
-const openUPIApp = (deepLink: string) => {
-  window.location.href = deepLink;
-};
-
-// UPI Payment Modal Component
-const UPIPaymentModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  amount: number;
-  upiId: string;
-  onSuccess: () => void;
-  onFailure: (error: string) => void;
-}> = ({ isOpen, onClose, amount, upiId, onSuccess, onFailure }) => {
-  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'success' | 'failed'>('pending');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  useEffect(() => {
-    if (isOpen) {
-      setPaymentStatus('pending');
-      setErrorMessage('');
-      
-      const handleVisibilityChange = () => {
-        if (document.visibilityState === 'visible') {
-          // Simulate payment verification (in real app, you'd check with your backend)
-          setTimeout(() => {
-            // Simulate random success/failure for testing
-            const isSuccess = Math.random() > 0.3; // 70% success rate for testing
-            
-            if (isSuccess) {
-              setPaymentStatus('success');
-              onSuccess();
-            } else {
-              setPaymentStatus('failed');
-              setErrorMessage('Transaction blocked by authorities or failed');
-              onFailure('Transaction blocked by authorities or failed');
-            }
-          }, 2000);
-        }
-      };
-
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }
-  }, [isOpen, onSuccess, onFailure]);
-
-  const handlePayment = () => {
-    const deepLink = generateUPIDeepLink(amount, upiId);
-    openUPIApp(deepLink);
-  };
-
-  const handleRetry = () => {
-    setPaymentStatus('pending');
-    setErrorMessage('');
-    handlePayment();
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#2A2A2A] rounded-xl max-w-md w-full p-6 border border-[#3A3A3A]">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-[#E0E0E0]">Pay via UPI</h2>
-          <button onClick={onClose} className="text-[#A0A0A0] hover:text-[#E0E0E0]">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {paymentStatus === 'pending' ? (
-          <>
-            <div className="text-center mb-6">
-              <p className="text-[#A0A0A0]">Amount to pay</p>
-              <p className="text-3xl font-bold text-[#00CFFF]">₹{amount}</p>
-              <p className="text-sm text-[#A0A0A0] mt-1">to {upiId}</p>
-            </div>
-
-            <div className="space-y-4">
-              <button
-                onClick={handlePayment}
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center justify-center"
-              >
-                <ExternalLink className="h-5 w-5 mr-2" />
-                Open UPI App to Pay
-              </button>
-
-              <div className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/30">
-                <p className="text-sm text-yellow-500">
-                  ⚠️ If transaction fails or gets blocked, try using a different UPI app
-                </p>
-              </div>
-            </div>
-          </>
-        ) : paymentStatus === 'success' ? (
-          <div className="text-center py-8">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-green-400 mb-2">Payment Successful!</h3>
-            <p className="text-[#A0A0A0]">₹{amount} has been added to your account</p>
-            <button
-              onClick={onClose}
-              className="mt-6 bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
-            >
-              Done
-            </button>
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-red-400 mb-2">Payment Failed</h3>
-            <p className="text-[#A0A0A0] mb-4">{errorMessage}</p>
-            <div className="space-y-3">
-              <button
-                onClick={handleRetry}
-                className="w-full bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={onClose}
-                className="w-full bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 const AddFunds: React.FC = () => {
   const { profile, user } = useAuth();
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'crypto'>('upi');
+  const [utrNumber, setUtrNumber] = useState('');
   const [txid, setTxid] = useState('');
   const [copied, setCopied] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [deposits, setDeposits] = useState<Deposit[]>([]);
-  const [verificationStatus, setVerificationStatus] = useState<'success' | 'pending' | 'error' | ''>('');
-  const [showUPIModal, setShowUPIModal] = useState(false);
 
-  const upiAmounts = [100, 500, 1000, 2000, 5000, 10000];
-  const cryptoAmounts = [10, 20, 50, 100, 200, 1000];
-  const currentAmounts = paymentMethod === 'upi' ? upiAmounts : cryptoAmounts;
-  const YOUR_UPI_ID = 'aaryaveer@upi';
-
-  // Reset states when component mounts or payment method changes
-  useEffect(() => {
-    setAmount('');
-    setTxid('');
-    setSubmitError('');
-    setVerificationStatus('');
-    setShowSuccess(false);
-  }, [paymentMethod]);
+  const predefinedAmounts = [100, 500, 1000, 2000, 5000, 10000];
 
   // Fetch user deposits
   useEffect(() => {
@@ -219,7 +67,7 @@ const AddFunds: React.FC = () => {
     setTimeout(() => setCopied(''), 2000);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const amountValue = parseFloat(amount);
@@ -228,13 +76,13 @@ const AddFunds: React.FC = () => {
       return;
     }
     
-    if (paymentMethod === 'upi' && amountValue < 10) {
-      setSubmitError('Minimum deposit amount is ₹10 for UPI');
+    if (amountValue < 10) {
+      setSubmitError('Minimum deposit amount is â‚¹10 for upi and $1 for crypto');
       return;
     }
-    
-    if (paymentMethod === 'crypto' && amountValue < 1) {
-      setSubmitError('Minimum deposit amount is $1 for crypto');
+
+    if (paymentMethod === 'upi' && !utrNumber) {
+      setSubmitError('Please enter UTR number');
       return;
     }
 
@@ -245,98 +93,31 @@ const AddFunds: React.FC = () => {
 
     setIsSubmitting(true);
     setSubmitError('');
-    setVerificationStatus('pending');
 
-    try {
-      let depositStatus = 'pending';
-      
-      if (paymentMethod === 'crypto') {
-        const verification = await verifyCryptoPayment(txid, 'auto');
-        
-        if (verification.success) {
-          depositStatus = 'verified';
-          setVerificationStatus('success');
-        } else {
-          setVerificationStatus('error');
-          setSubmitError(verification.error || 'Payment verification failed. Please check transaction hash.');
-          setIsSubmitting(false);
-          return;
-        }
-      }
+    const depositData = {
+      amount: parseFloat(amount),
+      payment_method: paymentMethod,
+      ...(paymentMethod === 'upi' ? { utr_number: utrNumber } : { txid }),
+    };
 
-      const depositData = {
-        amount: amountValue,
-        payment_method: paymentMethod,
-        status: depositStatus,
-        ...(paymentMethod === 'crypto' && { 
-          txid, 
-          crypto_type: 'auto' 
-        }),
-      };
-
-      const { data, error } = await createDeposit(depositData);
-      
+    createDeposit(depositData).then(({ data, error }) => {
       if (error) {
-        setVerificationStatus('error');
         setSubmitError(error.message);
       } else {
         setShowSuccess(true);
         setAmount('');
+        setUtrNumber('');
         setTxid('');
-        
+        // Refresh deposits list
         if (user) {
-          const { data: depositsData } = await getUserDeposits(user.id);
-          if (depositsData) setDeposits(depositsData);
+          getUserDeposits(user.id).then(({ data }) => {
+            if (data) setDeposits(data);
+          });
         }
-        
-        setTimeout(() => {
-          setShowSuccess(false);
-          setVerificationStatus('');
-        }, 5000);
+        setTimeout(() => setShowSuccess(false), 5000);
       }
-    } catch (error) {
-      setVerificationStatus('error');
-      setSubmitError('An unexpected error occurred');
-    } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleUPISuccess = async () => {
-    const amountValue = parseFloat(amount);
-    
-    const depositData = {
-      amount: amountValue,
-      payment_method: 'upi' as const,
-      status: 'verified' as const,
-      utr_number: `auto_${Date.now()}`,
-    };
-
-    const { error } = await createDeposit(depositData);
-    
-    if (!error) {
-      setShowSuccess(true);
-      setAmount('');
-      
-      if (user) {
-        const { data: depositsData } = await getUserDeposits(user.id);
-        if (depositsData) setDeposits(depositsData);
-      }
-    } else {
-      setSubmitError('Failed to update balance. Please contact support.');
-    }
-  };
-
-  const handleUPIFailure = (error: string) => {
-    setSubmitError(error);
-    setShowUPIModal(false);
-  };
-
-  const resetStates = () => {
-    setAmount('');
-    setSubmitError('');
-    setVerificationStatus('');
-    setShowSuccess(false);
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -356,9 +137,9 @@ const AddFunds: React.FC = () => {
       default: return status;
     }
   };
-
   return (
     <div className="min-h-screen bg-[#121212]">
+      {/* Header */}
       <header className="bg-[#1E1E1E] shadow-lg border-b border-[#2A2A2A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-2">
@@ -376,17 +157,8 @@ const AddFunds: React.FC = () => {
           <p className="text-[#A0A0A0]">Add money to your account to start placing orders instantly</p>
         </div>
 
-        {/* Error Message Display - Moved to top */}
-        {submitError && (
-          <div className="bg-[#FF5C5C]/10 border border-[#FF5C5C]/30 rounded-lg p-3 mb-4">
-            <div className="flex items-center">
-              <AlertCircle className="h-5 w-5 text-[#FF5C5C] mr-2" />
-              <p className="text-[#FF5C5C] text-sm">{submitError}</p>
-            </div>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Payment Form */}
           <div className="space-y-4">
             <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A]">
               <div className="p-4 border-b border-[#2A2A2A]">
@@ -397,20 +169,22 @@ const AddFunds: React.FC = () => {
                   <div className="bg-[#00CFFF]/10 border border-[#00CFFF]/30 rounded-lg p-4 flex items-center">
                     <CheckCircle className="h-5 w-5 text-[#00CFFF] mr-3" />
                     <span className="text-[#00CFFF] font-medium">
-                      {paymentMethod === 'crypto' 
-                        ? '✅ Payment verified successfully! Funds added to your account.' 
-                        : '✅ Payment successful! Funds added to your account.'}
+                      âœ… Transaction is being verified, please wait 1-2 minutes
                     </span>
+                  </div>
+                )}
+
+                {submitError && (
+                  <div className="bg-[#FF5C5C]/10 border border-[#FF5C5C]/30 rounded-lg p-3">
+                    <p className="text-[#FF5C5C] text-sm">{submitError}</p>
                   </div>
                 )}
 
                 {/* Amount Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">
-                    Select Amount {paymentMethod === 'upi' ? '(₹)' : '($)'}
-                  </label>
+                  <label className="block text-sm font-medium text-[#E0E0E0] mb-2">Select Amount (â‚¹)</label>
                   <div className="grid grid-cols-3 gap-3 mb-4">
-                    {currentAmounts.map((value) => (
+                    {predefinedAmounts.map((value) => (
                       <button
                         key={value}
                         type="button"
@@ -421,7 +195,7 @@ const AddFunds: React.FC = () => {
                             : 'border-[#2A2A2A] hover:border-[#00CFFF]/50 hover:bg-[#1E1E1E]'
                         }`}
                       >
-                        {paymentMethod === 'upi' ? '₹' : '$'}{value}
+                        â‚¹{value}
                       </button>
                     ))}
                   </div>
@@ -429,16 +203,14 @@ const AddFunds: React.FC = () => {
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder={`Enter custom amount ${paymentMethod === 'upi' ? '(₹)' : '($)'}`}
+                    placeholder="Enter custom amount"
                     className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 text-lg"
-                    min={paymentMethod === 'upi' ? 10 : 1}
+                    min={10}
                     required
                   />
                   <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">
                     <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />
-                    <span>
-                      Minimum deposit amount is {paymentMethod === 'upi' ? '₹10 for UPI' : '$1 for crypto'}
-                    </span>
+                    <span>Minimum deposit amount is â‚¹10</span>
                   </div>
                 </div>
 
@@ -452,10 +224,7 @@ const AddFunds: React.FC = () => {
                         name="paymentMethod"
                         value="upi"
                         checked={paymentMethod === 'upi'}
-                        onChange={(e) => {
-                          setPaymentMethod(e.target.value as 'upi' | 'crypto');
-                          resetStates();
-                        }}
+                        onChange={(e) => setPaymentMethod(e.target.value as 'upi' | 'crypto')}
                         className="text-[#00CFFF] focus:ring-[#00CFFF]"
                       />
                       <div className="ml-4 flex items-center">
@@ -464,7 +233,7 @@ const AddFunds: React.FC = () => {
                         </div>
                         <div>
                           <div className="font-medium text-[#E0E0E0]">UPI Payment</div>
-                          <div className="text-sm text-[#A0A0A0]">Instant payment via UPI apps</div>
+                          <div className="text-sm text-[#A0A0A0]">Pay via PhonePe, Google Pay, Paytm</div>
                         </div>
                       </div>
                     </label>
@@ -475,10 +244,7 @@ const AddFunds: React.FC = () => {
                         name="paymentMethod"
                         value="crypto"
                         checked={paymentMethod === 'crypto'}
-                        onChange={(e) => {
-                          setPaymentMethod(e.target.value as 'upi' | 'crypto');
-                          resetStates();
-                        }}
+                        onChange={(e) => setPaymentMethod(e.target.value as 'upi' | 'crypto')}
                         className="text-[#00CFFF] focus:ring-[#00CFFF]"
                       />
                       <div className="ml-4 flex items-center">
@@ -494,33 +260,46 @@ const AddFunds: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Verification Fields */}
                 {paymentMethod === 'upi' && (
                   <div className="space-y-4">
                     <div className="bg-[#00CFFF]/10 rounded-xl p-4 mb-4 border border-[#00CFFF]/30">
-                      <h4 className="font-medium text-[#00CFFF] mb-2">Instant UPI Payment</h4>
-                      <div className="text-sm text-[#E0E0E0] space-y-2">
-                        <p>Click the button below to open your UPI app and pay instantly:</p>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSubmitError('');
-                            setShowUPIModal(true);
-                          }}
-                          className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center justify-center"
-                        >
-                          <ExternalLink className="h-5 w-5 mr-2" />
-                          Pay Instantly with UPI App
-                        </button>
-                      </div>
+                      <h4 className="font-medium text-[#00CFFF] mb-2">UPI Payment Instructions:</h4>
+                      <ol className="text-sm text-[#E0E0E0] space-y-1">
+                        <li>1. Pay the exact amount to the UPI ID below</li>
+                        <li>2. Submit your 12-digit UTR number</li>
+                        <li>3. Wait 2-5 minutes for verification</li>
+                      </ol>
                     </div>
+                    
+                    <input
+                      type="text"
+                      value={utrNumber}
+                      onChange={(e) => setUtrNumber(e.target.value)}
+                      placeholder="Enter 12-digit UTR number"
+                      className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300"
+                      required
+                    />
 
                     <div className="bg-[#1E1E1E] rounded-xl p-4 text-center border border-[#2A2A2A]">
+                      <img
+                        src="/IMG_20250906_102052.jpg"
+                        alt="UPI QR"
+                        className="h-32 w-32 mx-auto mb-3"
+                      />
                       <p className="text-sm text-[#A0A0A0] mb-2">
-                        You will be redirected to your UPI app to complete the payment
+                        Scan this QR code with your UPI app
                       </p>
-                      <p className="text-xs text-[#00CFFF]">
-                        Supported: PhonePe, Google Pay, Paytm, BHIM, and all UPI apps
-                      </p>
+                      <div className="flex justify-center items-center bg-[#2A2A2A] p-2 rounded-lg border border-[#2A2A2A]">
+                        <span className="font-mono text-[#E0E0E0] mr-3">aaryaveer@upi</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy('aaryaveer@upi')}
+                          className="flex items-center text-[#00CFFF] hover:text-[#0AC5FF] text-sm font-medium transition-colors"
+                        >
+                          {copied === 'aaryaveer@upi' ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -530,9 +309,9 @@ const AddFunds: React.FC = () => {
                     <div className="bg-[#7B61FF]/10 rounded-xl p-4 mb-4 border border-[#7B61FF]/30">
                       <h4 className="font-medium text-[#7B61FF] mb-2">Crypto Payment Instructions:</h4>
                       <ol className="text-sm text-[#E0E0E0] space-y-1">
-                        <li>1. Send the exact amount to any of the wallet addresses below</li>
+                        <li>1. Send the exact amount to the wallet address</li>
                         <li>2. Submit your transaction ID (TXID)</li>
-                        <li>3. Instant verification (usually within seconds)</li>
+                        <li>3. Wait 2-5 minutes for verification</li>
                       </ol>
                     </div>
                     
@@ -567,68 +346,122 @@ const AddFunds: React.FC = () => {
                   </div>
                 )}
 
-                {paymentMethod === 'crypto' && (
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-[#00CFFF] to-[#0AC5FF] text-white font-semibold py-3 px-6 rounded-xl hover:from-[#00CFFF]/90 hover:to-[#0AC5FF]/90 transition-all duration-300 disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] disabled:text-[#A0A0A0] flex items-center justify-center disabled:shadow-none"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Verifying...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="h-5 w-5 mr-2" />
-                        Verify Crypto Payment
-                      </>
-                    )}
-                  </button>
-                )}
-
-                {paymentMethod === 'crypto' && (
-                  <div className="mt-4">
-                    {verificationStatus === 'pending' && (
-                      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
-                        <p className="text-yellow-500 font-medium">
-                          🔄 Verifying transaction on blockchain...
-                        </p>
-                      </div>
-                    )}
-                    {verificationStatus === 'success' && (
-                      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-center">
-                        <p className="text-green-500 font-medium">
-                          ✅ Transaction successful! Funds added to your account.
-                        </p>
-                      </div>
-                    )}
-                    {verificationStatus === 'error' && (
-                      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-center">
-                        <p className="text-red-500 font-medium">
-                          ❌ Transaction not confirmed. Please check your transaction hash.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full btn-accent disabled:from-[#2A2A2A] disabled:to-[#2A2A2A] py-3 px-6 flex items-center justify-center disabled:shadow-none"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      {paymentMethod === 'upi' ? 'Verify UPI Payment' : 'Verify Crypto Payment'}
+                    </>
+                  )}
+                </button>
               </form>
             </div>
           </div>
 
-          {/* Right Side Info - Same as before */}
-          {/* ... keep the right side info section unchanged ... */}
+          {/* Right Side Info */}
+          <div className="space-y-4">
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] p-4">
+              <div className="flex items-center mb-4">
+                <div className="bg-[#00CFFF]/20 p-3 rounded-xl mr-4">
+                  <Wallet className="h-6 w-6 text-[#00CFFF]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#E0E0E0]">Current Balance</h3>
+                  <p className="text-3xl font-bold text-[#00CFFF]">â‚¹{profile?.balance.toFixed(2) || '0.00'}</p>
+                </div>
+              </div>
+              {amount && (
+                <div className="bg-[#1E1E1E] rounded-lg p-4 border border-[#2A2A2A]">
+                  <p className="text-sm text-[#A0A0A0]">
+                    After adding â‚¹{amount}, your balance will be:{' '}
+                    <span className="font-semibold text-[#E0E0E0] ml-1">
+                      â‚¹{((profile?.balance || 0) + parseFloat(amount || '0')).toFixed(2)}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Recent Deposits */}
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A]">
+              <div className="p-4 border-b border-[#2A2A2A] flex items-center">
+                <History className="h-5 w-5 text-[#A0A0A0] mr-2" />
+                <h3 className="text-lg font-semibold text-[#E0E0E0]">Recent Deposits</h3>
+              </div>
+              
+              {deposits.length > 0 ? (
+                <div className="divide-y divide-[#2A2A2A]">
+                  {deposits.slice(0, 5).map((deposit) => (
+                    <div key={deposit.id} className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-[#E0E0E0]">â‚¹{deposit.amount.toFixed(2)}</span>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
+                          {getStatusLabel(deposit.status)}
+                        </span>
+                      </div>
+                      <div className="text-sm text-[#A0A0A0]">
+                        <div className="flex justify-between">
+                          <span>{deposit.payment_method.toUpperCase()}</span>
+                          <span>{new Date(deposit.created_at).toLocaleDateString()}</span>
+                        </div>
+                        {deposit.utr_number && (
+                          <div className="mt-1">UTR: {deposit.utr_number}</div>
+                        )}
+                        {deposit.txid && (
+                          <div className="mt-1">TXID: {deposit.txid.slice(0, 20)}...</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  <p className="text-[#A0A0A0]">No deposits yet</p>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] p-4">
+              <h3 className="text-base font-semibold text-[#E0E0E0] mb-3 flex items-center">
+                <Shield className="h-5 w-5 mr-2 text-[#00CFFF]" />
+                Security & Support
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <Shield className="h-5 w-5 text-[#00CFFF] mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-[#E0E0E0]">100% Secure</div>
+                    <div className="text-sm text-[#A0A0A0]">All transactions are encrypted and secure</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <Clock className="h-5 w-5 text-[#7B61FF] mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-[#E0E0E0]">Instant Credit</div>
+                    <div className="text-sm text-[#A0A0A0]">Funds are credited within 2-5 minutes</div>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <Smartphone className="h-5 w-5 text-[#A085FF] mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-[#E0E0E0]">Contact Us</div>
+                    <div className="text-sm text-[#A0A0A0]">Email: quickboostbusiness@gmail.com</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <UPIPaymentModal
-        isOpen={showUPIModal}
-        onClose={() => setShowUPIModal(false)}
-        amount={parseFloat(amount) || 0}
-        upiId={YOUR_UPI_ID}
-        onSuccess={handleUPISuccess}
-        onFailure={handleUPIFailure}
-      />
     </div>
   );
 };
