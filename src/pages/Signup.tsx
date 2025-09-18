@@ -65,55 +65,52 @@ const Signup = () => {
     }
 
     try {
-      // Split name into first and last name
       const nameParts = formData.name.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
       console.log('📝 Attempting signup for:', formData.email);
-      
-      // Call the signUp function from AuthContext
+
+      // Call signUp from context
       await signUp(formData.email, formData.password, {
         first_name: firstName,
         last_name: lastName,
         phone: ''
       });
-      
-      // IMMEDIATELY create the profile in case the trigger is slow
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        console.log('🔄 Creating profile immediately for user:', session.user.id);
-        
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: session.user.id,
-            email: session.user.email || '',
-            first_name: firstName,
-            last_name: lastName,
-            phone: '',
-            balance: 0,
-            total_orders: 0,
-            total_spent: 0
-          }, {
-            onConflict: 'id'
-          });
 
-        if (profileError) {
-          console.error('❌ Profile creation error:', profileError);
-        } else {
-          console.log('✅ Profile created successfully');
-        }
+      // Get session directly from supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
       }
-      
-      // Success - auth context will handle redirect via useEffect
+
+      if (session?.user) {
+        console.log('🔄 User signed up, navigating to dashboard:', session.user.id);
+
+        // Create profile immediately
+        await supabase.from('profiles').upsert({
+          id: session.user.id,
+          email: session.user.email || '',
+          first_name: firstName,
+          last_name: lastName,
+          phone: '',
+          balance: 0,
+          total_orders: 0,
+          total_spent: 0
+        }, { onConflict: 'id' });
+
+        // ✅ Navigate right after signup success
+        navigate('/dashboard', { replace: true });
+      }
     } catch (error: any) {
       console.error('❌ Signup error:', error);
       if (error.message?.includes('already registered')) {
         setError('Email already registered. Please sign in instead.');
       } else if (error.message?.includes('email')) {
         setError('Invalid email address format.');
+      } else {
+        setError(error.message || 'Account creation failed. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
