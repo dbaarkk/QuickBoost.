@@ -11,7 +11,43 @@ export interface Deposit {
   created_at: string;
 }
 
-// Create a new deposit
+// Create or update user profile
+export const updateUserProfile = async (userId: string, updates: { balance?: number }): Promise<{ error: any }> => {
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({
+      id: userId,
+      ...updates,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'id'
+    });
+
+  return { error };
+};
+
+// Get user profile with balance
+export const getUserProfile = async (userId: string): Promise<{ data: any | null; error: any }> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  return { data, error };
+};
+
+// Manual balance update function
+export const updateUserBalance = async (userId: string, amount: number): Promise<{ error: any }> => {
+  const { error } = await supabase.rpc('increment_balance', {
+    user_uuid: userId,
+    amount: amount
+  });
+
+  return { error };
+};
+
+// Your existing deposit functions...
 export const createDeposit = async (depositData: {
   user_id: string;
   amount: number;
@@ -31,7 +67,6 @@ export const createDeposit = async (depositData: {
   return { data, error };
 };
 
-// Get user's deposits
 export const getUserDeposits = async (userId: string): Promise<{ data: Deposit[] | null; error: any }> => {
   const { data, error } = await supabase
     .from('deposits')
@@ -42,7 +77,6 @@ export const getUserDeposits = async (userId: string): Promise<{ data: Deposit[]
   return { data, error };
 };
 
-// Update deposit status (this will trigger the balance update)
 export const updateDepositStatus = async (depositId: string, status: 'success' | 'rejected'): Promise<{ data: Deposit | null; error: any }> => {
   const { data, error } = await supabase
     .from('deposits')
@@ -55,14 +89,4 @@ export const updateDepositStatus = async (depositId: string, status: 'success' |
     .single();
 
   return { data, error };
-};
-
-// Manual balance update function (if needed)
-export const updateUserBalance = async (userId: string, amount: number): Promise<{ error: any }> => {
-  const { error } = await supabase.rpc('increment_balance', {
-    user_id: userId,
-    amount: amount
-  });
-
-  return { error };
 };
