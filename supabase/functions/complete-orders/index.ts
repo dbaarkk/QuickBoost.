@@ -4,12 +4,14 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-api-key',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
 }
 
 interface OrderCompletionRequest {
   order_id?: string;
   api_key?: string;
+  status?: 'completed' | 'processing' | 'partial' | 'refunded';
+  progress?: number;
 }
 
 interface OrderCompletionResponse {
@@ -27,17 +29,17 @@ serve(async (req) => {
 
   try {
     // Initialize Supabase client with service role key
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseUrl = 'https://aubpburchvdzkbpfzbrn.supabase.co'
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     
-    if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error('Missing Supabase configuration')
+    if (!supabaseServiceKey) {
+      throw new Error('Missing Supabase Service Role Key')
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Validate API key for security
-    const API_KEY = Deno.env.get('ORDER_COMPLETION_API_KEY') || 'quickboost-api-2024'
+    // Validate API key for security - USE A STRONG SECRET KEY!
+    const API_KEY = Deno.env.get('ORDER_COMPLETION_API_KEY') || 'quickboost-secure-api-key-2024'
     
     let requestData: OrderCompletionRequest = {}
     
@@ -45,17 +47,29 @@ serve(async (req) => {
       try {
         requestData = await req.json()
       } catch {
-        requestData = {}
+        return new Response(
+          JSON.stringify({
+            status: 'error',
+            message: 'Invalid JSON payload'
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        )
       }
     }
 
-    // Check API key
-    const providedApiKey = requestData.api_key || req.headers.get('x-api-key')
-    if (providedApiKey !== API_KEY) {
+    // Check API key from multiple sources
+    const providedApiKey = requestData.api_key || 
+                          req.headers.get('x-api-key') || 
+                          req.headers.get('authorization')?.replace('Bearer ', '')
+    
+    if (!providedApiKey || providedApiKey !== API_KEY) {
       return new Response(
         JSON.stringify({
           status: 'error',
-          message: 'Invalid API key'
+          message: 'Invalid or missing API key'
         }),
         {
           status: 401,
@@ -64,20 +78,22 @@ serve(async (req) => {
       )
     }
 
+    const targetStatus = requestData.status || 'completed'
+    const targetProgress = requestData.progress || (targetStatus === 'completed' ? 100 : 50)
+
     // If specific order_id provided, complete that order
     if (requestData.order_id) {
       const { data: order, error: fetchError } = await supabase
         .from('orders')
         .select('*')
         .eq('id', requestData.order_id)
-        .eq('status', 'pending')
         .single()
 
       if (fetchError || !order) {
         return new Response(
           JSON.stringify({
             status: 'error',
-            message: 'Order not found or already completed'
+            message: 'Order not found'
           }),
           {
             status: 404,
@@ -86,12 +102,12 @@ serve(async (req) => {
         )
       }
 
-      // Update order to completed with 100% progress
+      // Update order status and progress
       const { error: updateError } = await supabase
         .from('orders')
         .update({
-          status: 'completed',
-          progress: 100,
+          status: targetStatus,
+          progress: targetProgress,
           updated_at: new Date().toISOString()
         })
         .eq('id', requestData.order_id)
@@ -104,7 +120,7 @@ serve(async (req) => {
         JSON.stringify({
           status: 'success',
           order_id: requestData.order_id,
-          message: 'Order completed successfully'
+          message: `Order ${requestData.order_id} updated to ${targetStatus} status`
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -127,7 +143,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           status: 'success',
-          message: 'No pending orders to complete',
+          message: 'No pending orders found',
           completed_orders: 0
         }),
         {
@@ -142,8 +158,8 @@ serve(async (req) => {
     const { error: bulkUpdateError } = await supabase
       .from('orders')
       .update({
-        status: 'completed',
-        progress: 100,
+        status: targetStatus,
+        progress: targetProgress,
         updated_at: new Date().toISOString()
       })
       .in('id', orderIds)
@@ -155,7 +171,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         status: 'success',
-        message: `${pendingOrders.length} orders completed successfully`,
+        message: `${pendingOrders.length} orders updated to ${targetStatus} status`,
         completed_orders: pendingOrders.length
       }),
       {
