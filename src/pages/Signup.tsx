@@ -114,8 +114,6 @@ const Signup = () => {
         setError('Email already registered. Please sign in instead.');
       } else if (error.message?.includes('email')) {
         setError('Invalid email address format.');
-      } else {
-        setError('Signup failed. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
