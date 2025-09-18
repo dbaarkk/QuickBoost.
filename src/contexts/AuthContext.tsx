@@ -1,10 +1,23 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase, UserProfile } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
+
+interface Profile {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone?: string;
+  balance: number;
+  total_orders: number;
+  total_spent: number;
+  created_at: string;
+  updated_at: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  profile: UserProfile | null;
+  profile: Profile | null;
   loading: boolean;
   signUp: (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -20,10 +33,10 @@ export const useAuth = () => {
   return context;
 };
 
-const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
+const getUserProfile = async (userId: string): Promise<Profile | null> => {
   try {
     const { data, error } = await supabase
-      .from('user_profiles')
+      .from('profiles')  // Changed from 'user_profiles' to 'profiles'
       .select('*')
       .eq('id', userId)
       .single();
@@ -35,20 +48,22 @@ const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
     return data;
   } catch (error) {
     console.error('Error fetching profile:', error);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms between retries
+    return null;
   }
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
 
   const refreshProfile = async () => {
     if (!user) return;
     try {
       const profileData = await getUserProfile(user.id);
-      setProfile(profileData);
+      if (profileData) {
+        setProfile(profileData);
+      }
     } catch (error) {
       console.error('Error refreshing profile:', error);
     }
@@ -65,25 +80,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (mounted) {
           if (session?.user) {
             setUser(session.user);
-            // Set profile immediately for faster loading
-            setProfile({
-              id: session.user.id,
-              email: session.user.email || '',
-              first_name: session.user.user_metadata?.first_name || '',
-              last_name: session.user.user_metadata?.last_name || '',
-              phone: session.user.user_metadata?.phone || '',
-              balance: 0,
-              total_orders: 0,
-              total_spent: 0,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            });
-            // Fetch real profile data in background
-            getUserProfile(session.user.id).then(profileData => {
-              if (mounted && profileData) {
-                setProfile(profileData);
+            // Fetch real profile data immediately
+            const profileData = await getUserProfile(session.user.id);
+            if (profileData) {
+              setProfile(profileData);
+            } else {
+              // Create profile if it doesn't exist
+              const { data: newProfile } = await supabase
+                .from('profiles')
+                .insert({
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  first_name: session.user.user_metadata?.first_name || '',
+                  last_name: session.user.user_metadata?.last_name || '',
+                  phone: session.user.user_metadata?.phone || '',
+                  balance: 0,
+                  total_orders: 0,
+                  total_spent: 0
+                })
+                .select()
+                .single();
+              
+              if (newProfile) {
+                setProfile(newProfile);
               }
-            });
+            }
           }
           setLoading(false);
         }
@@ -103,25 +124,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         if (session?.user) {
           setUser(session.user);
-          // Set profile immediately for faster loading
-          setProfile({
-            id: session.user.id,
-            email: session.user.email || '',
-            first_name: session.user.user_metadata?.first_name || '',
-            last_name: session.user.user_metadata?.last_name || '',
-            phone: session.user.user_metadata?.phone || '',
-            balance: 0,
-            total_orders: 0,
-            total_spent: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-          // Fetch real profile data in background
-          getUserProfile(session.user.id).then(profileData => {
-            if (mounted && profileData) {
-              setProfile(profileData);
-            }
-          });
+          // Fetch real profile data
+          const profileData = await getUserProfile(session.user.id);
+          if (profileData) {
+            setProfile(profileData);
+          }
         } else {
           setUser(null);
           setProfile(null);
@@ -148,26 +155,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (error) throw error;
 
-    // Set user and profile immediately for instant redirect
     if (data.user) {
       setUser(data.user);
-      setProfile({
-        id: data.user.id,
-        email: data.user.email || '',
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-        phone: userData.phone || '',
-        balance: 0,
-        total_orders: 0,
-        total_spent: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
-    }
+      
+      // Create profile in the correct table
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          email: data.user.email || '',
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          phone: userData.phone || '',
+          balance: 0,
+          total_orders: 0,
+          total_spent: 0
+        })
+        .select()
+        .single();
 
-    // If user already exists but no session, sign them in
-    if (data.user && !data.session) {
-      await signIn(email, password);
+      if (profileData) {
+        setProfile(profileData);
+      }
     }
   };
 
@@ -180,20 +189,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) throw error;
     if (!data.user) throw new Error('No user data received');
     
-    // Set user and profile immediately for instant redirect
     setUser(data.user);
-    setProfile({
-      id: data.user.id,
-      email: data.user.email || '',
-      first_name: data.user.user_metadata?.first_name || '',
-      last_name: data.user.user_metadata?.last_name || '',
-      phone: data.user.user_metadata?.phone || '',
-      balance: 0,
-      total_orders: 0,
-      total_spent: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    });
+    
+    // Fetch profile from correct table
+    const profileData = await getUserProfile(data.user.id);
+    if (profileData) {
+      setProfile(profileData);
+    }
   };
 
   const signOut = async () => {
