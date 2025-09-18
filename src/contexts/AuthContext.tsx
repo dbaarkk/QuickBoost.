@@ -18,6 +18,7 @@ interface Profile {
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
+  loading: boolean;
   signUp: (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -35,7 +36,7 @@ export const useAuth = () => {
 const getUserProfile = async (userId: string): Promise<Profile | null> => {
   try {
     const { data, error } = await supabase
-      .from('profiles')
+      .from('profiles')  // Changed from 'user_profiles' to 'profiles'
       .select('*')
       .eq('id', userId)
       .single();
@@ -54,6 +55,7 @@ const getUserProfile = async (userId: string): Promise<Profile | null> => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const refreshProfile = async () => {
     if (!user) return;
@@ -67,55 +69,154 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-useEffect(() => {
-  let mounted = true;
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
 
-  const initAuth = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (mounted && session?.user) {
-        setUser(session.user);
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         
-        // Try to get profile - if it doesn't exist, create it
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profileError || !profileData) {
-          // Profile doesn't exist - create it
-          const { data: newProfile } = await supabase
-            .from('profiles')
-            .upsert({
-              id: session.user.id,
-              email: session.user.email || '',
-              first_name: session.user.user_meta_data?.first_name || '',
-              last_name: session.user.user_meta_data?.last_name || '',
-              phone: session.user.user_meta_data?.phone || '',
-              balance: 0,
-              total_orders: 0,
-              total_spent: 0
-            }, {
-              onConflict: 'id'
-            })
-            .select()
-            .single();
-          
-          if (newProfile) {
-            setProfile(newProfile);
+        if (mounted) {
+          if (session?.user) {
+            setUser(session.user);
+            // Fetch real profile data immediately
+            const profileData = await getUserProfile(session.user.id);
+            if (profileData) {
+              setProfile(profileData);
+            } else {
+              // Create profile if it doesn't exist
+              const { data: newProfile } = await supabase
+                .from('profiles')
+                .insert({
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  first_name: session.user.user_metadata?.first_name || '',
+                  last_name: session.user.user_metadata?.last_name || '',
+                  phone: session.user.user_metadata?.phone || '',
+                  balance: 0,
+                  total_orders: 0,
+                  total_spent: 0
+                })
+                .select()
+                .single();
+              
+              if (newProfile) {
+                setProfile(newProfile);
+              }
+            }
           }
-        } else {
-          setProfile(profileData);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setLoading(false);
         }
       }
-    } catch (error) {
-      console.error('Auth initialization error:', error);
+    };
+
+    initAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
+      try {
+        if (session?.user) {
+          setUser(session.user);
+          // Fetch real profile data
+          const profileData = await getUserProfile(session.user.id);
+          if (profileData) {
+            setProfile(profileData);
+          }
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error handling auth state change:', error);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const signUp = async (email: string, password: string, userData: { first_name: string; last_name: string; phone?: string }) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: userData
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.user) {
+      setUser(data.user);
+      
+      // Create profile in the correct table
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          email: data.user.email || '',
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          phone: userData.phone || '',
+          balance: 0,
+          total_orders: 0,
+          total_spent: 0
+        })
+        .select()
+        .single();
+
+      if (profileData) {
+        setProfile(profileData);
+      }
     }
   };
 
-  initAuth();
+  const signIn = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-  // ... rest of your auth listener code
-}, []);
+    if (error) throw error;
+    if (!data.user) throw new Error('No user data received');
+    
+    setUser(data.user);
+    
+    // Fetch profile from correct table
+    const profileData = await getUserProfile(data.user.id);
+    if (profileData) {
+      setProfile(profileData);
+    }
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    
+    setUser(null);
+    setProfile(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{
+      user,
+      profile,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      refreshProfile
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
