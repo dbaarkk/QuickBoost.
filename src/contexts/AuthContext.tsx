@@ -190,3 +190,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+useEffect(() => {
+  let mounted = true;
+
+  const initAuth = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (mounted && session?.user) {
+        setUser(session.user);
+        
+        // Try to get profile - if it doesn't exist, create it
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError || !profileData) {
+          // Profile doesn't exist - create it
+          const { data: newProfile } = await supabase
+            .from('profiles')
+            .upsert({
+              id: session.user.id,
+              email: session.user.email || '',
+              first_name: session.user.user_meta_data?.first_name || '',
+              last_name: session.user.user_meta_data?.last_name || '',
+              phone: session.user.user_meta_data?.phone || '',
+              balance: 0,
+              total_orders: 0,
+              total_spent: 0
+            }, {
+              onConflict: 'id'
+            })
+            .select()
+            .single();
+          
+          if (newProfile) {
+            setProfile(newProfile);
+          }
+        } else {
+          setProfile(profileData);
+        }
+      }
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+    }
+  };
+
+  initAuth();
+
+  // ... rest of your auth listener code
+}, []);
