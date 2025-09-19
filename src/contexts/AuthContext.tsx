@@ -59,7 +59,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  // 🔄 Refresh profile after deposits or updates
   const refreshProfile = async () => {
     if (!user) return;
     try {
@@ -110,11 +109,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
+    // 🔴 Real-time subscription to profile changes
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    if (user) {
+      channel = supabase
+        .channel('profile-changes')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+          (payload) => {
+            console.log('Profile updated in Supabase:', payload);
+            setProfile((prev) => ({ ...prev!, ...payload.new } as Profile));
+          }
+        )
+        .subscribe();
+    }
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      if (channel) supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user]);
 
   const signUp = async (
     email: string,
@@ -134,7 +150,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (data.user) {
       setUser(data.user);
 
-      // Insert profile if not created by a trigger
       const { error: profileError, data: profileData } = await supabase
         .from('profiles')
         .upsert(
