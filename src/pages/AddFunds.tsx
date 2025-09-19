@@ -43,28 +43,27 @@ const upiAmounts = [100, 500, 1000, 2000, 5000, 10000];
 const cryptoAmounts = [10, 20, 50, 100, 200, 1000];
 const currentAmounts = paymentMethod === 'upi' ? upiAmounts : cryptoAmounts;
 
-// Fetch user deposits
+// Fetch user deposits only once when the user logs in
 useEffect(() => {
-const fetchDeposits = async () => {
-if (!user) return;
+  if (!user) return;
 
-try {  
-    const { data, error } = await getUserDeposits(user.id);  
-    if (error) {  
-      console.error('Error fetching deposits:', error);  
-      setDeposits([]);  
-    } else {  
-      setDeposits(data || []);  
-    }  
-  } catch (error) {  
-    console.error('Error fetching deposits:', error);  
-    setDeposits([]);  
-  }  
-};  
+  const fetchDeposits = async () => {
+    try {
+      const { data, error } = await getUserDeposits(user.id);
+      if (error) {
+        console.error('Error fetching deposits:', error);
+        setDeposits([]);
+      } else {
+        setDeposits(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching deposits:', error);
+      setDeposits([]);
+    }
+  };
 
-fetchDeposits();
-
-}, [user]);
+  fetchDeposits();
+}, [user?.id]); // 👈 only run once when user.id changes
 
 const handleAmountSelect = (value: number) => setAmount(value.toString());
 
