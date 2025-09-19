@@ -160,12 +160,17 @@ export const updateUserBalance = async (userId: string, newBalance: number) => {
   }
 };
 
-// Update deposit status
+// Update deposit status - FIXED VERSION
 export const updateDepositStatus = async (depositId: string, status: 'pending' | 'success' | 'rejected') => {
   try {
+    console.log('🔄 Updating deposit status:', { depositId, status });
+    
     const { data, error } = await supabase
       .from('deposits')
-      .update({ status })
+      .update({ 
+        status: status,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', depositId)
       .select()
       .single();
@@ -175,6 +180,7 @@ export const updateDepositStatus = async (depositId: string, status: 'pending' |
       return { data: null, error };
     }
     
+    console.log('✅ Deposit status updated successfully:', data);
     return { data, error: null };
   } catch (error) {
     console.error('❌ Deposit status update exception:', error);
@@ -267,13 +273,14 @@ export const getUserOrders = async (userId: string) => {
   }
 };
 
-// Deposits
+// FIXED createDeposit function
 export const createDeposit = async (depositData: {
   amount: number;
   payment_method: 'upi' | 'crypto';
   utr_number?: string;
   txid?: string;
   status?: 'pending' | 'success' | 'rejected';
+  crypto_type?: string; // Add this if missing
 }) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -281,12 +288,20 @@ export const createDeposit = async (depositData: {
       return { data: null, error: { message: 'User not authenticated' } };
     }
 
+    console.log('💾 Creating deposit:', { userId: user.id, ...depositData });
+
     const { data, error } = await supabase
       .from('deposits')
       .insert({ 
-        user_id: user.id, 
-        status: 'pending',
-        ...depositData 
+        user_id: user.id, // NOT 'user'
+        status: depositData.status || 'pending',
+        amount: depositData.amount,
+        payment_method: depositData.payment_method,
+        utr_number: depositData.utr_number,
+        txid: depositData.txid,
+        crypto_type: depositData.crypto_type,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       })
       .select()
       .single();
@@ -296,29 +311,10 @@ export const createDeposit = async (depositData: {
       return { data: null, error };
     }
     
+    console.log('✅ Deposit created successfully:', data);
     return { data, error: null };
   } catch (error) {
     console.error('❌ Deposit creation exception:', error);
-    return { data: null, error };
-  }
-};
-
-export const getUserDeposits = async (userId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('deposits')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('❌ Deposits fetch error:', error);
-      return { data: null, error };
-    }
-    
-    return { data, error: null };
-  } catch (error) {
-    console.error('❌ Deposits fetch exception:', error);
     return { data: null, error };
   }
 };
