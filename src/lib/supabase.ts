@@ -148,7 +148,7 @@ export const updateUserBalance = async (userId: string, newBalance: number) => {
       .update({ 
         balance: newBalance,
         updated_at: new Date().toISOString()
-      })  // <-- Added missing closing parenthesis
+      })
       .eq('id', userId)
       .select()
       .single();
@@ -164,7 +164,7 @@ export const updateUserBalance = async (userId: string, newBalance: number) => {
     console.error('❌ Balance update exception:', error);
     return { data: null, error };
   }
-};  // <-- Added missing semicolon
+};
 
 // Update deposit status - FIXED VERSION
 export const updateDepositStatus = async (depositId: string, status: 'pending' | 'success' | 'rejected') => {
@@ -286,7 +286,7 @@ export const createDeposit = async (depositData: {
   utr_number?: string;
   txid?: string;
   status?: 'pending' | 'success' | 'rejected';
-  crypto_type?: string; // Add this if missing
+  crypto_type?: string;
 }) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -299,7 +299,7 @@ export const createDeposit = async (depositData: {
     const { data, error } = await supabase
       .from('deposits')
       .insert({ 
-        user_id: user.id, // NOT 'user'
+        user_id: user.id,
         status: depositData.status || 'pending',
         amount: depositData.amount,
         payment_method: depositData.payment_method,
@@ -343,5 +343,26 @@ export const getUserBalance = async (userId: string) => {
   } catch (error) {
     console.error('❌ Balance fetch exception:', error);
     return { balance: 0, error };
+  }
+};
+
+// ADDED: Get user deposits - THIS WAS MISSING
+export const getUserDeposits = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('deposits')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('❌ Deposits fetch error:', error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Deposits fetch exception:', error);
+    return { data: null, error };
   }
 };
