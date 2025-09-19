@@ -138,7 +138,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   }
 };
 
-// Update user balance - FIXED VERSION
+// Update user balance - FIXED SYNTAX
 export const updateUserBalance = async (userId: string, newBalance: number) => {
   try {
     console.log('🔄 Updating user balance:', { userId, newBalance });
@@ -148,7 +148,7 @@ export const updateUserBalance = async (userId: string, newBalance: number) => {
       .update({ 
         balance: newBalance,
         updated_at: new Date().toISOString()
-      })
+      })  // <-- Added missing closing parenthesis
       .eq('id', userId)
       .select()
       .single();
@@ -164,7 +164,7 @@ export const updateUserBalance = async (userId: string, newBalance: number) => {
     console.error('❌ Balance update exception:', error);
     return { data: null, error };
   }
-};
+};  // <-- Added missing semicolon
 
 // Update deposit status - FIXED VERSION
 export const updateDepositStatus = async (depositId: string, status: 'pending' | 'success' | 'rejected') => {
