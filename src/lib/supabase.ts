@@ -166,17 +166,22 @@ export const updateUserBalance = async (userId: string, newBalance: number) => {
   }
 };
 
-// Update deposit status - FIXED VERSION
+// FIXED updateDepositStatus - ensure no extra fields
 export const updateDepositStatus = async (depositId: string, status: 'pending' | 'success' | 'rejected') => {
   try {
     console.log('🔄 Updating deposit status:', { depositId, status });
     
+    // Prepare update data carefully
+    const updateData = {
+      status: status,
+      updated_at: new Date().toISOString()
+    };
+
+    console.log('📝 Update data:', updateData);
+
     const { data, error } = await supabase
       .from('deposits')
-      .update({ 
-        status: status,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', depositId)
       .select()
       .single();
@@ -279,7 +284,7 @@ export const getUserOrders = async (userId: string) => {
   }
 };
 
-// FIXED createDeposit function
+// FIXED createDeposit function - ensure no 'user' field is used
 export const createDeposit = async (depositData: {
   amount: number;
   payment_method: 'upi' | 'crypto';
@@ -296,19 +301,24 @@ export const createDeposit = async (depositData: {
 
     console.log('💾 Creating deposit:', { userId: user.id, ...depositData });
 
+    // Prepare the data object carefully - ONLY include fields that exist in your table
+    const insertData = {
+      user_id: user.id, // CORRECT: This is user_id
+      status: depositData.status || 'pending',
+      amount: depositData.amount,
+      payment_method: depositData.payment_method,
+      utr_number: depositData.utr_number,
+      txid: depositData.txid,
+      crypto_type: depositData.crypto_type,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    console.log('📝 Insert data:', insertData);
+
     const { data, error } = await supabase
       .from('deposits')
-      .insert({ 
-        user_id: user.id,
-        status: depositData.status || 'pending',
-        amount: depositData.amount,
-        payment_method: depositData.payment_method,
-        utr_number: depositData.utr_number,
-        txid: depositData.txid,
-        crypto_type: depositData.crypto_type,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
+      .insert(insertData)
       .select()
       .single();
     
