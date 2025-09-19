@@ -9,10 +9,11 @@ import {
   Shield,
   Clock,
   AlertTriangle,
-  History
+  History,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { createDeposit, getUserDeposits, Deposit } from '../lib/supabase';
+import { createDeposit, getUserDeposits, updateDepositStatus, updateUserBalance, Deposit } from '../lib/supabase';
 import { verifyCryptoPayment } from '../lib/cryptoVerification';
 
 const wallets = [
@@ -24,7 +25,7 @@ const wallets = [
 ];
 
 const AddFunds: React.FC = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'crypto'>('upi');
   const [utrNumber, setUtrNumber] = useState('');
@@ -35,6 +36,7 @@ const AddFunds: React.FC = () => {
   const [submitError, setSubmitError] = useState('');
   const [deposits, setDeposits] = useState<Deposit[]>([]);
   const [verificationStatus, setVerificationStatus] = useState<'success' | 'pending' | 'error' | ''>('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Different predefined amounts for UPI and Crypto
   const upiAmounts = [100, 500, 1000, 2000, 5000, 10000];
@@ -69,6 +71,19 @@ const AddFunds: React.FC = () => {
     navigator.clipboard.writeText(text);
     setCopied(text);
     setTimeout(() => setCopied(''), 2000);
+  };
+
+  const handleRefreshBalance = async () => {
+    if (!user) return;
+    
+    setIsRefreshing(true);
+    try {
+      await refreshProfile();
+    } catch (error) {
+      console.error('Error refreshing balance:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,7 +128,7 @@ const AddFunds: React.FC = () => {
         const verification = await verifyCryptoPayment(txid, 'auto');
         
         if (verification.success) {
-          depositStatus = 'verified';
+          depositStatus = 'success';
           setVerificationStatus('success');
         } else {
           setVerificationStatus('error');
@@ -146,6 +161,21 @@ const AddFunds: React.FC = () => {
         setUtrNumber('');
         setTxid('');
         
+        // Update the user's balance in the database and AuthContext
+        if (depositStatus === 'success' && user) {
+          const newBalance = (profile?.balance || 0) + amountValue;
+          
+          // Update in database
+          const { error: updateError } = await updateUserBalance(user.id, newBalance);
+          
+          if (!updateError) {
+            // Refresh profile to get updated balance
+            await refreshProfile();
+          } else {
+            console.error('Error updating balance:', updateError);
+          }
+        }
+        
         // Refresh deposits list
         if (user) {
           const { data: depositsData } = await getUserDeposits(user.id);
@@ -165,9 +195,47 @@ const AddFunds: React.FC = () => {
     }
   };
 
+  // Function to manually verify a deposit
+  const handleVerifyDeposit = async (depositId: string, depositAmount: number) => {
+    try {
+      const { error } = await updateDepositStatus(depositId, 'success');
+      
+      if (error) {
+        console.error('Error verifying deposit:', error);
+        return;
+      }
+      
+      // Update the deposit in local state
+      setDeposits(prevDeposits => 
+        prevDeposits.map(deposit => 
+          deposit.id === depositId 
+            ? { ...deposit, status: 'success' } 
+            : deposit
+        )
+      );
+      
+      // Update balance if the deposit was successful
+      if (user) {
+        const newBalance = (profile?.balance || 0) + depositAmount;
+        
+        // Update in database
+        const { error: updateError } = await updateUserBalance(user.id, newBalance);
+        
+        if (!updateError) {
+          // Refresh profile to get updated balance
+          await refreshProfile();
+        } else {
+          console.error('Error updating balance:', updateError);
+        }
+      }
+    } catch (error) {
+      console.error('Error verifying deposit:', error);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'verified': return 'text-green-700 bg-green-100';
+      case 'success': return 'text-green-700 bg-green-100';
       case 'pending': return 'text-yellow-700 bg-yellow-100';
       case 'rejected': return 'text-red-700 bg-red-100';
       default: return 'text-gray-700 bg-gray-100';
@@ -176,7 +244,7 @@ const AddFunds: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'verified': return 'Verified';
+      case 'success': return 'Success';
       case 'pending': return 'Pending';
       case 'rejected': return 'Rejected';
       default: return status;
@@ -449,14 +517,24 @@ const AddFunds: React.FC = () => {
           {/* Right Side Info */}
           <div className="space-y-4">
             <div className="bg-[#2A2A2A] rounded-xl shadow-lg border border-[#2A2A2A] p-4">
-              <div className="flex items-center mb-4">
-                <div className="bg-[#00CFFF]/20 p-3 rounded-xl mr-4">
-                  <Wallet className="h-6 w-6 text-[#00CFFF]" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="bg-[#00CFFF]/20 p-3 rounded-xl mr-4">
+                    <Wallet className="h-6 w-6 text-[#00CFFF]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#E0E0E0]">Current Balance</h3>
+                    <p className="text-3xl font-bold text-[#00CFFF]">₹{profile?.balance?.toFixed(2) || '0.00'}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[#E0E0E0]">Current Balance</h3>
-                  <p className="text-3xl font-bold text-[#00CFFF]">₹{profile?.balance.toFixed(2) || '0.00'}</p>
-                </div>
+                <button
+                  onClick={handleRefreshBalance}
+                  disabled={isRefreshing}
+                  className="p-2 bg-[#1E1E1E] rounded-lg hover:bg-[#2A2A2A] transition-colors"
+                  title="Refresh balance"
+                >
+                  <RefreshCw className={`h-5 w-5 text-[#00CFFF] ${isRefreshing ? 'animate-spin' : ''}`} />
+                </button>
               </div>
               {amount && (
                 <div className="bg-[#1E1E1E] rounded-lg p-4 border border-[#2A2A2A]">
@@ -483,9 +561,19 @@ const AddFunds: React.FC = () => {
                     <div key={deposit.id} className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-[#E0E0E0]">₹{deposit.amount.toFixed(2)}</span>
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
-                          {getStatusLabel(deposit.status)}
-                        </span>
+                        <div className="flex items-center">
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>
+                            {getStatusLabel(deposit.status)}
+                          </span>
+                          {deposit.status === 'pending' && (
+                            <button
+                              onClick={() => handleVerifyDeposit(deposit.id, deposit.amount)}
+                              className="ml-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                              Verify
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="text-sm text-[#A0A0A0]">
                         <div className="flex justify-between">
@@ -548,4 +636,4 @@ const AddFunds: React.FC = () => {
   );
 };
 
-export default AddFunds;
+export default AddFunds;   
