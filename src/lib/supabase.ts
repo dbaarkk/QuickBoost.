@@ -20,6 +20,8 @@ const getEnvVariable = (key: string, fallback?: string): string => {
   throw new Error(`Environment variable ${key} is required but not found`);
 };
 
+let supabase;
+
 try {
   const supabaseUrl = getEnvVariable('VITE_SUPABASE_URL');
   const supabaseAnonKey = getEnvVariable('VITE_SUPABASE_ANON_KEY');
@@ -31,7 +33,7 @@ try {
     hasEnvKey: !!getEnvVariable('VITE_SUPABASE_ANON_KEY', null)
   });
 
-  export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
@@ -42,7 +44,7 @@ try {
   console.error('❌ Failed to initialize Supabase client:', error);
   
   // Create a mock client that will throw errors when used
-  export const supabase = {
+  supabase = {
     auth: {
       getUser: () => Promise.resolve({ data: { user: null }, error: new Error('Supabase not initialized') }),
       getSession: () => Promise.resolve({ data: { session: null }, error: new Error('Supabase not initialized') })
@@ -56,6 +58,8 @@ try {
     })
   } as any;
 }
+
+export { supabase };
 
 export interface UserProfile {
   id: string;
