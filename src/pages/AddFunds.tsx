@@ -178,11 +178,10 @@ try {
       }  
     }  
       
-    // Refresh deposits list  
-    if (user) {  
-      const { data: depositsData } = await getUserDeposits(user.id);  
-      if (depositsData) setDeposits(depositsData);  
-    }  
+    // Update deposits locally without full refetch
+if (data && data.length > 0) {
+  setDeposits((prev) => [data[0], ...prev]);
+    }
       
     setTimeout(() => {  
       setShowSuccess(false);  
