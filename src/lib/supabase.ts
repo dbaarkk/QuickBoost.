@@ -1,23 +1,61 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Hardcoded credentials as fallback to ensure they work
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://aubpburchvdzkbpfzbrn.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1YnBidXJjaHZkemticGZ6YnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNDkwOTksImV4cCI6MjA3MjkyNTA5OX0.I372F-Ml5Mv9LnKJGXphBKDcfF5H_g72racwq-il774';
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
 
-console.log('🔧 Supabase Config:', {
-  url: supabaseUrl,
-  keyLength: supabaseAnonKey.length,
-  envUrl: import.meta.env.VITE_SUPABASE_URL,
-  envKeyLength: import.meta.env.VITE_SUPABASE_ANON_KEY?.length
-});
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false
+// Get environment variables with proper error handling
+const getEnvVariable = (key: string, fallback?: string): string => {
+  if (isBrowser) {
+    // In browser, use import.meta.env
+    const value = (import.meta.env as any)[key];
+    if (value) return value;
+  } else {
+    // In Node.js, use process.env
+    const value = process.env[key];
+    if (value) return value;
   }
-});
+  
+  if (fallback) return fallback;
+  
+  throw new Error(`Environment variable ${key} is required but not found`);
+};
+
+try {
+  const supabaseUrl = getEnvVariable('VITE_SUPABASE_URL');
+  const supabaseAnonKey = getEnvVariable('VITE_SUPABASE_ANON_KEY');
+  
+  console.log('🔧 Supabase Config:', {
+    url: supabaseUrl,
+    keyLength: supabaseAnonKey.length,
+    hasEnvUrl: !!getEnvVariable('VITE_SUPABASE_URL', null),
+    hasEnvKey: !!getEnvVariable('VITE_SUPABASE_ANON_KEY', null)
+  });
+
+  export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false
+    }
+  });
+} catch (error) {
+  console.error('❌ Failed to initialize Supabase client:', error);
+  
+  // Create a mock client that will throw errors when used
+  export const supabase = {
+    auth: {
+      getUser: () => Promise.resolve({ data: { user: null }, error: new Error('Supabase not initialized') }),
+      getSession: () => Promise.resolve({ data: { session: null }, error: new Error('Supabase not initialized') })
+    },
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          single: () => Promise.resolve({ data: null, error: new Error('Supabase not initialized') })
+        })
+      })
+    })
+  } as any;
+}
 
 export interface UserProfile {
   id: string;
@@ -68,7 +106,7 @@ export interface Deposit {
   payment_method: 'upi' | 'crypto';
   utr_number?: string;
   txid?: string;
-  status: 'pending' | 'verified' | 'rejected';
+  status: 'pending' | 'success' | 'rejected';
   created_at: string;
   updated_at: string;
 }
@@ -78,7 +116,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   try {
     console.log('🔍 Fetching profile for user:', userId);
     const { data, error } = await supabase
-      .from('user_profiles')
+      .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -93,6 +131,50 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   } catch (error) {
     console.error('❌ Profile fetch exception:', error);
     return null;
+  }
+};
+
+// Update user balance
+export const updateUserBalance = async (userId: string, newBalance: number) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ balance: newBalance })
+      .eq('id', userId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Balance update error:', error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Balance update exception:', error);
+    return { data: null, error };
+  }
+};
+
+// Update deposit status
+export const updateDepositStatus = async (depositId: string, status: 'pending' | 'success' | 'rejected') => {
+  try {
+    const { data, error } = await supabase
+      .from('deposits')
+      .update({ status })
+      .eq('id', depositId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Deposit status update error:', error);
+      return { data: null, error };
+    }
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error('❌ Deposit status update exception:', error);
+    return { data: null, error };
   }
 };
 
@@ -187,6 +269,7 @@ export const createDeposit = async (depositData: {
   payment_method: 'upi' | 'crypto';
   utr_number?: string;
   txid?: string;
+  status?: 'pending' | 'success' | 'rejected';
 }) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -196,7 +279,11 @@ export const createDeposit = async (depositData: {
 
     const { data, error } = await supabase
       .from('deposits')
-      .insert({ user_id: user.id, ...depositData })
+      .insert({ 
+        user_id: user.id, 
+        status: 'pending',
+        ...depositData 
+      })
       .select()
       .single();
     
