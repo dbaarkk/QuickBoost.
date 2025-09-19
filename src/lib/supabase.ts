@@ -138,12 +138,17 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   }
 };
 
-// Update user balance
+// Update user balance - FIXED VERSION
 export const updateUserBalance = async (userId: string, newBalance: number) => {
   try {
+    console.log('🔄 Updating user balance:', { userId, newBalance });
+    
     const { data, error } = await supabase
       .from('profiles')
-      .update({ balance: newBalance })
+      .update({ 
+        balance: newBalance,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', userId)
       .select()
       .single();
@@ -153,6 +158,7 @@ export const updateUserBalance = async (userId: string, newBalance: number) => {
       return { data: null, error };
     }
     
+    console.log('✅ Balance updated successfully:', data);
     return { data, error: null };
   } catch (error) {
     console.error('❌ Balance update exception:', error);
@@ -316,5 +322,26 @@ export const createDeposit = async (depositData: {
   } catch (error) {
     console.error('❌ Deposit creation exception:', error);
     return { data: null, error };
+  }
+};
+
+// Get user balance safely
+export const getUserBalance = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('balance')
+      .eq('id', userId)
+      .single();
+    
+    if (error) {
+      console.error('❌ Balance fetch error:', error);
+      return { balance: 0, error };
+    }
+    
+    return { balance: data.balance || 0, error: null };
+  } catch (error) {
+    console.error('❌ Balance fetch exception:', error);
+    return { balance: 0, error };
   }
 };
