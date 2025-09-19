@@ -568,15 +568,7 @@ return (
                     <div className="flex items-center">  
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(deposit.status)}`}>  
                         {getStatusLabel(deposit.status)}  
-                      </span>  
-                      {deposit.status === 'pending' && (  
-                        <button  
-                          onClick={() => handleVerifyDeposit(deposit.id, deposit.amount)}  
-                          className="ml-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"  
-                        >  
-                          Verify  
-                        </button>  
-                      )}  
+                      </span> 
                     </div>  
                   </div>  
                   <div className="text-sm text-[#A0A0A0]">  
