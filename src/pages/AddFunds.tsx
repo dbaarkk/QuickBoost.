@@ -571,7 +571,11 @@ return (
                       </span>  
                       {deposit.status === 'pending' && (  
                         <button  
-                          onClick={() => handleVerifyDeposit(deposit.id, deposit.amount)}
+                          onClick={() => handleVerifyDeposit(deposit.id, deposit.amount)}  
+                          className="ml-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"  
+                        >  
+                          Verify  
+                        </button>  
                       )}  
                     </div>  
                   </div>  
