@@ -145,19 +145,25 @@ const Dashboard: React.FC = () => {
   ];
 
   const announcements = [
-    {
-      title: '🎉 New Year Special!',
-      message: 'Get 20% extra credits on all deposits above ₹500',
-      type: 'offer',
-      color: 'from-green-500/20 to-emerald-500/20 border-green-500/30'
-    },
-    {
-      title: '⚡ Lightning Fast Delivery',
-      message: 'All Instagram services now deliver within 30 minutes',
-      type: 'update',
-      color: 'from-blue-500/20 to-cyan-500/20 border-blue-500/30'
-    }
-  ];
+  {
+    title: '🎉 New Year Special!',
+    message: 'Get 20% extra credits on all deposits above ₹500',
+    type: 'offer',
+    color: 'from-green-500/20 to-emerald-500/20 border-green-500/30'
+  },
+  {
+    title: '⚡ Lightning Fast Delivery',
+    message: 'All Instagram services now deliver within 30 minutes',
+    type: 'update',
+    color: 'from-blue-500/20 to-cyan-500/20 border-blue-500/30'
+  },
+  {
+    title: '💰 Double Your Deposit!',
+    message: 'Get 100% bonus on deposits above ₹1000',
+    type: 'offer',
+    color: 'from-purple-500/20 to-pink-500/20 border-purple-500/30'
+  }
+];
 
   const menuItems = [
     { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
