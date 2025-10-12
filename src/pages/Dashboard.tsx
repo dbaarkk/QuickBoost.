@@ -146,7 +146,7 @@ const Dashboard: React.FC = () => {
 
   const announcements = [
   {
-    title: '🎉 New Year Special!',
+    title: '🎉 Diwali offer!',
     message: 'Get 20% extra credits on all deposits above ₹500',
     type: 'offer',
     color: 'from-green-500/20 to-emerald-500/20 border-green-500/30'
