@@ -327,7 +327,15 @@ return (
                 className="w-full px-4 py-3 bg-[#1E1E1E] border border-[#2A2A2A] text-[#E0E0E0] placeholder-[#A0A0A0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00CFFF] focus:border-[#00CFFF] transition-all duration-300 text-lg"  
                 min={paymentMethod === 'upi' ? 10 : 1}  
                 required  
-              />  
+              />
+
+              {/* Disclaimer for deposit bonus */}
+{paymentMethod === 'upi' && parseFloat(amount || '0') >= 1000 && (
+  <div className="mt-2 text-sm text-[#00FF7F] flex items-center">
+    <AlertTriangle className="h-4 w-4 mr-1" />
+    <span>🎁 Offer! Get double in wallet on deposits above ₹1000</span>
+  </div>
+)}
               <div className="mt-2 flex items-center text-sm text-[#FF5C5C]">  
                 <AlertTriangle className="h-4 w-4 mr-1 text-[#FF5C5C]" />  
                 <span>  
