@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
 
   const achievements = [
     {
-      title: 'Welcome SHIVAM!',
+      title: 'Welcome Abroad!',
       description: 'Account created successfully',
       icon: <Gift className="h-5 w-5" />,
       completed: true,
