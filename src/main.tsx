@@ -13,3 +13,9 @@ createRoot(rootElement).render(
     <App />
   </StrictMode>
 );
+import { registerSW } from 'virtual:pwa-register'
+
+const updateSW = registerSW({
+  onNeedRefresh() {},
+  onOfflineReady() {}
+})
